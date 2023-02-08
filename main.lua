@@ -4,11 +4,15 @@ Camera = require('lib.humpcam')
 bump = require('lib.bump')
 Class = require('lib.30log')
 Camera = require('lib.humpcam')
-
+--GLOBALS
+MOUSEX, MOUSEY = 0, 0
 
 --requires
 Character = require('classes.characters.Character')
 Player = require('classes.characters.Player')
+
+Weapon = require('classes.weapons.Weapon')
+Pistol = require('classes.weapons.Pistol')
 
 local function mapcreator(x,y,val)
  
@@ -62,9 +66,18 @@ function love.load()
 
   player.camera = Camera(player.x, player.y, 6)
 
+  INVENTORY = {}
+
+  --debug purposes
+  INVENTORY[1] = Pistol()
 
 end
 
+
+function love.mousemoved( x, y)
+    MOUSEX = x
+    MOUSEY = y
+end
 
 
 
@@ -74,20 +87,34 @@ function love.update(dt)
     player:physics(dt)
     local dx,dy = player.x - player.camera.x, player.y - player.camera.y
     player.camera:move(dx/2, dy/2)
+    INVENTORY[1]:update(dt)
+
 end
 
 function love.draw() 
     player.camera:attach()
-   for x = 1, maxX do
-    for y = 1, maxY do
-        local cell = MAP[x][y] 
-        if cell.type == 1 then          
-            love.graphics.setColor(1,1,1)
-            love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16)
-        end
-    end
-   end
 
-   player:draw()
+
+
+        for x = 1, maxX do
+            for y = 1, maxY do
+                local cell = MAP[x][y] 
+                if cell.type == 1 then          
+                    love.graphics.setColor(1,1,1)
+                    love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16)
+                end
+            end
+        end
+
+        player:draw()
+
+        if INVENTORY ~= nil then
+            INVENTORY[1]:draw()
+        end
+  
+
+
    player.camera:detach()
+
+
 end
