@@ -75,8 +75,8 @@ end
 
 
 function love.mousemoved( x, y)
-    MOUSEX = x
-    MOUSEY = y
+    MOUSEX = x / 6
+    MOUSEY = y / 6
 end
 
 
