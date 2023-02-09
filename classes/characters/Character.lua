@@ -20,7 +20,7 @@ end
 function  Character:draw()
 
     love.graphics.draw(self.image, self.x, self.y)
-
+  --  print(self.x, self.y)
 end
 
 function  Character:updateWorld(dt)

@@ -12,15 +12,19 @@ end
 function  Weapon:draw()
    
     love.graphics.draw(self.image, self.x, self.y, self.r)
-
+    
 end
 
 function Weapon:update(dt)
 
-    self.r = math.atan(MOUSEX - (player.x * 6), MOUSEY - (player.y * 6) )
-    self.x, self.y = player.x + 5, player.y
+--[[ 
+    local w = 800 / player.camera.scale
+    local h = 600 / player.camera.scale ]]
 
-    print(player.x * 6, MOUSEX)
+    self.r = math.atan2(MOUSEY - (player.y) , MOUSEX - (player.x ))
+    self.x, self.y = player.x + 4, player.y + 4
+    
+  -- print("mm"..MOUSEX, MOUSEY)
  
 end
 

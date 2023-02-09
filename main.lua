@@ -35,11 +35,32 @@ local function mapcreator(x,y,val)
     
 end
 
+local function lightCalbak(x, y)
+    for x = 1, maxX do
+        for y = 1, maxY do
+            
+            if MAP[x][y].type == 0 then 
+             -- print "atlatszo" 
+              return true
+            else --print "nematlatszo"
+              return false 
+             end
+        end
+    end
+end
+
+function computeCalbak(x, y, r, v)
+if x <= 0 or y <= 0 then print ("x kevesebb mint 0") return end
+if x > maxX or y > maxY then print ("y kevesebb mint 0") return end
+
+ MAP[x][y].visible = true
+
+end
 
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest") 
    -- f =ROT.Display:new(16,16)
-   maxX, maxY = 32, 32
+   maxX, maxY = 16, 16
     em=ROT.Map.EllerMaze:new(maxX, maxY)
 
     mapWorld = bump.newWorld(64)
@@ -54,52 +75,47 @@ function love.load()
     end
   end
 
+  
+
 
   em:create(mapcreator) 
   
-   local playerx = (MAP.emptytiles[1].x * 16) + 4
-   local playery = (MAP.emptytiles[1].y * 16) + 4
- 
+  local playerx = (MAP.emptytiles[1].x * 16) + 4
+  local playery = (MAP.emptytiles[1].y * 16) + 4
 
-  print(playerx, playery)
   player = Player(playerx, playery)
-
+  
   player.camera = Camera(player.x, player.y, 6)
-
+  player.fov=ROT.FOV.Precise:new(lightCalbak)
   INVENTORY = {}
-
+  
   --debug purposes
   INVENTORY[1] = Pistol()
-
+  player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 5, computeCalbak)
+    
 end
-
-
-function love.mousemoved( x, y)
-    MOUSEX = x / 6
-    MOUSEY = y / 6
-end
-
-
 
 function love.update(dt)
+    MOUSEX, MOUSEY = player.camera:worldCoords(love.mouse.getPosition())
     lurker.update()
     player:move(dt)
     player:physics(dt)
-    local dx,dy = player.x - player.camera.x, player.y - player.camera.y
-    player.camera:move(dx/2, dy/2)
-    INVENTORY[1]:update(dt)
 
+    player.camera:lookAt(player.x, player.y)
+    INVENTORY[1]:update(dt)
+   
 end
 
 function love.draw() 
     player.camera:attach()
-
-
-
+    
+    
+    
         for x = 1, maxX do
             for y = 1, maxY do
                 local cell = MAP[x][y] 
-                if cell.type == 1 then          
+
+                if cell.type == 1 and cell.visible then          
                     love.graphics.setColor(1,1,1)
                     love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16)
                 end

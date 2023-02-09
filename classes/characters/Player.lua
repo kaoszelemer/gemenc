@@ -41,6 +41,7 @@ function Player:move(dt)
     if love.keyboard.isDown("d") and
 	self.velx < self.speed then
 		self.velx = self.velx + self.speed * dt
+
 	end
 
 	if love.keyboard.isDown("a") and
@@ -62,7 +63,7 @@ function Player:move(dt)
     self.x, self.y = actualX, actualY
     
     
-     
+    player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 10, computeCalbak)
 
 
 end
