@@ -36,7 +36,7 @@ end
 
 
 function Player:move(dt)
- --   
+
 
     if love.keyboard.isDown("d") and
 	self.velx < self.speed then
@@ -62,9 +62,11 @@ function Player:move(dt)
     local actualX, actualY, cols, len = mapWorld:move(self, self.x, self.y)
     self.x, self.y = actualX, actualY
     
-    
-    player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 10, computeCalbak)
+   
 
+    
+   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
+  --  player.fov:compute(player.x , player.y , 10, computeCalbak)
 
 end
 

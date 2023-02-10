@@ -5,6 +5,13 @@ bump = require('lib.bump')
 Class = require('lib.30log')
 Camera = require('lib.humpcam')
 --GLOBALS
+
+GLOBALS = {
+
+
+
+}
+
 MOUSEX, MOUSEY = 0, 0
 
 --requires
@@ -24,6 +31,7 @@ local function mapcreator(x,y,val)
         x = x,
         y = y}
 
+    
     if val == 1 then
         mapWorld:add(MAP[x][y], MAP[x][y].x * MAP[x][y].w, MAP[x][y].y * MAP[x][y].h, MAP[x][y].w, MAP[x][y].h)
         table.insert(MAP.walltiles, MAP[x][y])
@@ -35,18 +43,18 @@ local function mapcreator(x,y,val)
     
 end
 
-local function lightCalbak(x, y)
-    for x = 1, maxX do
-        for y = 1, maxY do
-            
-            if MAP[x][y].type == 0 then 
-             -- print "atlatszo" 
-              return true
-            else --print "nematlatszo"
-              return false 
-             end
-        end
+local function lightCalbak(fov, x, y)
+
+
+    if x <= 0 or x >= maxX then return end
+    if y <= 0 or y >= maxY then return end
+
+
+    if MAP[x][y].type == 0 then
+        return true
     end
+
+    return false
 end
 
 function computeCalbak(x, y, r, v)
@@ -60,7 +68,7 @@ end
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest") 
    -- f =ROT.Display:new(16,16)
-   maxX, maxY = 16, 16
+   maxX, maxY = 32, 32
     em=ROT.Map.EllerMaze:new(maxX, maxY)
 
     mapWorld = bump.newWorld(64)
@@ -91,7 +99,8 @@ function love.load()
   
   --debug purposes
   INVENTORY[1] = Pistol()
-  player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 5, computeCalbak)
+  player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+ -- player.fov:compute(player.x , player.y , 10, computeCalbak)
     
 end
 

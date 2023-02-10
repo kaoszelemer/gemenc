@@ -13,4 +13,16 @@ function Pistol:init()
 
 end
 
+
+
+function  Shoot()
+
+
+    
+    
+end
+
+
+
+
 return Pistol
