@@ -1,10 +1,11 @@
 local Weapon = Class('Weapon')
 
 
-function Weapon:init(x,y,image)
+function Weapon:init(x,y,image, type)
     self.x = x
     self.y = y
     self.image = image
+    self.type = type
 end
 
 

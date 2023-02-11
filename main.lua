@@ -4,12 +4,10 @@ Camera = require('lib.humpcam')
 bump = require('lib.bump')
 Class = require('lib.30log')
 Camera = require('lib.humpcam')
+Timer = require('lib.humptimer')
 --GLOBALS
 
 GLOBALS = {
-
-
-
 }
 
 MOUSEX, MOUSEY = 0, 0
@@ -20,6 +18,13 @@ Player = require('classes.characters.Player')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
+
+FieldItem = require('classes.items.FieldItem')
+Medpack = require('classes.items.Medpack')
+
+Bullet = require('classes.Bullet')
+
+
 
 local function mapcreator(x,y,val)
  
@@ -58,24 +63,53 @@ local function lightCalbak(fov, x, y)
 end
 
 function computeCalbak(x, y, r, v)
-if x <= 0 or y <= 0 then print ("x kevesebb mint 0") return end
-if x > maxX or y > maxY then print ("y kevesebb mint 0") return end
+if x <= 0 or y <= 0 then  return end
+if x > maxX or y > maxY then return end
 
  MAP[x][y].visible = true
 
 end
 
-function love.load()
-    love.graphics.setDefaultFilter("nearest", "nearest") 
-   -- f =ROT.Display:new(16,16)
-   maxX, maxY = 32, 32
-    em=ROT.Map.EllerMaze:new(maxX, maxY)
+local function initPlayer()
+    local playerx = (MAP.emptytiles[1].x * 16) + 4
+    local playery = (MAP.emptytiles[1].y * 16) + 4
+  
+    player = Player(playerx, playery)
+    
+    player.camera = Camera(player.x, player.y, 6)
+    player.fov=ROT.FOV.Precise:new(lightCalbak)
+    player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+end
 
-    mapWorld = bump.newWorld(64)
-  --  em:create(calbak)
+
+local function spawnItems()
+  
+    local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
+    local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
+    print(ix, iy)
+    print("addded")
+    table.insert(ITEMS, Medpack(ix,iy))
+end
+
+
+
+
+
+function love.load()
+  love.graphics.setDefaultFilter("nearest", "nearest") 
+  
+  maxX, maxY = 32, 32
+  em=ROT.Map.EllerMaze:new(maxX, maxY)
+
+  mapWorld = bump.newWorld(64)
+
   MAP = {}
   MAP.emptytiles = {}
   MAP.walltiles = {}
+  ITEMS = {}
+
+  
+
   for x = 1, maxX do
     MAP[x] = {}
     for y = 1, maxY do
@@ -83,24 +117,24 @@ function love.load()
     end
   end
 
-  
-
-
   em:create(mapcreator) 
-  
-  local playerx = (MAP.emptytiles[1].x * 16) + 4
-  local playery = (MAP.emptytiles[1].y * 16) + 4
 
-  player = Player(playerx, playery)
-  
-  player.camera = Camera(player.x, player.y, 6)
-  player.fov=ROT.FOV.Precise:new(lightCalbak)
+  for i = 1, 16 do
+    spawnItems()
+  end
+
+
+  initPlayer()
+
+
   INVENTORY = {}
-  
+
+  BULLETS = {}
+
   --debug purposes
   INVENTORY[1] = Pistol()
-  player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
- -- player.fov:compute(player.x , player.y , 10, computeCalbak)
+
+
     
 end
 
@@ -109,9 +143,13 @@ function love.update(dt)
     lurker.update()
     player:move(dt)
     player:physics(dt)
+    Timer.update(dt)
 
     player.camera:lookAt(player.x, player.y)
     INVENTORY[1]:update(dt)
+    for i = 1, #BULLETS do
+        BULLETS[i]:update(dt)
+    end
    
 end
 
@@ -137,9 +175,23 @@ function love.draw()
             INVENTORY[1]:draw()
         end
   
+        for i = 1, #BULLETS do
+            BULLETS[i]:draw()
+        end
 
+        for i = 1, #ITEMS do
+         --   print(ITEMS[i].x)
+            ITEMS[i]:draw()
+        end
 
    player.camera:detach()
 
 
 end
+
+
+function love.mousepressed(x, y, button, istouch)
+    if button == 1 then 
+        player:action(MOUSEX,MOUSEY)
+    end
+ end
