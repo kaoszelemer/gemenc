@@ -11,6 +11,8 @@ GLOBALS = {
 }
 
 MOUSEX, MOUSEY = 0, 0
+maxX, maxY = 16, 16
+
 
 --requires
 Character = require('classes.characters.Character')
@@ -59,6 +61,9 @@ local function lightCalbak(fov, x, y)
         return true
     end
 
+
+
+
     return false
 end
 
@@ -67,6 +72,7 @@ if x <= 0 or y <= 0 then  return end
 if x > maxX or y > maxY then return end
 
  MAP[x][y].visible = true
+ 
 
 end
 
@@ -86,9 +92,14 @@ local function spawnItems()
   
     local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
     local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
-    print(ix, iy)
-    print("addded")
-    table.insert(ITEMS, Medpack(ix,iy))
+    local tx = ix /16
+    local ty = iy /16
+    if MAP[tx][ty].type == 0 then
+        table.insert(ITEMS, Medpack(ix,iy))
+        MAP[tx][ty].type = 2
+    end
+    
+
 end
 
 
@@ -98,7 +109,7 @@ end
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest") 
   
-  maxX, maxY = 32, 32
+
   em=ROT.Map.EllerMaze:new(maxX, maxY)
 
   mapWorld = bump.newWorld(64)
@@ -106,6 +117,7 @@ function love.load()
   MAP = {}
   MAP.emptytiles = {}
   MAP.walltiles = {}
+  MAP.itemtiles = {}
   ITEMS = {}
 
   
@@ -150,6 +162,11 @@ function love.update(dt)
     for i = 1, #BULLETS do
         BULLETS[i]:update(dt)
     end
+
+    for i = 1, #ITEMS do
+        ITEMS[i]:updateVisibility()
+    end
+   
    
 end
 

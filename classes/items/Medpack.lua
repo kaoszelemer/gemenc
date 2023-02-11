@@ -14,9 +14,27 @@ function Medpack:init(x, y)
 )
 
     mapWorld:add(self, self.x, self.y, self.w, self.h)
-    self.visible = true
+    self.visible = false
+
+    self.tilex = math.floor(self.x / self.w)
+    self.tiley = math.floor(self.x / self.h)
+
 end
 
+
+function Medpack:updateVisibility()
+
+            print(MAP[self.tilex][self.tilex].type)
+         --[[    if MAP[self.tilex][self.tilex].type == 2 then
+                self.visible = true
+            end ]]
+
+            if MAP[self.tilex][self.tiley].visible and not self.pickedup then
+                self.visible = true
+            end
+
+   
+end
 
 
 function Medpack:draw()
@@ -30,8 +48,11 @@ end
 
 function Medpack:action()
 
-    self.visible = false
-
+    if self.visible ~= false then
+        self.visible = false
+        self.pickedup = true
+        print(self.tilex, self.tiley)
+    end
 
 end
 

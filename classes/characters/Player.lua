@@ -97,7 +97,7 @@ function Player:move(dt)
    
 
     
-   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
+   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 2, computeCalbak)
 
 
 end
