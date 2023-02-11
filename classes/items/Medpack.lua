@@ -17,42 +17,51 @@ function Medpack:init(x, y)
     self.visible = false
 
     self.tilex = math.floor(self.x / self.w)
-    self.tiley = math.floor(self.x / self.h)
+    self.tiley = math.floor(self.y / self.h)
 
 end
 
 
 function Medpack:updateVisibility()
 
-            print(MAP[self.tilex][self.tilex].type)
-         --[[    if MAP[self.tilex][self.tilex].type == 2 then
-                self.visible = true
-            end ]]
+    --      print(MAP[self.tilex][self.tilex].type)
+       --[[    if MAP[self.tilex][self.tilex].type == 2 then
+              self.visible = true
+          end ]]
 
-            if MAP[self.tilex][self.tiley].visible and not self.pickedup then
-                self.visible = true
-            end
+          if MAP[self.tilex][self.tiley].visible and not self.pickedup then
+              self.visible = true
+          end
 
-   
+ 
 end
 
 
 function Medpack:draw()
 
-    if self.visible then
-        love.graphics.draw(self.image, self.x, self.y)
-    end
+  if self.visible then
+      love.graphics.draw(self.image, self.x, self.y)
+  end
 
 
 end
 
 function Medpack:action()
 
-    if self.visible ~= false then
+    if not self.pickedup then
         self.visible = false
         self.pickedup = true
-        print(self.tilex, self.tiley)
+      --  print(self.tilex, self.tiley)
+        MAP[self.tilex][self.tiley].type = 0
+       -- print("itt")
+ 
+
+    for i = 1, #ITEMS do
+        if ITEMS[i] == self then
+            table.remove(ITEMS, i)
+        end
     end
+end
 
 end
 

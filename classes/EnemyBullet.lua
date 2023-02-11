@@ -1,6 +1,6 @@
-local Bullet = Class('Bullet')
+local EnemyBullet = Class('EnemyBullet')
 
-function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, visible, type)
+function EnemyBullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, visible, type)
     self.x = x
     self.y = y
     self.targetx = targetx
@@ -8,10 +8,10 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
     self.parent = parent
     self.w = 1
     self.h = 1
-    self.velx = 50
-    self.vely = 50
+    self.velx = 1
+    self.vely = 1
     self.visible = true
-    self.type = "Bullet"
+    self.type = "EnemyBullet"
 
     self.removed = false
     print(self, " added")
@@ -19,12 +19,13 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
 
 end
 
-local function bulletFilter(item, other)
-    if other.type == 2 or other.type == 3 then
+local function EnemyBulletFilter(item, other)
+    if item.parent == other.parent then return nil end
+    if other.type == 3 then
         
         return nil
     
-    elseif other.type == 1 or other.type == "enemy" then
+    elseif other.type == 1 or other.type == 2 then
 
         return "touch"
     else return nil
@@ -32,7 +33,7 @@ local function bulletFilter(item, other)
 end
 
 
-function Bullet:draw()
+function EnemyBullet:draw()
 
     if self.visible then
 
@@ -48,7 +49,7 @@ function Bullet:draw()
 end
 
 
-function Bullet:update(dt)
+function EnemyBullet:update(dt)
 
 
     if self.removed ~= true then
@@ -59,15 +60,16 @@ function Bullet:update(dt)
         self.x = self.x + self.velx * dt
         self.y = self.y + self.vely * dt
 
-        local _, _, cols, len = mapWorld:move(self, self.x, self.y, bulletFilter)
+        local _, _, cols, len = mapWorld:move(self, self.x, self.y, EnemyBulletFilter)
         for i = 1, #cols do
-           print("type: "..cols[i].other.type)
-            if cols[i].other.type == "enemy" then
-                cols[i].other:kill()
+            print(    cols[i].other.EnemyBulletshot)
+            if cols[i].other.type == 2 then
+                player.hp = player.hp - 1
                 self.visible = false
                 self.removed = true
-                INVENTORY[1].bulletshot = false
-                print(self, "  removed cos kill")
+                Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
+             
+                print(self, "  removed cos playerhit")
                 mapWorld:remove(self)
             end
                 
@@ -78,8 +80,8 @@ function Bullet:update(dt)
                 
                 self.visible = false
                 self.removed = true
-                INVENTORY[1].bulletshot = false
-                print(self, "  removed cos hit")
+                Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
+                print(self, "  removed cos wallhit")
                 mapWorld:remove(self)
                 return
             end
@@ -90,18 +92,16 @@ function Bullet:update(dt)
             
         end
         
-        local distance = math.sqrt((MOUSEX - self.x)^2 + (MOUSEY - self.y)^2)
+        local distance = math.sqrt((self.x - player.x)^2 + (self.y - player.y)^2)
         
-        if distance <= 5 and self.removed ==false then
+        if distance <= 1 and self.removed ==false then
             self.visible = false
             self.removed = true
-            INVENTORY[1].bulletshot = false
+            self.parent.EnemyBulletshot = false
             print(self, "  removed cos distance")
             mapWorld:remove(self)
             return
         end
-
-
 
 
     end
@@ -117,4 +117,4 @@ end
 
 
 
-return Bullet
+return EnemyBullet

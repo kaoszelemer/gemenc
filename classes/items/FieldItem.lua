@@ -11,4 +11,6 @@ function FieldItem:init(x,y,w,h,image, type)
 end
 
 
+
+
 return FieldItem

@@ -19,7 +19,7 @@ end
 function Pistol:shoot(x, y)
     
     if self.bulletshot ~= true then
-        table.insert(BULLETS, Bullet(self.x,self.y, x, y))
+        table.insert(BULLETS, Bullet(self.x,self.y, x, y, player))
         print("inserting bullet")
         self.bulletshot = true
     end

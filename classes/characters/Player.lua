@@ -9,7 +9,7 @@ function Player:init(x, y)
     8,
     8,
     {
-        name = "abi",
+        name = "gemenc",
         x = x,
         y = y,
         w = 8,
@@ -24,14 +24,18 @@ function Player:init(x, y)
     2 -- type
 
 )
+self.tx = math.floor(self.x / 16)
+self.ty = math.floor(self.y / 16)
 
   mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
-  
+  self.visible = true
+
+  self.hp = 10
 end
 
 local function  playerFilter(item, other)
     if other.type == 1 then
-        return "slide"
+        return "touch"
     elseif other.type == 4 then
         return "cross"
     else
@@ -40,6 +44,10 @@ local function  playerFilter(item, other)
 end
 
 
+function Player:update(dt)
+    self.tx = math.floor(self.x / 16)
+    self.ty = math.floor(self.y / 16)
+end
 
 
 function Player:physics(dt)
@@ -97,7 +105,7 @@ function Player:move(dt)
    
 
     
-   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 2, computeCalbak)
+   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
 
 
 end
@@ -105,7 +113,10 @@ end
 
 function Player:action(x,y)
 
-    INVENTORY[1]:shoot(x,y)
+    if self.munition > 0 then
+        self.munition = self.munition - 1
+        INVENTORY[1]:shoot(x,y)
+    end
 
 end
 
