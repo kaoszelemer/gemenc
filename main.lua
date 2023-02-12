@@ -168,34 +168,42 @@ end
 
 
 function changeLevel()
-
+    MAP.type = nil
    ENEMIES = {}
    ITEMS = {}
  
    print("changing level")
    local case = love.math.random(1,4)
    local mapmaker
-      if case == 1 then
-   mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
-   print("ellermaze")
-   elseif case == 2 then
-    mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-   -- mapmaker = ROT.Map.Uniform:new(maxX, maxY)
-    print("dungeon")
-   elseif case == 3 then
-    mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-    print("cellular")
-   elseif case == 4 then
-    print("IceyMaze")
-    mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
-   end
-
    for x = 1, maxX do
     MAP[x] = {}
     for y = 1, maxY do
         MAP[x][y] = 0
     end
+    end
+if case == 1 then
+  mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
+  print("ellermaze")
+  --[[ elseif case == 2 then
+   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
+  -- mapmaker = ROT.Map.Uniform:new(maxX, maxY)
+   print("dungeon") ]]
+  elseif case == 3 then
+   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
+   MAP.type = "Cellular"
+   print("cellular")
+  elseif case == 2 then
+   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
+   MAP.type = "Cellular"
+   print("cellular")
+  elseif case == 4 then
+   print("IceyMaze")
+   mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
   end
+if MAP.type == "Cellular" then
+    mapmaker:randomize(0.5)
+
+end
   
   mapWorld = bump.newWorld(64)
     mapmaker:create(mapcreator) 
@@ -269,55 +277,58 @@ function love.load()
 
     mapmaker:create(mapcreator) 
 
-    if MAP.type == "Cellular" then
-
-        for i = 0, maxX - 1 do
-            local a = MAP[1 + i][1]
-            local b = MAP[1][1 + i]
-            local c = MAP[maxX - i][1]
-            local d = MAP[1][maxY - i]
-           
-            for f = 1, #MAP.emptytiles do
-                
-                local g = MAP.emptytiles[f]
-                if g ~= nil then
-                    if (g.x == a.x and g.y == a.y) or (g.x == b.x and g.y == b.y) or (g.x == c.x and g.y == c.y) or (g.x == d.x and g.y == d.y) then
-                        print(a.x)
-                        table.remove(MAP.emptytiles, f)
+ --[[    if MAP.type == "Cellular" then
+        local maxix = maxX - 1
+        if maxix ~= nil then
+            for i = 0, maxix do
+            
+                local a = MAP[1 + i][1]
+                local b = MAP[1][1 + i]
+                local c = MAP[maxX - i][1]
+                local d = MAP[1][maxY - i]
+            
+                for f = 1, #MAP.emptytiles do
+                    
+                    local g = MAP.emptytiles[f]
+                    if g ~= nil then
+                        if (g.x == a.x and g.y == a.y) or (g.x == b.x and g.y == b.y) or (g.x == c.x and g.y == c.y) or (g.x == d.x and g.y == d.y) then
+                            print(a.x)
+                            table.remove(MAP.emptytiles, f)
+                        end
                     end
+        
                 end
-    
-            end
 
-            if a.type ~= 1 then
-           
-                a.type = 1
-                table.insert(MAP.walltiles, a)
-                mapWorld:add(a, a.x,a.y,a.w,a.h)
-            end
-            if b.type ~= 1 then
-                b.type = 1
-                table.insert(MAP.walltiles,  b)
-                mapWorld:add(b, b.x,b.y,b.w,b.h)
-            end
-            if c.type ~= 1 then
-                c.type = 1
-                table.insert(MAP.walltiles, c)
-                mapWorld:add(c, c.x,c.y,c.w,c.h)
-             end
-            if d.type ~= 1 then
-                d.type = 1
-                table.insert(MAP.walltiles, d)
-                mapWorld:add(d, d.x,d.y,d.w,d.h)
-            end
+                if a.type ~= 1 then
+            
+                    a.type = 1
+                    table.insert(MAP.walltiles, a)
+                    mapWorld:add(a, a.x,a.y,a.w,a.h)
+                end
+                if b.type ~= 1 then
+                    b.type = 1
+                    table.insert(MAP.walltiles,  b)
+                    mapWorld:add(b, b.x,b.y,b.w,b.h)
+                end
+                if c.type ~= 1 then
+                    c.type = 1
+                    table.insert(MAP.walltiles, c)
+                    mapWorld:add(c, c.x,c.y,c.w,c.h)
+                end
+                if d.type ~= 1 then
+                    d.type = 1
+                    table.insert(MAP.walltiles, d)
+                    mapWorld:add(d, d.x,d.y,d.w,d.h)
+                end
 
-         
-        end
+            
+            end
+        end ]]
 
 
         
 
-    end
+   -- end
 
     initPlayer()
 

@@ -50,6 +50,20 @@ end
 function Player:update(dt)
     self.tx = math.floor(self.x / 16)
     self.ty = math.floor(self.y / 16)
+    if self.x < 18 then
+        print("soimethin")
+        self.x = 18
+    end
+    if self.y < 18 then
+        self.y = 18
+    end
+    if self.x > ((maxX) * 16) +4 then
+        self.x = ((maxX) * 16)+4
+    end
+    if self.y > ((maxY) * 16)+4 then
+        self.y = ((maxY) * 16)+4
+    end
+
 end
 
 
