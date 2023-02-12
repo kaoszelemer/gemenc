@@ -44,6 +44,7 @@ function Medpack:action()
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
+        player.hp = player.hp + 1
       --  print(self.tilex, self.tiley)
         MAP[self.tilex][self.tiley].type = 0
        -- print("itt")

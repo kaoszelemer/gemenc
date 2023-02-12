@@ -1,6 +1,6 @@
-local Ammo = FieldItem:extend('Ammo')
+local DrillItem = FieldItem:extend('DrillItem')
 
-function Ammo:init(x, y)
+function DrillItem:init(x, y)
 
     FieldItem.init(
     self,
@@ -8,7 +8,7 @@ function Ammo:init(x, y)
     y,
     16,
     16,
-    love.graphics.newImage("assets/ammo.png"),
+    love.graphics.newImage("assets/drillitem.png"),
     4
   
 )
@@ -22,7 +22,7 @@ function Ammo:init(x, y)
 end
 
 
-function Ammo:updateVisibility()
+function DrillItem:updateVisibility()
 
       --      print(MAP[self.tilex][self.tilex].type)
          --[[    if MAP[self.tilex][self.tilex].type == 2 then
@@ -37,7 +37,7 @@ function Ammo:updateVisibility()
 end
 
 
-function Ammo:draw()
+function DrillItem:draw()
 
     if self.visible then
         love.graphics.draw(self.image, self.x, self.y)
@@ -46,16 +46,17 @@ function Ammo:draw()
 
 end
 
-function Ammo:action()
+function DrillItem:action()
 
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
-        player.munition = player.munition + 5
+        
       --  print(self.tilex, self.tiley)
-        MAP[self.tilex][self.tiley].type = 0
+     
        -- print("itt")
- 
+        table.insert(INVENTORY, Drill())
+        print(#INVENTORY)
 
     for i = 1, #ITEMS do
         if ITEMS[i] == self then
@@ -66,4 +67,4 @@ end
 
 end
 
-return Ammo
+return DrillItem

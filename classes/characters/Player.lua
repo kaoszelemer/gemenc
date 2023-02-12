@@ -64,6 +64,17 @@ function Player:update(dt)
         self.y = ((maxY) * 16)+4
     end
 
+    if #INVENTORY > 1 then
+        if love.keyboard.isDown("q") and not self.changingweapon then
+            self.changingweapon = true
+            local oldi = INVENTORY[1]
+            INVENTORY[1] = INVENTORY[2]
+            INVENTORY[2] = oldi
+            print(INVENTORY[1], INVENTORY[2])
+            Timer.after(0.1, function() self.changingweapon = nil end)
+        end
+    end
+
 end
 
 
@@ -109,7 +120,7 @@ function Player:move(dt)
 
 
         if len == 1 and cols[i].other.type ~= 4 then
-            print(cols[i].other)
+           -- print(cols[i].other)
             self.velx, self.vely = 0,0
         end
         
@@ -134,8 +145,17 @@ function Player:action(x,y)
 
     if self.munition > 0 then
         self.munition = self.munition - 1
+        self.bulletshot = true
         INVENTORY[1]:shoot(x,y)
     end
+
+
+        if INVENTORY[1]:instanceOf(Drill) then
+            self.bulletshot = true
+            INVENTORY[1]:shoot(x,y)
+        end
+
+    
 
 end
 

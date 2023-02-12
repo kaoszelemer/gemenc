@@ -130,7 +130,7 @@ function EnemyBullet:update(dt)
         end
         
         local distance = math.sqrt((self.targetx - (self.x))^2 + (self.targety - (self.y))^2)
-        print(distance, self.maxbulletdistance)
+       -- print(distance, self.maxbulletdistance)
      
         if distance <= 1 and self.removed ~= true then
             self.visible = false

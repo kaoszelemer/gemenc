@@ -22,15 +22,18 @@ Enemy = require('classes.characters.Enemy')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
+Drill = require('classes.weapons.Drill')
 
 FieldItem = require('classes.items.FieldItem')
 Medpack = require('classes.items.Medpack')
 Ammo = require('classes.items.Ammo')
+DrillItem = require('classes.items.DrillItem')
 
 Stairs = require('classes.items.Stairs')
 
 Bullet = require('classes.Bullet')
 EnemyBullet = require('classes.EnemyBullet')
+DrillBullet = require('classes.DrillBullet')
 
 
 local function mapcreator(x,y,val)
@@ -43,25 +46,26 @@ local function mapcreator(x,y,val)
         x = x,
         y = y}
 
-    
-    if val == 1 then
-        mapWorld:add(MAP[x][y], MAP[x][y].x * MAP[x][y].w, MAP[x][y].y * MAP[x][y].h, MAP[x][y].w, MAP[x][y].h)
-        table.insert(MAP.walltiles, MAP[x][y])
-    end
+        
+        if val == 1 then
+            mapWorld:add(MAP[x][y], MAP[x][y].x * MAP[x][y].w, MAP[x][y].y * MAP[x][y].h, MAP[x][y].w, MAP[x][y].h)
+            table.insert(MAP.walltiles, MAP[x][y])
+        end
+        
+     --[[    if x == 4 and y == 4 then
+            
+            val = 0
+        end ]]
 
     if val == 0 then
-        
-        print(i)
-        MAP[x][y].k = i
         table.insert(MAP.emptytiles, MAP[x][y])
     end
 
-    
+ --   print(MAP[x][y].type)
   
 
     
 end
-
 
 local function lightCalbak(fov, x, y)
 
@@ -91,17 +95,30 @@ end
 
 end
 
-local function initPlayer()
+local function initPlayer(p)
+   -- print(MAP.emptytiles[1].x * 16, "KAJAJAJSKJDSLJDSLKJDKLJ")
     local playerx = (MAP.emptytiles[1].x * 16) + 4
     local playery = (MAP.emptytiles[1].y * 16) + 4
-  
-    player = Player(playerx, playery)
     
-    player.camera = Camera(player.x, player.y, 6)
-    player.fov=ROT.FOV.Precise:new(lightCalbak)
-    player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+    player = Player(playerx, playery)
+    if p == nil then
+       
+        player.camera = Camera(player.x, player.y, 6)
+        player.fov=ROT.FOV.Precise:new(lightCalbak)
+        player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
 
-    player.munition = 5
+        player.munition = 5
+    else
+        player.camera = Camera(player.x, player.y, 6)
+        player.fov=ROT.FOV.Precise:new(lightCalbak)
+        player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+        player.hp = p.hp
+        player.munition = p.munition
+        player.x = playerx
+        player.y = playery
+        player.tx = math.floor(playerx / 16)
+        player.ty = math.floor(playery / 16)
+    end
 end
 
 
@@ -133,6 +150,12 @@ local function spawnItems(mpnum, bunum)
         end
     end
 
+    if LEVEL == 2 then
+     
+        table.insert(ITEMS, DrillItem(player.x + 8,player.y))
+    
+    end
+
       
 
 end
@@ -156,63 +179,121 @@ local function spawnStairs()
 
     for x = maxX /2, maxX do
         for y = maxY /2, maxY do
+         --   print(MAP[x][y].occupied ~= true)
             if MAP[x][y].occupied ~= true and MAP[x][y].type == 0 and not MAP.stairsinserted then
                 MAP[x][y].occupied = true
                 table.insert(ITEMS, Stairs(x * 16, y * 16))
                 MAP.stairsinserted = true
+                print("stairs inserted")
             end
         end
     end
 
 end
 
+local function chooseRandomMap()
+    local case = love.math.random(1,4)
+    local mapmaker
+    if LEVEL == 1 then case = 1  end
+    if case == 1 then
+        maxX, maxY = 16,16
+        mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
+        print("ellermaze")
+        MAP.type = "ellermaze"
+    elseif case == 3 then
+        maxX, maxY = 48,48
+       mapmaker = ROT.Map.Cellular:new(maxX, maxY)
+       MAP.type = "Cellular"
+       print("cellular")
+
+    elseif case == 2 then
+        maxX, maxY = 64,64
+        local rng = {4}
+        mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {3,2,4,4})
+        MAP.type = "Uniform"
+        print("Uniform")
+    elseif case == 4 then
+        maxX, maxY = 32,32
+        MAP.type = "IceyMaze"
+       mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
+    end
+
+  
+    return mapmaker
+
+end
+
+local function setDifficultyForMapAndLevel()
+    if MAP.type == "Cellular" then
+        MAP.maxitem = {10, 24}
+        MAP.maxenemy = 50 + LEVEL
+      end
+      if MAP.type == "ellermaze" then
+        MAP.maxitem = {5, 8}
+        MAP.maxenemy = 10 + LEVEL
+      end
+      if MAP.type == "Uniform" then
+        MAP.maxitem = {20, 40}
+        MAP.maxenemy = 80 + LEVEL
+      end
+      if MAP.type == "IceyMaze" then
+        MAP.maxitem = {8, 12}
+        MAP.maxenemy = 30 + LEVEL
+      end
+end
+
 
 function changeLevel()
-    MAP.type = nil
+    LEVEL = LEVEL + 1
+   MAP = {}
    ENEMIES = {}
    ITEMS = {}
+   MAP.walltiles = {}
+   MAP.emptytiles = {}
+   MAP.itemtiles = {}
+   for i = 1, #BULLETS do
  
-   print("changing level")
-   local case = love.math.random(1,4)
-   local mapmaker
+    if BULLETS[i] ~= nil then
+   
+        table.remove(BULLETS, i)
+      
+    end
+  end
+   BULLETS = {}
+   print("changing level to level"..LEVEL)
+
+
+   local mapmaker = chooseRandomMap()
+  
    for x = 1, maxX do
     MAP[x] = {}
     for y = 1, maxY do
-        MAP[x][y] = 0
+        MAP[x][y] = {}
     end
-    end
-if case == 1 then
-  mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
-  print("ellermaze")
-  --[[ elseif case == 2 then
-   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-  -- mapmaker = ROT.Map.Uniform:new(maxX, maxY)
-   print("dungeon") ]]
-  elseif case == 3 then
-   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-   MAP.type = "Cellular"
-   print("cellular")
-  elseif case == 2 then
-   mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-   MAP.type = "Cellular"
-   print("cellular")
-  elseif case == 4 then
-   print("IceyMaze")
-   mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
-  end
+   end
+   
+  -- 
+ 
 if MAP.type == "Cellular" then
     mapmaker:randomize(0.5)
 
 end
+
+
+
   
-  mapWorld = bump.newWorld(64)
+    mapWorld = bump.newWorld(64)
     mapmaker:create(mapcreator) 
-    initPlayer()
-    player.fov=ROT.FOV.Precise:new(lightCalbak)
-    print("cssc")
+    setDifficultyForMapAndLevel()
+    initPlayer(player)
     spawnStairs()
-    spawnItems(5,12)
-    spawnEnemies(10)
+
+    spawnItems(MAP.maxitem[1],MAP.maxitem[2])
+    spawnEnemies(MAP.maxenemy)
+
+    player.fov=ROT.FOV.Precise:new(lightCalbak)
+  
+
 
     
 end
@@ -225,17 +306,18 @@ function love.load()
   love.mouse.setVisible(false)
   mouseReticleImage = love.graphics.newImage("assets/reticle.png")
 
-  local case = love.math.random(1,4)
-    local mapmaker
-    
+
     
     
     mapWorld = bump.newWorld(64)
     
     MAP = {}
+    LEVEL = 1
     MAP.emptytiles = {}
     MAP.walltiles = {}
     MAP.itemtiles = {}
+    MAP.maxitem = {5, 12}
+    MAP.maxenemy = 10
     ITEMS = {}
     ENEMIES = {}
     TILES = {
@@ -244,97 +326,37 @@ function love.load()
     }
     
     
-    
+    local mapmaker = chooseRandomMap()
     for x = 1, maxX do
         MAP[x] = {}
         for y = 1, maxY do
             MAP[x][y] = 0
         end
     end
-    if case == 1 then
-      mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
-      print("ellermaze")
-      --[[ elseif case == 2 then
-       mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-      -- mapmaker = ROT.Map.Uniform:new(maxX, maxY)
-       print("dungeon") ]]
-      elseif case == 3 then
-       mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-       MAP.type = "Cellular"
-       print("cellular")
-      elseif case == 2 then
-       mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-       MAP.type = "Cellular"
-       print("cellular")
-      elseif case == 4 then
-       print("IceyMaze")
-       mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
-      end
+    setDifficultyForMapAndLevel()
+    
     if MAP.type == "Cellular" then
+        
         mapmaker:randomize(0.5)
 
     end
 
+--[[     if MAP.type == "Uniform" then
+        for x = 1, maxX do
+            MAP[x] = {}
+            for y = 1, maxY do
+                MAP[x][y] = {}
+            end
+        end
+    end ]]
     mapmaker:create(mapcreator) 
 
- --[[    if MAP.type == "Cellular" then
-        local maxix = maxX - 1
-        if maxix ~= nil then
-            for i = 0, maxix do
-            
-                local a = MAP[1 + i][1]
-                local b = MAP[1][1 + i]
-                local c = MAP[maxX - i][1]
-                local d = MAP[1][maxY - i]
-            
-                for f = 1, #MAP.emptytiles do
-                    
-                    local g = MAP.emptytiles[f]
-                    if g ~= nil then
-                        if (g.x == a.x and g.y == a.y) or (g.x == b.x and g.y == b.y) or (g.x == c.x and g.y == c.y) or (g.x == d.x and g.y == d.y) then
-                            print(a.x)
-                            table.remove(MAP.emptytiles, f)
-                        end
-                    end
-        
-                end
-
-                if a.type ~= 1 then
-            
-                    a.type = 1
-                    table.insert(MAP.walltiles, a)
-                    mapWorld:add(a, a.x,a.y,a.w,a.h)
-                end
-                if b.type ~= 1 then
-                    b.type = 1
-                    table.insert(MAP.walltiles,  b)
-                    mapWorld:add(b, b.x,b.y,b.w,b.h)
-                end
-                if c.type ~= 1 then
-                    c.type = 1
-                    table.insert(MAP.walltiles, c)
-                    mapWorld:add(c, c.x,c.y,c.w,c.h)
-                end
-                if d.type ~= 1 then
-                    d.type = 1
-                    table.insert(MAP.walltiles, d)
-                    mapWorld:add(d, d.x,d.y,d.w,d.h)
-                end
-
-            
-            end
-        end ]]
-
-
-        
-
-   -- end
 
     initPlayer()
-
+    print(MAP.maxitem)
   spawnStairs()
-    spawnItems(5,12)
-    spawnEnemies(10)
+    spawnItems(MAP.maxitem[1],MAP.maxitem[2])
+    spawnEnemies(MAP.maxenemy)
 
 
 
