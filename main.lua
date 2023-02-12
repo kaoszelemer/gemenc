@@ -194,7 +194,7 @@ end
 local function chooseRandomMap()
     local case = love.math.random(1,4)
     local mapmaker
-    if LEVEL == 1 then case = 1  end
+    if LEVEL == 1 then case = 2  end
     if case == 1 then
         maxX, maxY = 16,16
         mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
@@ -242,6 +242,24 @@ local function setDifficultyForMapAndLevel()
       end
 end
 
+local function setTileImagesForMap(type)
+    print(type)
+    if type == "ellermaze" then
+        TILES.floor = TILES.ellerfloor
+        TILES.wall = TILES.ellerwall
+    elseif type == "Uniform" then
+        TILES.floor = TILES.uniformfloor
+        TILES.wall = TILES.uniformwall
+    elseif type == "IceyMaze" then
+        TILES.floor = TILES.iceyfloor
+        TILES.wall = TILES.iceywall
+    elseif type == "Cellular" then
+        TILES.floor = TILES.cellularfloor
+        TILES.wall = TILES.cellularwall
+    end
+
+end
+
 
 function changeLevel()
     LEVEL = LEVEL + 1
@@ -249,7 +267,7 @@ function changeLevel()
    ENEMIES = {}
    ITEMS = {}
    BLOODSPLATTERS = {}
- 
+  
    MAP.walltiles = {}
    MAP.emptytiles = {}
    MAP.itemtiles = {}
@@ -266,7 +284,7 @@ function changeLevel()
 
 
    local mapmaker = chooseRandomMap()
-  
+   setTileImagesForMap(MAP.type)
    for x = 1, maxX do
     MAP[x] = {}
     for y = 1, maxY do
@@ -326,12 +344,21 @@ function love.load()
 
 
     TILES = {
-        floor = {img = love.graphics.newImage("assets/floortile.png")},
-        wall = {img = love.graphics.newImage("assets/walltile.png")},
+        wall = {},
+        floor = {},
+        ellerfloor = {img = love.graphics.newImage("assets/floortile.png")},
+        ellerwall = {img = love.graphics.newImage("assets/walltile.png")},
+        iceyfloor = {img = love.graphics.newImage("assets/iceymazetile.png")},
+        iceywall = {img = love.graphics.newImage("assets/iceymazewall.png")},
+        cellularfloor = {img = love.graphics.newImage("assets/cellulartile.png")},
+        cellularwall = {img = love.graphics.newImage("assets/cellularwall.png")},
+        uniformfloor = {img = love.graphics.newImage("assets/uniformtile.png")},
+        uniformwall = {img = love.graphics.newImage("assets/uniformwall.png")}
     }
     
     
     local mapmaker = chooseRandomMap()
+    setTileImagesForMap(MAP.type)
     for x = 1, maxX do
         MAP[x] = {}
         for y = 1, maxY do
