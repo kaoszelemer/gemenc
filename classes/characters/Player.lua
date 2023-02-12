@@ -64,7 +64,6 @@ function Player:update(dt)
     self.tx = math.floor(self.x / 16)
     self.ty = math.floor(self.y / 16)
     if self.x < 18 then
-        print("soimethin")
         self.x = 18
     end
     if self.y < 18 then

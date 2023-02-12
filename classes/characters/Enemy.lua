@@ -80,6 +80,19 @@ function Enemy:update(dt)
     if self.isDead then
         self.particleSystem:update(dt)
     end
+
+    if self.x < 18 then
+        self.x = 18
+    end
+    if self.y < 18 then
+        self.y = 18
+    end
+    if self.x > ((maxX) * 16) +4 then
+        self.x = ((maxX) * 16)+4
+    end
+    if self.y > ((maxY) * 16)+4 then
+        self.y = ((maxY) * 16)+4
+    end
 end
 
 function Enemy:move(dt)

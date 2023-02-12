@@ -194,7 +194,7 @@ end
 local function chooseRandomMap()
     local case = love.math.random(1,4)
     local mapmaker
-    if LEVEL == 1 then case = 2  end
+    if LEVEL == 1 then case = 1  end
     if case == 1 then
         maxX, maxY = 16,16
         mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
