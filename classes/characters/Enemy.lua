@@ -34,7 +34,7 @@ function Enemy:init(x, y)
     self.ox = self.x
     self.direction = 1
     self.walkdistance = love.math.random(1,15)
-
+    self.angle = 0
 
 
     self.particleImage = love.graphics.newImage("assets/blood.png")
@@ -43,10 +43,8 @@ function Enemy:init(x, y)
     self.particleSystem:setEmissionRate(32)
     self.particleSystem:setSizeVariation(1)
     self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
-    self.particleSystem:setColors(255, 0, 0, 255, 255, 0, 0, 0)
+    self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
     self.particleSystem:start()
-
-
 
 end
 
@@ -66,7 +64,7 @@ end
 function Enemy:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
-    if distance < 50 and not self.isDead and MAP.type ~= "Dungeon" and MAP.type ~= "Uniform" then
+    if distance < 40 and not self.isDead and MAP.type ~= "Dungeon" and MAP.type ~= "Uniform" then
         self.visible = true
     elseif distance < 100 and not self.isDead  then
         self.visible = true

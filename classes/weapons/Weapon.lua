@@ -12,14 +12,14 @@ end
 
 function  Weapon:draw()
    
-    love.graphics.draw(self.image, self.x, self.y, self.r)
+    love.graphics.draw(self.image, self.x + 5, self.y + 4, self.r)
     
 end
 
 function Weapon:update(dt)
 
     self.r = math.atan2(MOUSEY - (player.y) , MOUSEX - (player.x ))
-    self.x, self.y = player.x + 4, player.y + 4
+    self.x, self.y = player.x, player.y
 
 end
 

@@ -83,10 +83,18 @@ function EnemyBullet:update(dt)
             --   print(    cols[i].other.EnemyBulletshot)
             if cols[i].other.type == 2 then
                 self.velx, self.vely = 0,0
+                player.isHit = true
+                player.particleSystem:start()
+                Timer.after(0.4, function() 
+                    player.particleSystem:stop() 
+                    player:addBloodSplatters(self.x +4, self.y+4, 8)
+                end)
                 player.hp = player.hp - 1
                 self.visible = false
                 self.removed = true
-                Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
+                Timer.after(1, function()    self.parent.EnemyBulletshot = false 
+
+                end)
                 
                 print(self, "  removed cos playerhit")
                 mapWorld:remove(self)

@@ -12,15 +12,16 @@ function Drill:init()
 )
 
 
+
 end
 
 
 
 function Drill:shoot(x, y)
- player.bulletshot = true
-  player.bulletshot = false
-    if player.bulletshot ~= true then
-        player.bulletshot = true
+
+    
+    if player.drillbulletshot ~= true then
+        player.drillbulletshot = true
         table.insert(BULLETS, DrillBullet(self.x,self.y, x, y, player))
         print("inserting bullet")
     end 

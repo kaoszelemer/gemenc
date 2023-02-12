@@ -248,6 +248,8 @@ function changeLevel()
    MAP = {}
    ENEMIES = {}
    ITEMS = {}
+   BLOODSPLATTERS = {}
+ 
    MAP.walltiles = {}
    MAP.emptytiles = {}
    MAP.itemtiles = {}
@@ -320,6 +322,9 @@ function love.load()
     MAP.maxenemy = 10
     ITEMS = {}
     ENEMIES = {}
+    BLOODSPLATTERS = {}
+
+
     TILES = {
         floor = {img = love.graphics.newImage("assets/floortile.png")},
         wall = {img = love.graphics.newImage("assets/walltile.png")},
@@ -353,8 +358,8 @@ function love.load()
 
 
     initPlayer()
-    print(MAP.maxitem)
-  spawnStairs()
+    --print(MAP.maxitem)
+    spawnStairs()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(MAP.maxenemy)
 
@@ -376,6 +381,7 @@ function love.update(dt)
     lurker.update()
     player:move(dt)
     player:update(dt)
+    Character:update(dt)
     player:physics(dt)
     Timer.update(dt)
 
@@ -439,11 +445,11 @@ function love.draw()
             ITEMS[i]:draw()
         end
         
+        
+        player:draw()
         for i = 1, #ENEMIES do
             ENEMIES[i]:draw()
         end
-        
-        player:draw()
         love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
 
    player.camera:detach()

@@ -31,6 +31,19 @@ self.ty = math.floor(self.y / 16)
   self.visible = true
 
   self.hp = 10
+
+  self.angle = 0
+
+
+  
+  self.particleImage = love.graphics.newImage("assets/blood.png")
+  self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
+  self.particleSystem:setParticleLifetime(1, 1)
+  self.particleSystem:setEmissionRate(32)
+  self.particleSystem:setSizeVariation(1)
+  self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
+  self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
+  self.particleSystem:start()
 end
 
 local function playerFilter(item, other)
@@ -75,6 +88,11 @@ function Player:update(dt)
         end
     end
 
+    if self.isHit then
+        self.particleSystem:update(dt)
+    end
+
+  
 end
 
 
@@ -88,28 +106,38 @@ function Player:physics(dt)
 end
 
 
-function Player:move(dt)
 
+function Player:move(dt)
     
+   -- local anglechange = 0
+    self.prevx = 0
+    self.prevy = 0
     if love.keyboard.isDown("d") and
 	self.velx < self.speed then
 		self.velx = self.velx + self.speed * dt
+        self.anglechange = -math.pi / 2
 	end
     
 	if love.keyboard.isDown("a") and
 	self.velx > -self.speed then
 		self.velx = self.velx - self.speed * dt
+        self.anglechange = math.pi / 2
 	end
     
 	if love.keyboard.isDown("s") and
 	self.vely < self.speed then
 		self.vely = self.vely + self.speed * dt
+        self.anglechange = 0
 	end
     
 	if love.keyboard.isDown("w") and
 	self.vely > -self.speed then
 		self.vely = self.vely - self.speed * dt
+        self.anglechange = math.pi
 	end
+
+    self.angle = self.anglechange
+    --self.angle = self.angle % (2 * math.pi)
     
     local ax, ay, cols, len = mapWorld:move(self, self.x , self.y, playerFilter)
  
@@ -136,7 +164,8 @@ function Player:move(dt)
 
     
    player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
-
+   player.prevx = self.x
+   player.prevy = self.y
 
 end
 
