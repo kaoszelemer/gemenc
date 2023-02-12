@@ -6,8 +6,8 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
-    self.w = 1
-    self.h = 1
+    self.w = 2
+    self.h = 2
     self.velx = 50
     self.vely = 50
     self.visible = true

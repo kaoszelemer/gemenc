@@ -18,7 +18,7 @@ function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, fri
 
 
     self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
-
+    self.shadowimage = love.graphics.newImage("assets/shadow.png")
 
 end
 
@@ -34,6 +34,13 @@ function  Character:draw()
         splatter.alpha,
         splatter.scale
     )
+end
+if self.name == "gemenc" then
+  
+  love.graphics.setColor(1,1,1,0.2)
+  love.graphics.draw(self.shadowimage, self.x + 6, self.y + 6, self.angle, nil, nil, 4, 4)
+  love.graphics.setBlendMode("alpha")
+  love.graphics.setColor(1,1,1,1)
 end
   if self.visible then
 
@@ -56,6 +63,17 @@ end
       love.graphics.setColor(1,1,1) ]]
    love.graphics.draw(self.bloodSplatterImage, v.x + 4, v.y + 4, 0.75, 0.75)
    love.graphics.setColor(1,1,1, 1)
+    end
+
+  
+    if player.trail[1] then
+      love.graphics.circle ('fill', player.trail[1], player.trail[2], #player.trail/2)
+    end
+    for i = 3, #player.trail-1, 2 do
+      local w = #player.trail-i
+      love.graphics.setLineWidth (w)
+      love.graphics.line (player.trail[i-2], player.trail[i-1], player.trail[i], player.trail[i+1])
+      love.graphics.circle ('fill', player.trail[i], player.trail[i+1], w/2)
     end
 
 

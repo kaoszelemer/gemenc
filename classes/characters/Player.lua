@@ -15,7 +15,7 @@ function Player:init(x, y)
         w = 8,
         h = 8
     },
-    "soldier",
+    "gemenc",
     love.graphics.newImage("assets/player.png"),
     0,
     0,
@@ -33,6 +33,11 @@ self.ty = math.floor(self.y / 16)
   self.hp = 10
 
   self.angle = 0
+
+  self.trail = {}
+  self.maxTrailLength = 32
+  self.trailDuration = 0.05
+  self.trailTimer = 0
 
 
   
@@ -83,7 +88,7 @@ function Player:update(dt)
             INVENTORY[1] = INVENTORY[2]
             INVENTORY[2] = oldi
             print(INVENTORY[1], INVENTORY[2])
-            Timer.after(0.1, function() self.changingweapon = nil end)
+            Timer.after(0.3, function() self.changingweapon = nil end)
         end
     end
 
@@ -91,7 +96,29 @@ function Player:update(dt)
         self.particleSystem:update(dt)
     end
 
-  
+--[[     self.trailTimer = self.trailTimer + dt
+
+        while self.trailTimer > self.trailDuration do
+            self.trailTimer = self.trailTimer - self.trailDuration
+            -- remove two last coordinates:
+            self.trail[#self.trail] = nil
+            self.trail[#self.trail] = nil
+        end
+ ]]
+      --  self.trailadded = false
+      --[[   if self.trailadded ~= true then
+            print("itt")
+        table.insert (self.trail, 1, player.prevy)
+        table.insert (self.trail, 1, player.prevx)
+            if #self.trail > self.maxTrailLength*2 then
+                for i = #self.trail, self.maxTrailLength*2+1, -1 do -- backwards
+                    self.trail[i] = nil
+                end
+            end
+        self.trailadded = true
+        end ]]
+
+       
 end
 
 
@@ -109,8 +136,8 @@ end
 function Player:move(dt)
     
    -- local anglechange = 0
-    self.prevx = 0
-    self.prevy = 0
+    self.prevx = self.x
+    self.prevy = self.y
     if love.keyboard.isDown("d") and
 	self.velx < self.speed then
 		self.velx = self.velx + self.speed * dt
@@ -163,8 +190,11 @@ function Player:move(dt)
 
     
    player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
-   player.prevx = self.x
-   player.prevy = self.y
+
+
+ --[[   player.prevx = self.x
+   player.prevy = self.y ]]
+
 
 end
 

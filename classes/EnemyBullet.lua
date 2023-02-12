@@ -6,8 +6,8 @@ function EnemyBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, spee
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
-    self.w = 1
-    self.h = 1
+    self.w = 2
+    self.h = 2
     self.velx = 0
     self.vely = 0
     self.speed = 500
