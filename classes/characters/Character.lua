@@ -41,11 +41,24 @@ function Character:action()
 end
 
 function Character:kill()
-  print("kill")
   Timer.after(1, function() self.particleSystem:stop() end)
   self.isDead = true
   self.visible = false
   mapWorld:remove(self)
+
+
+
+    for i = 1, #BULLETS do
+ 
+      if BULLETS[i] ~= nil then
+        if BULLETS[i].parent == self then  
+          table.remove(BULLETS, i)
+        end
+      end
+    end
+
+
+  
 
 end
 

@@ -53,6 +53,7 @@ end
 
 
 local function enemyFilter(item, other)
+ 
     if other.type == 1 or other.type == 2 then
         return "bounce"
     else
@@ -94,28 +95,24 @@ function Enemy:move(dt)
         self.x = self.x + (self.speed * self.direction * dt)
 
             
-        local ax, ay, cols, len = mapWorld:move(self, self.x , self.y)
+        local ax, ay, cols, len = mapWorld:move(self, self.x , self.y, enemyFilter)
         
         self.x = ax
         self.y = ay
 
-        if len == 0 then
+      --[[   if len == 0 then
             self.speed = 20
-        end
+        end ]]
         --  mapWorld:update(self, self.cx, self.cy)
         for i = 1, #cols do
 
             
         
-            if len >= 1 and cols[i].other.type ~= "EnemyBullet" then
+            if len >= 1 and cols[i].other.type ~= "EnemyBullet" and cols[i].other.type ~= "enemy" and cols[i].other.type ~= "enemy" then
             
                 self.direction = -self.direction
             end
             
-
-          --[[   if len >=1 and cols[i].other.type == 2 then
-                self.speed = 0
-            end ]]
 
         end
 
@@ -127,11 +124,12 @@ function Enemy:action(x,y)
 
    
         if self.EnemyBulletshot ~= true then
-            local parent = self
-            table.insert(BULLETS, EnemyBullet(self.x,self.y, player.x, player.y, parent))
+        
+            table.insert(BULLETS, EnemyBullet(self.x,self.y, player.x, player.y, self))
             self.EnemyBulletshot = true
         end
-   
+        
+      
         
 
 end

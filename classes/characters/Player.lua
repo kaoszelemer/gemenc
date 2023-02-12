@@ -33,9 +33,12 @@ self.ty = math.floor(self.y / 16)
   self.hp = 10
 end
 
-local function  playerFilter(item, other)
+local function playerFilter(item, other)
+   
     if other.type == 1 then
-        return "touch"
+        return "slide"
+    elseif other.type == "enemy" then
+        return "bounce"
     elseif other.type == 4 then
         return "cross"
     else
@@ -89,8 +92,10 @@ function Player:move(dt)
     self.y = ay
   --  mapWorld:update(self, self.cx, self.cy)
     for i = 1, #cols do
+
+
         if len == 1 and cols[i].other.type ~= 4 then
-        
+            print(cols[i].other)
             self.velx, self.vely = 0,0
         end
         

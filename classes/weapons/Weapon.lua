@@ -18,15 +18,9 @@ end
 
 function Weapon:update(dt)
 
---[[ 
-    local w = 800 / player.camera.scale
-    local h = 600 / player.camera.scale ]]
-
     self.r = math.atan2(MOUSEY - (player.y) , MOUSEX - (player.x ))
     self.x, self.y = player.x + 4, player.y + 4
-    
-  -- print("mm"..MOUSEX, MOUSEY)
- 
+
 end
 
 

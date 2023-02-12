@@ -23,17 +23,10 @@ end
 
 
 function Medpack:updateVisibility()
-
-    --      print(MAP[self.tilex][self.tilex].type)
-       --[[    if MAP[self.tilex][self.tilex].type == 2 then
-              self.visible = true
-          end ]]
-
           if MAP[self.tilex][self.tiley].visible and not self.pickedup then
               self.visible = true
           end
 
- 
 end
 
 

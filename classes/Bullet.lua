@@ -61,7 +61,7 @@ function Bullet:update(dt)
 
         local _, _, cols, len = mapWorld:move(self, self.x, self.y, bulletFilter)
         for i = 1, #cols do
-           print("type: "..cols[i].other.type)
+       --    print("type: "..cols[i].other.type)
             if cols[i].other.type == "enemy" then
                 cols[i].other:kill()
                 self.visible = false
