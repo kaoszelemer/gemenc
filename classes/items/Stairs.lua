@@ -27,6 +27,13 @@ function Stairs:updateVisibility()
               self.visible = true
           end
 
+          if self.tilex == player.tx and self.tiley == player.ty then
+            player.standingonStairs = true
+          else
+            player.standingonStairs = false
+          end
+
+         -- print(self.ty)
 end
 
 
@@ -42,14 +49,17 @@ function Stairs:draw()
 end
 
 function Stairs:action()
-    if not self.standingonStairs then
+    --[[ if not self.standingonStairs then
         player.standingonStairs = true
+        Timer.after(5, function ()
+            player.standingonStairs = false
+        end) ]]
      
         if love.keyboard.isDown("space") and player.changinglevel ~= true then
             player.changinglevel = true
             changeLevel()
         end      
-    end
+--    end
 end
 
 

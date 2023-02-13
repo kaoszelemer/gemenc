@@ -41,6 +41,9 @@ if self.name == "gemenc" then
   love.graphics.draw(self.shadowimage, self.x + 6, self.y + 6, self.angle, nil, nil, 4, 4)
   love.graphics.setBlendMode("alpha")
   love.graphics.setColor(1,1,1,1)
+
+  love.graphics.draw(self.smokeparticle, self.x, self.y, self.angle, nil, nil)
+
 end
   if self.visible then
 
@@ -75,6 +78,8 @@ end
       love.graphics.line (player.trail[i-2], player.trail[i-1], player.trail[i], player.trail[i+1])
       love.graphics.circle ('fill', player.trail[i], player.trail[i+1], w/2)
     end
+
+ 
 
 
  -- love.graphics.setBlendMode('darken', "premultiplied")
@@ -198,6 +203,10 @@ function  Character:update(dt)
        table.remove(bloodprints, i)
        
     end
+  end
+
+  if player.velX == 0 and player.velY == 0 then
+    player.smokeparticle:stop()
   end
     
 end

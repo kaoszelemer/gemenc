@@ -39,6 +39,7 @@ self.ty = math.floor(self.y / 16)
   self.trailDuration = 0.05
   self.trailTimer = 0
 
+  self.smokeparticleimage = love.graphics.newImage('assets/smokeparticle.png') 
 
   
   self.particleImage = love.graphics.newImage("assets/blood.png")
@@ -49,6 +50,14 @@ self.ty = math.floor(self.y / 16)
   self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
   self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
   self.particleSystem:start()
+
+  self.smokeparticle = love.graphics.newParticleSystem(self.smokeparticleimage, 8)
+  self.smokeparticle:setParticleLifetime(0.1, 1) -- particles live between 2 and 5 seconds
+  self.smokeparticle:setEmissionRate(10) -- emit 5 particles per second
+  self.smokeparticle:setSizeVariation(1) -- vary particle size by up to 100%
+  self.smokeparticle:setLinearAcceleration(-10, -10, 10, 10) -- random acceleration in any direction
+  self.smokeparticle:setColors(255, 255, 255, 255, 255, 255, 255, 0) 
+  
 end
 
 local function playerFilter(item, other)
@@ -96,27 +105,8 @@ function Player:update(dt)
         self.particleSystem:update(dt)
     end
 
---[[     self.trailTimer = self.trailTimer + dt
-
-        while self.trailTimer > self.trailDuration do
-            self.trailTimer = self.trailTimer - self.trailDuration
-            -- remove two last coordinates:
-            self.trail[#self.trail] = nil
-            self.trail[#self.trail] = nil
-        end
- ]]
-      --  self.trailadded = false
-      --[[   if self.trailadded ~= true then
-            print("itt")
-        table.insert (self.trail, 1, player.prevy)
-        table.insert (self.trail, 1, player.prevx)
-            if #self.trail > self.maxTrailLength*2 then
-                for i = #self.trail, self.maxTrailLength*2+1, -1 do -- backwards
-                    self.trail[i] = nil
-                end
-            end
-        self.trailadded = true
-        end ]]
+    --self.smokeparticle:update(dt)
+    
 
        
 end
@@ -142,6 +132,7 @@ function Player:move(dt)
 	self.velx < self.speed then
 		self.velx = self.velx + self.speed * dt
         self.anglechange = -math.pi / 2
+        self.smokeparticle:start()
 	end
     
 	if love.keyboard.isDown("a") and
@@ -181,6 +172,7 @@ function Player:move(dt)
         if cols[i].other.type == 4 then
             cols[i].other:action()
         end
+   
 
     end
 

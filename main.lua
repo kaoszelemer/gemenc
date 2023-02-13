@@ -36,6 +36,38 @@ EnemyBullet = require('classes.EnemyBullet')
 DrillBullet = require('classes.DrillBullet')
 
 
+
+StateMachine = require('classes.StateMachine')
+
+
+gameState = StateMachine({
+    game = {
+        name = "game",
+        transitions = {"game", "starting", "gameover", "map"} 
+    },
+
+    map = {
+        name = "map",
+        transitions = {"game", "map"}
+    },
+
+    starting = {
+        name =  "starting",
+        transitions = {"starting", "game"}
+    },
+
+    gameover = {
+        name = "gameover", 
+        transitions = {"starting","gameover"}
+    },
+
+    },
+    "starting"
+)
+
+
+
+
 local function mapcreator(x,y,val)
  
    
@@ -355,6 +387,11 @@ function love.load()
         uniformfloor = {img = love.graphics.newImage("assets/uniformtile.png")},
         uniformwall = {img = love.graphics.newImage("assets/uniformwall.png")}
     }
+
+    IMAGES = {
+        titlescreen = love.graphics.newImage("assets/titlescreen.png"),
+        godeeper = love.graphics.newImage("assets/godeeper.png")
+    }
     
     
     local mapmaker = chooseRandomMap()
@@ -399,48 +436,58 @@ function love.load()
   --debug purposes
   INVENTORY[1] = Pistol()
 
-
+    print(gameState.state)
     
 end
 
 function love.update(dt)
-    MOUSEX, MOUSEY = player.camera:worldCoords(love.mouse.getPosition())
-    lurker.update()
-    player:move(dt)
-    player:update(dt)
-    Character:update(dt)
-    player:physics(dt)
-    Timer.update(dt)
 
-    player.camera:lookAt(player.x, player.y, 6)
-    INVENTORY[1]:update(dt)
-    for i = 1, #BULLETS do
-        if BULLETS[i] ~= nil then
-            BULLETS[i]:update(dt)
+    if gameState.state == gameState.states.game then
+      --  print("kldjssdkldskl")
+        MOUSEX, MOUSEY = player.camera:worldCoords(love.mouse.getPosition())
+        lurker.update()
+        player:move(dt)
+        player:update(dt)
+        Character:update(dt)
+        player:physics(dt)
+       
+
+        player.camera:lookAt(player.x, player.y, 6)
+        INVENTORY[1]:update(dt)
+        for i = 1, #BULLETS do
+            if BULLETS[i] ~= nil then
+                BULLETS[i]:update(dt)
+            end
+        end
+
+        for i = 1, #ITEMS do
+    
+                ITEMS[i]:updateVisibility()
+        
+        end
+    
+        for i = 1, #ENEMIES do
+        
+                ENEMIES[i]:move(dt)
+                ENEMIES[i]:update(dt)
         end
     end
 
-    for i = 1, #ITEMS do
- 
-            ITEMS[i]:updateVisibility()
-    
-    end
-   
-    for i = 1, #ENEMIES do
-    
-            ENEMIES[i]:move(dt)
-            ENEMIES[i]:update(dt)
-    end
 
+    Timer.update(dt)
    -- print(ENEMIES[1].x)
    
 end
 
 function love.draw() 
-    player.camera:attach()
-    
-    
-    
+
+    if gameState.state == gameState.states.starting then
+        love.graphics.draw(IMAGES.titlescreen, 0,0)
+    end
+
+    if gameState.state == gameState.states.game then
+        player.camera:attach()
+  
         for x = 1, maxX do
             for y = 1, maxY do
                 if MAP[x][y] ~= nil then
@@ -479,18 +526,82 @@ function love.draw()
         end
         love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
 
-   player.camera:detach()
+        player.camera:detach()
 
-   love.graphics.print("AMMO: "..player.munition, 0,0)
-   love.graphics.print("HP: "..player.hp, 0,16)
-   if player.standingonStairs then
-    love.graphics.print("press space to change level", player.x, player.y)
-  end
+        love.graphics.print("AMMO: "..player.munition, 0,0)
+        love.graphics.print("HP: "..player.hp, 0,16)
+        if player.standingonStairs then
+           
+            love.graphics.draw(IMAGES.godeeper, player.x + 200, player.y + 80)
+        end
+    end
+
+    if gameState.state == gameState.states.map then
+        for x = 1, maxX do
+            for y = 1, maxY do
+                if MAP[x][y] ~= nil then
+                    local cell = MAP[x][y] 
+
+                    if cell.type == 1 and cell.visible then          
+                        --[[ love.graphics.setColor(1,1,1)
+                        love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16) ]]
+                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+                    end
+                    if cell.type == 0 and cell.visible then
+                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
+                    end
+                    for i = 1, #ITEMS do
+                        --   print(ITEMS[i].x)
+                        ITEMS[i]:draw()
+                    end
+                end
+            end
+        end
+    end
+
+   
+
 end
 
 
 function love.mousepressed(x, y, button, istouch)
-    if button == 1 then 
-        player:action(MOUSEX,MOUSEY)
+
+    if gameState.state == gameState.states.starting then
+        gameState:changeState(gameState.states.game)
     end
+
+
+    if gameState.state == gameState.states.game then
+        if button == 1 then 
+            player:action(MOUSEX,MOUSEY)
+        end
+    end
+ end
+
+ function love.keypressed(key)
+    if gameState.state == gameState.states.map and player.onMap == true then
+        if key == "tab" then
+        
+            Timer.after(0.5, function ()
+                 player.onMap = false
+            end)
+
+            player.camera.scale = 6
+
+            gameState:changeState(gameState.states.game)
+        end
+    
+    end
+    
+    if gameState.state == gameState.states.game and player.onMap ~= true then
+            if key == "tab" then
+                player.camera.scale = 1
+            gameState:changeState(gameState.states.map)
+            
+            player.onMap = true
+
+            end
+    end
+
+
  end
