@@ -1,5 +1,5 @@
 ROT=require('rotLove.src.rot')
-lurker = require('lib.lurker')
+--lurker = require('lib.lurker')
 Camera = require('lib.humpcam')
 bump = require('lib.bump')
 Class = require('lib.30log')
@@ -321,6 +321,7 @@ function changeLevel()
     MAP[x] = {}
     for y = 1, maxY do
         MAP[x][y] = {}
+        MAP[x][y].visible = false
     end
    end
    
@@ -436,7 +437,7 @@ function love.load()
   --debug purposes
   INVENTORY[1] = Pistol()
 
-    print(gameState.state)
+   -- print(gameState.state)
     
 end
 
@@ -445,7 +446,7 @@ function love.update(dt)
     if gameState.state == gameState.states.game then
       --  print("kldjssdkldskl")
         MOUSEX, MOUSEY = player.camera:worldCoords(love.mouse.getPosition())
-        lurker.update()
+     --   lurker.update()
         player:move(dt)
         player:update(dt)
         Character:update(dt)
@@ -554,6 +555,7 @@ function love.draw()
                         --   print(ITEMS[i].x)
                         ITEMS[i]:draw()
                     end
+                    player:draw()
                 end
             end
         end
