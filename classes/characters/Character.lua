@@ -144,26 +144,34 @@ function Character:action()
 
 end
 
-function Character:kill()
-  Timer.after(0.4, function() 
-    self.particleSystem:stop() 
-    self:addBloodSplatters(self.x +4, self.y+4, 8)
-  end)
- 
-  self.isDead = true
-  self.visible = false
-  mapWorld:remove(self)
+function Character:kill(pl)
+  if pl == "pl" then
+    Timer.after(0.2, function() 
+      gameState:changeState(gameState.states.gameover)
+    end)
+  else
 
-
-
-    for i = 1, #BULLETS do
- 
-      if BULLETS[i] ~= nil then
-        if BULLETS[i].parent == self then  
-          table.remove(BULLETS, i)
+    Timer.after(0.4, function() 
+      self.particleSystem:stop() 
+      self:addBloodSplatters(self.x +4, self.y+4, 8)
+    end)
+   
+    self.isDead = true
+    self.visible = false
+    mapWorld:remove(self)
+  
+  
+  
+      for i = 1, #BULLETS do
+   
+        if BULLETS[i] ~= nil then
+          if BULLETS[i].parent == self then  
+            table.remove(BULLETS, i)
+          end
         end
       end
-    end
+
+  end
 
 
   

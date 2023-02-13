@@ -89,7 +89,11 @@ function EnemyBullet:update(dt)
                     player.particleSystem:stop() 
                     player:addBloodSplatters(self.x +4, self.y+4, 8)
                 end)
-                player.hp = player.hp - 1
+                if player.hp > 0 then
+                    player.hp = player.hp - 1
+                else
+                    player:kill("pl")
+                end
                 self.visible = false
                 self.removed = true
                 Timer.after(1, function()    self.parent.EnemyBulletshot = false 

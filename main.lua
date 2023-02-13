@@ -414,6 +414,7 @@ function love.load()
     IMAGES = {
         titlescreen = love.graphics.newImage("assets/titlescreen.png"),
         godeeper = love.graphics.newImage("assets/godeeper.png"),
+        gameover = love.graphics.newImage("assets/gameover.png")
     }
     
     
@@ -637,6 +638,10 @@ function love.draw()
                 end
             end
         end
+    end
+
+    if gameState.state == gameState.states.gameover then
+        love.graphics.draw(IMAGES.gameover, 0,0)
     end
 
    
