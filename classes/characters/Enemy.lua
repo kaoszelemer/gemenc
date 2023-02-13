@@ -64,14 +64,15 @@ end
 function Enemy:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
-    if distance < 60 and not self.isDead then
+    self.tx = math.floor(self.x / 16)
+    self.ty = math.floor(self.y / 16)
+
+    if MAP[self.tx][self.ty].visible and not self.isDead then
         self.visible = true
-  --[[   elseif distance < 50 and not self.isDead  then
-        self.visible = true
- ]]
     else
         self.visible = false
     end
+
 
     if distance < 35 and not self.isDead then
         self:action(x, y)

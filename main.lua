@@ -11,6 +11,27 @@ Luastar = require('lib.luastar')
 GLOBALS = {
 }
 
+local shadowCanvas
+
+local blur_shader = love.graphics.newShader[[
+  vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
+    vec2 center = vec2(0.5, 0.5);
+    float distance = length(texture_coords - center);
+    float brightness = distance * 2.0;
+    
+    vec4 sum = vec4(0);
+    int samples = 10;
+    float s = 0.05;
+    for (int i = -samples; i <= samples; i++) {
+      for (int j = -samples; j <= samples; j++) {
+        vec2 offset = vec2(float(i) * s, float(j) * s);
+        sum += Texel(texture, texture_coords + offset) * 0.11;
+      }
+    }
+    return sum * brightness;
+  }
+]]
+
 MOUSEX, MOUSEY = 0, 0
 maxX, maxY = 16, 16
 
@@ -356,6 +377,7 @@ end
 
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest") 
+  shadowCanvas = love.graphics.newCanvas()
   love.mouse.setVisible(false)
   mouseReticleImage = love.graphics.newImage("assets/reticle.png")
 
@@ -391,7 +413,7 @@ function love.load()
 
     IMAGES = {
         titlescreen = love.graphics.newImage("assets/titlescreen.png"),
-        godeeper = love.graphics.newImage("assets/godeeper.png")
+        godeeper = love.graphics.newImage("assets/godeeper.png"),
     }
     
     
@@ -482,21 +504,56 @@ end
 
 function love.draw() 
 
+ 
+
     if gameState.state == gameState.states.starting then
         love.graphics.draw(IMAGES.titlescreen, 0,0)
     end
 
     if gameState.state == gameState.states.game then
+        
+ 
+    
+
         player.camera:attach()
+     
   
+        love.graphics.setCanvas(shadowCanvas)
+        local px, py = player.camera:worldCoords(player.x, player.y)
+        love.graphics.clear()
+        love.graphics.setColor(1, 1, 1, 0.1)
+        love.graphics.circle("fill", px, py, 80)
+        love.graphics.setCanvas()
+       
         for x = 1, maxX do
+            for y = 1, maxY do
+                if MAP[x][y] ~= nil then
+                    local cell = MAP[x][y] 
+                    local distance =  math.sqrt((player.x - (cell.x * 16 + 8)) ^ 2 + (player.y - (cell.y * 16 + 8)) ^ 2) 
+                  
+                    local alpha = math.max(0, math.min(1, 1 - distance / 90))
+
+        
+                    if cell.type == 1 and cell.visible then          
+                        love.graphics.setColor(1,1,1, alpha)
+                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+                    end
+                    if cell.type == 0 and cell.visible then
+                        love.graphics.setColor(1,1,1, alpha)
+                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
+                    end
+                end
+            end
+        end
+
+
+     --[[    for x = 1, maxX do
             for y = 1, maxY do
                 if MAP[x][y] ~= nil then
                     local cell = MAP[x][y] 
 
                     if cell.type == 1 and cell.visible then          
-                        --[[ love.graphics.setColor(1,1,1)
-                        love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16) ]]
+                   
                         love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
                     end
                     if cell.type == 0 and cell.visible then
@@ -504,30 +561,50 @@ function love.draw()
                     end
                 end
             end
+        end ]]
+
+ 
+        
+   
+        
+        love.graphics.setColor(1,1,1,1)
+        
+        for i = 1, #ITEMS do
+     
+            ITEMS[i]:draw()
+        end
+           
+        for i = 1, #BULLETS do
+            BULLETS[i]:draw()
+        end
+
+        for i = 1, #ENEMIES do
+         
+            ENEMIES[i]:draw()
         end
 
         
+        love.graphics.draw(shadowCanvas, 0, 0)
         if INVENTORY ~= nil then
             INVENTORY[1]:draw()
         end
         
-        for i = 1, #BULLETS do
-            BULLETS[i]:draw()
-        end
-        
-        for i = 1, #ITEMS do
-            --   print(ITEMS[i].x)
-            ITEMS[i]:draw()
-        end
-        
-        
         player:draw()
-        for i = 1, #ENEMIES do
-            ENEMIES[i]:draw()
-        end
+
+
+  -- Draw the shadows to the shadow canvas
+    
+
+        -- Blend the shadow canvas with the main canvas
+   
+   
+
+
         love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
 
         player.camera:detach()
+
+
 
         love.graphics.print("AMMO: "..player.munition, 0,0)
         love.graphics.print("HP: "..player.hp, 0,16)
@@ -535,6 +612,7 @@ function love.draw()
            
             love.graphics.draw(IMAGES.godeeper, player.x + 200, player.y + 80)
         end
+      
     end
 
     if gameState.state == gameState.states.map then
