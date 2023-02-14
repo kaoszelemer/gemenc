@@ -51,7 +51,7 @@ function Ammo:action()
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
-        player.munition = player.munition + 5
+        player.munition = player.munition + 10
       --  print(self.tilex, self.tiley)
         MAP[self.tilex][self.tiley].type = 0
        -- print("itt")

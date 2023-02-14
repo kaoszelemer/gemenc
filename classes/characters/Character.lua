@@ -1,7 +1,7 @@
 local Character = Class('Character')
 
 
-function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, friction, type, rof)
+function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, friction, type, rof, hp)
 
     self.x = x
     self.y = y
@@ -16,6 +16,7 @@ function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, fri
     self.friction = friction
     self.type =  type
     self.rof = rof
+    self.hp = hp
 
 
     self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
@@ -29,7 +30,7 @@ local bloodprints = {}
 
 function  Character:draw()
 
-if self.name ~= "Turret" then
+if self.name ~= "Turret" or self.name ~= "Tank" then
     for _, splatter in pairs(BLOODSPLATTERS) do
       love.graphics.draw(
           self.bloodSplatterImage,
@@ -49,6 +50,7 @@ if self.name ~= "Turret" then
   end
 
 end
+
 if self.name == "gemenc" then
   
   love.graphics.setColor(1,1,1,0.2)
@@ -70,44 +72,21 @@ end
 
   if self.isDead or self.isHit then
 
-    if self.name ~= "Turret" then
+    if self.name ~= "Turret" and self.name ~= "Tank" then
     love.graphics.draw(self.particleSystem, self.x + 4  , self.y + 4)
    
     else
+
     love.graphics.draw(self.particleSystem, self.x + 4, self.y + 4)
     love.graphics.draw(self.particleSystem, self.x + 8, self.y + 12)
     love.graphics.draw(self.particleSystem, self.x + 12, self.y + 8)
     love.graphics.draw(self.particleSystem, self.x + 16, self.y + 4)
- --   love.graphics.draw(self.particleSystem, self.x + 16, self.y + 8)
+
     end
  
     
   end
 
-
-
-
-  
- --[[    if player.trail[1] then
-      love.graphics.circle ('fill', player.trail[1], player.trail[2], #player.trail/2)
-    end
-    for i = 3, #player.trail-1, 2 do
-      local w = #player.trail-i
-      love.graphics.setLineWidth (w)
-      love.graphics.line (player.trail[i-2], player.trail[i-1], player.trail[i], player.trail[i+1])
-      love.graphics.circle ('fill', player.trail[i], player.trail[i+1], w/2)
-    end
-
-  ]]
-
-
- -- love.graphics.setBlendMode('darken', "premultiplied")
-
- -- love.graphics.setBlendMode('alpha')
-  --debug
-  
-
-  --  print(self.x, self.y)
 end
 
 function Character:addBloodSplatters(x, y, times)
@@ -173,7 +152,7 @@ function Character:kill(pl)
 
     Timer.after(0.4, function() 
       self.particleSystem:stop()
-      if self.name ~= "Turret" then
+      if self.name ~= "Turret" and self.name ~="Tank" then
         self:addBloodSplatters(self.x +4, self.y+4, 8)
       end
     end)

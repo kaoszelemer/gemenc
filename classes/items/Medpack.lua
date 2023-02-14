@@ -42,7 +42,7 @@ end
 function Medpack:action()
 
     if not self.pickedup then
-        if player.hp <= player.maxhp then
+        if player.hp < player.maxhp then
         self.visible = false
         self.pickedup = true
         player.hp = player.hp + 1

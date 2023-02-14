@@ -17,18 +17,22 @@ function Tank:init(x, y)
         w = 8,
         h = 8
     },
-    "soldier",
+    "Tank",
     love.graphics.newImage("assets/tank.png"),
     0,
     0,
-    20,
+    3,
     1,
-    "tank" ,-- type
-    1 --rof
+    "enemy" ,-- type
+    3, --rof
+    3 --hp
 )
 
-  mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
-  self.visible = false
+
+
+    mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
+    self.visible = false
+    self.hitinvi = false
     self.tx = math.floor(self.x / 16)
     self.ty = math.floor(self.y / 16)
     self.ox = self.x
@@ -60,7 +64,7 @@ end
 
 
 
-function Enemy:update(dt)
+function Tank:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
     self.tx = math.floor(self.x / 16)
@@ -74,8 +78,19 @@ function Enemy:update(dt)
         end
     end
 
+    
+    if self.hitinvi and not self.showhitinvi then
+        self.showhitinvi = true
+        Timer.every(0.03, function() 
+            self.visible = true
+        end, 14)
+        Timer.every(0.05, function ()
+            self.visible = false
+        end, 8)
+    end 
 
-    if distance < 35 and not self.isDead then
+
+    if distance < 60 and not self.isDead then
         self:action(x, y)
     end
 
@@ -101,7 +116,7 @@ function Enemy:update(dt)
     end
 end
 
-function Enemy:move(dt)
+function Tank:move(dt)
 
 
 
@@ -120,15 +135,11 @@ function Enemy:move(dt)
         self.x = ax
         self.y = ay
 
-      --[[   if len == 0 then
-            self.speed = 20
-        end ]]
-        --  mapWorld:update(self, self.cx, self.cy)
         for i = 1, #cols do
 
             
         
-            if len >= 1 and cols[i].other.type ~= "EnemyBullet" and cols[i].other.type ~= "enemy" and cols[i].other.type ~= "enemy" then
+            if len >= 1 and cols[i].other.type ~= "TankBullet" and cols[i].other.type ~= "enemy" and cols[i].other.type ~= "enemy" then
             
                 self.direction = -self.direction
             end
@@ -140,12 +151,12 @@ function Enemy:move(dt)
     end
 end
 
-function Enemy:action(x,y)
+function Tank:action(x,y)
 
    
         if self.EnemyBulletshot ~= true then
         
-            table.insert(BULLETS, EnemyBullet(self.x,self.y, player.x, player.y, self))
+            table.insert(BULLETS, TankBullet(self.x,self.y, player.x, player.y, self))
             self.EnemyBulletshot = true
         end
         
@@ -155,4 +166,4 @@ function Enemy:action(x,y)
 end
 
 
-return Enemy
+return Tank

@@ -63,14 +63,26 @@ function Bullet:update(dt)
         local _, _, cols, len = mapWorld:move(self, self.x, self.y, bulletFilter)
         for i = 1, #cols do
        --    print("type: "..cols[i].other.type)
-            if cols[i].other.type == "enemy" then
+            if cols[i].other.type == "enemy" and not cols[i].other.hitinvi then
+                cols[i].other.hp = cols[i].other.hp - 1
             --    screenShake(0.1, 3)
+                print(cols[i].other.hp)
+                if cols[i].other.hp == 0 then
                 cols[i].other:kill()
                 self.visible = false
                 self.removed = true
                 INVENTORY[1].bulletshot = false
                 print(self, "  removed cos kill")
                 mapWorld:remove(self)
+                else
+                    cols[i].other.hitinvi = true
+                    cols[i].other.particleSystem:start()
+                    Timer.after(0.4, function() 
+                        cols[i].other.hitinvi = false
+                        cols[i].other.showhitinvi = false
+                    end)
+                end
+             
             end
                 
            

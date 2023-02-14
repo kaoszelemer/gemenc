@@ -22,7 +22,8 @@ function Player:init(x, y)
     500,
     10,
     2, -- type
-    0 -- rof aint used
+    0, -- rof aint used
+    25  --hp
 )
 self.tx = math.floor(self.x / 16)
 self.ty = math.floor(self.y / 16)
@@ -30,8 +31,7 @@ self.ty = math.floor(self.y / 16)
   mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
   self.visible = true
 
-  self.hp = 10
-  self.maxhp = 10
+  self.maxhp = self.hp
   
   self.angle = 0
 

@@ -24,6 +24,7 @@ Character = require('classes.characters.Character')
 Player = require('classes.characters.Player')
 Enemy = require('classes.characters.Enemy')
 Turret = require('classes.characters.Turret')
+Tank = require('classes.characters.Tank')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -40,6 +41,7 @@ Stairs = require('classes.items.Stairs')
 Bullet = require('classes.Bullet')
 EnemyBullet = require('classes.EnemyBullet')
 DrillBullet = require('classes.DrillBullet')
+TankBullet = require('classes.TankBullet')
 
 
 
@@ -151,14 +153,18 @@ local function initPlayer(p)
     local playerx = (MAP.emptytiles[1].x * 16) + 4
     local playery = (MAP.emptytiles[1].y * 16) + 4
     
+    table.remove(MAP.emptytiles, 1)
+    
+    
     player = Player(playerx, playery)
+    MAP[player.tx][player.ty].occupied = true
     if p == nil then
        
         player.camera = Camera(player.x, player.y, 6)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
         player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
 
-        player.munition = 20
+        player.munition = 30
     else
         player.camera = Camera(player.x, player.y, 6)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
@@ -228,19 +234,30 @@ local function spawnEnemies(num)
         local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
         local tx = ix /16
         local ty = iy /16
+        
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Enemy(ix,iy))
+            table.insert(ENEMIES, Enemy(ix,iy + 6))
 
         end
     end
 
-    for i = num/2, num do
+    for i = num/4, num do
         local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
         local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
         local tx = ix /16
         local ty = iy /16
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Turret(ix,iy))
+
+        end
+    end
+    for i = num/4, num do
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
+        local tx = ix /16
+        local ty = iy /16
+        if MAP[tx][ty].type == 0 then
+            table.insert(ENEMIES, Tank(ix,iy + 6))
 
         end
     end
@@ -398,7 +415,7 @@ local function drawGUI()
     love.graphics.setColor(1,1,1)
 
 
-    local rectangle = {x = 5, y = 5, w = player.hp * 25, h = 40}
+    local rectangle = {x = 5, y = 5, w = player.hp * 12, h = 40}
     
     local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
     local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
@@ -409,15 +426,15 @@ local function drawGUI()
     love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
     love.graphics.setColor(COLORS.white)
 
-    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * 25) +2,rectangle.h+2)
+    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * 12) +2,rectangle.h+2)
 
     love.graphics.setFont(FONT.f16)
     love.graphics.print("HP", 6,6)
 
     love.graphics.setFont(FONT.f16)
-    love.graphics.print("AMMO", (rectangle.x + (player.maxhp*25)) + 50, rectangle.y)
+    love.graphics.print("AMMO", (rectangle.x + (player.maxhp*12)) + 50, rectangle.y)
     love.graphics.setFont(FONT.f24)
-    love.graphics.print(player.munition, (rectangle.x + (player.maxhp*25)) + 150, rectangle.y)
+    love.graphics.print(player.munition, (rectangle.x + (player.maxhp*12)) + 150, rectangle.y)
 
     
 end

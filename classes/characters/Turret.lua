@@ -24,7 +24,8 @@ function Turret:init(x, y)
     20,
     1,
     "enemy", -- type
-    0.1 --rof
+    0.1, --rof
+    1
 )
 
     mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
