@@ -21,8 +21,8 @@ function Player:init(x, y)
     0,
     500,
     10,
-    2 -- type
-
+    2, -- type
+    0 -- rof aint used
 )
 self.tx = math.floor(self.x / 16)
 self.ty = math.floor(self.y / 16)
@@ -57,6 +57,8 @@ self.ty = math.floor(self.y / 16)
   self.smokeparticle:setSizeVariation(1) -- vary particle size by up to 100%
   self.smokeparticle:setLinearAcceleration(-10, -10, 10, 10) -- random acceleration in any direction
   self.smokeparticle:setColors(255, 255, 255, 255, 255, 255, 255, 0) 
+
+  self.hitinvi = false
   
 end
 
@@ -89,6 +91,18 @@ function Player:update(dt)
     if self.y > ((maxY) * 16)+4 then
         self.y = ((maxY) * 16)+4
     end
+
+    if self.hitinvi and not self.showhitinvi then
+        self.showhitinvi = true
+        Timer.every(0.03, function() 
+            player.visible = true
+        end, 14)
+        Timer.every(0.05, function ()
+            player.visible = false
+        end, 8)
+    end 
+
+    
 
     if #INVENTORY > 1 then
         if love.keyboard.isDown("q") and not self.changingweapon then

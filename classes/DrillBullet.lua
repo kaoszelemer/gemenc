@@ -13,8 +13,8 @@ function DrillBullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vel
     self.visible = true
     self.type = "DrillBullet"
 
+
     self.removed = false
-    print(self, " added")
     mapWorld:add(self, self.x, self.y, self.w, self.h)
     self.dpi = love.graphics.newImage("assets/dustparticle.png")
     self.dustparticles = love.graphics.newParticleSystem(self.dpi, 100)
@@ -50,11 +50,6 @@ function DrillBullet:draw()
     if self.isHit then
         love.graphics.draw(self.dustparticles, self.x, self.y)
     end
---debug purposes
---[[     if self.removed then
-        love.graphics.setColor(1,0,0)
-        love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
-    end ]]
 
 end
 
@@ -77,17 +72,6 @@ function DrillBullet:update(dt)
         self.x = ax
         self.y = ay
         for i = 1, #cols do
-       --    print("type: "..cols[i].other.type)
-      --[[       if cols[i].other.type == "enemy" then
-                cols[i].other:kill()
-                self.visible = false
-                self.removed = true
-                INVENTORY[1].DrillBulletshot = false
-                print(self, "  removed cos kill")
-                mapWorld:remove(self)
-            end ]]
-                
-           
         
             if len == 1 and self.removed == false then
                 self.velx, self.vely = 0,0
@@ -96,20 +80,13 @@ function DrillBullet:update(dt)
                 self.removed = true
                 player.drillbulletshot = false
                 self.isHit = true
-            --[[     for k, v in pairs(cols[i].touch.x) do
-                    print(k)
-                end ]]
+
                 self.dustparticles:start()
                 Timer.after(0.4, function() 
                     self.dustparticles:stop() 
                     self.isHit = false
-                   -- player:addBloodSplatters(self.x +4, self.y+4, 8)
                 end)
-                --[[ local mapx = math.floor(cols[i].touch.x / 16)
-                local mapy = math.floor(cols[i].touch.y / 16) ]]
 
-        --[[         print(mapx, mapy)
-                print(MAP[mapx][mapy].type) ]]
                 mapWorld:remove(self)
                 cols[i].other.type = 0
                 print(self, "  removed cos hit")
@@ -131,7 +108,6 @@ function DrillBullet:update(dt)
             mapWorld:remove(self)
             return
         end
-      --  local distance = math.sqrt((MOUSEX - self.x)^2 + (MOUSEY - self.y)^2)
         
         local distance1 = math.sqrt((player.x - (self.targetx))^2 + (player.y - (self.targety))^2)
         local distance2 = math.sqrt((player.x - (self.x))^2 + (player.y - (self.y))^2)
@@ -151,13 +127,6 @@ function DrillBullet:update(dt)
 
 
     end
-
-    
-  
-
-    -- print(self.removed)
-
-      --  print(self.x, self.targetx, self.x == self.targetx)
 
 end
 

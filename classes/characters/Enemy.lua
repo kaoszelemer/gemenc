@@ -18,13 +18,13 @@ function Enemy:init(x, y)
         h = 8
     },
     "soldier",
-    love.graphics.newImage("assets/enemy.png"),
+    love.graphaics.newImage("assets/enemy.png"),
     0,
     0,
     20,
     1,
-    "enemy" -- type
-
+    "enemy" ,-- type
+    1 --rof
 )
 
   mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)

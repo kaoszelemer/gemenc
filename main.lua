@@ -11,6 +11,7 @@ Luastar = require('lib.luastar')
 GLOBALS = {
 }
 
+
 local shadowCanvas
 
 
@@ -22,6 +23,7 @@ maxX, maxY = 16, 16
 Character = require('classes.characters.Character')
 Player = require('classes.characters.Player')
 Enemy = require('classes.characters.Enemy')
+Turret = require('classes.characters.Turret')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -31,6 +33,7 @@ FieldItem = require('classes.items.FieldItem')
 Medpack = require('classes.items.Medpack')
 Ammo = require('classes.items.Ammo')
 DrillItem = require('classes.items.DrillItem')
+Shield = require('classes.items.Shield')
 
 Stairs = require('classes.items.Stairs')
 
@@ -41,6 +44,15 @@ DrillBullet = require('classes.DrillBullet')
 
 
 StateMachine = require('classes.StateMachine')
+
+
+SCREENSHAKE = {
+
+    t = 0,
+    shakeDuration = -1,
+    shakeMagnitude = 0
+
+}
 
 
 gameState = StateMachine({
@@ -69,7 +81,11 @@ gameState = StateMachine({
 )
 
 
+function screenShake(dur, mag)
 
+    SCREENSHAKE.t, SCREENSHAKE.shakeDuration, SCREENSHAKE.shakeMagnitude = 0, dur, mag
+
+end
 
 local function mapcreator(x,y,val)
  
@@ -191,12 +207,23 @@ local function spawnItems(mpnum, bunum)
     
     end
 
+    local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
+    local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
+    local tx = ix /16
+    local ty = iy /16
+
+    if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
+        table.insert(ITEMS, Shield(ix,iy))
+       -- MAP[tx][ty].type = 2
+        MAP[tx][ty].occupied = true
+    end
+
       
 
 end
 
 local function spawnEnemies(num)
-    for i = 1, num do
+    for i = 1, num /2 do
         local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
         local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
         local tx = ix /16
@@ -207,6 +234,16 @@ local function spawnEnemies(num)
         end
     end
 
+    for i = num/2, num do
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
+        local tx = ix /16
+        local ty = iy /16
+        if MAP[tx][ty].type == 0 then
+            table.insert(ENEMIES, Turret(ix,iy))
+
+        end
+    end
 end
 
 
@@ -215,8 +252,9 @@ local function spawnStairs()
     for x = maxX /2, maxX do
         for y = maxY /2, maxY do
          --   print(MAP[x][y].occupied ~= true)
-            if MAP[x][y].occupied ~= true and MAP[x][y].type == 0 and not MAP.stairsinserted then
+            if MAP[x][y].occupied ~= true and not MAP.stairsinserted then
                 MAP[x][y].occupied = true
+                MAP[x][y].type = 0
                 table.insert(ITEMS, Stairs(x * 16, y * 16))
                 MAP.stairsinserted = true
                 print("stairs inserted")
@@ -448,6 +486,10 @@ end
 
 function love.update(dt)
 
+    if SCREENSHAKE.t < SCREENSHAKE.shakeDuration then
+        SCREENSHAKE.t = SCREENSHAKE.t + dt
+    end
+
     if gameState.state == gameState.states.game then
       --  print("kldjssdkldskl")
         MOUSEX, MOUSEY = player.camera:worldCoords(love.mouse.getPosition())
@@ -482,11 +524,15 @@ function love.update(dt)
 
     Timer.update(dt)
    -- print(ENEMIES[1].x)
-   
+
 end
 
 function love.draw() 
-
+    if SCREENSHAKE.t < SCREENSHAKE.shakeDuration then
+        local dx = love.math.random(-SCREENSHAKE.shakeMagnitude, SCREENSHAKE.shakeMagnitude)
+        local dy = love.math.random(-SCREENSHAKE.shakeMagnitude, SCREENSHAKE.shakeMagnitude)
+        love.graphics.translate(math.floor(dx), math.ceil(dy))
+    end
  
 
     if gameState.state == gameState.states.starting then

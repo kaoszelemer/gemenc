@@ -12,9 +12,10 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
     self.vely = 50
     self.visible = true
     self.type = "Bullet"
+  
 
     self.removed = false
-    print(self, " added")
+  --  print(self, " added")
     mapWorld:add(self, self.x, self.y, self.w, self.h)
 
 end
@@ -63,6 +64,7 @@ function Bullet:update(dt)
         for i = 1, #cols do
        --    print("type: "..cols[i].other.type)
             if cols[i].other.type == "enemy" then
+            --    screenShake(0.1, 3)
                 cols[i].other:kill()
                 self.visible = false
                 self.removed = true

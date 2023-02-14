@@ -14,8 +14,9 @@ function EnemyBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, spee
     self.visible = true
     self.type = "EnemyBullet"
 
+
     self.removed = false
-    print(self, " added")
+   -- print(self, " added")
     mapWorld:add(self, self.x, self.y, self.w, self.h)
     self.maxbulletdistance = 25
     self.ox = x
@@ -37,16 +38,9 @@ end
 
 function EnemyBullet:draw()
 
-    if self.visible then
-
+    if self.visible and self.parent.visible then
         love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
     end
-
---debug purposes
---[[     if self.removed then
-        love.graphics.setColor(1,0,0)
-        love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
-    end ]]
 
 end
 
@@ -81,26 +75,33 @@ function EnemyBullet:update(dt)
         for i = 1, #cols do
            
             --   print(    cols[i].other.EnemyBulletshot)
-            if cols[i].other.type == 2 then
+            if cols[i].other.type == 2 and not player.shielded then
                 self.velx, self.vely = 0,0
                 player.isHit = true
-                player.particleSystem:start()
-                Timer.after(0.4, function() 
-                    player.particleSystem:stop() 
-                    player:addBloodSplatters(self.x +4, self.y+4, 8)
-                end)
                 if player.hp > 0 then
-                    player.hp = player.hp - 1
+                    if player.hitinvi == false then
+                        player.hp = player.hp - 1
+                    end
                 else
                     player:kill("pl")
                 end
+                player.hitinvi = true
+                player.particleSystem:start()
+                Timer.after(0.4, function() 
+                    player.hitinvi = false
+                    player.showhitinvi = false
+                    player.particleSystem:stop() 
+                    player:addBloodSplatters(self.x +4, self.y+4, 8)
+                end)
+                screenShake(0.1, 3)
+            
                 self.visible = false
                 self.removed = true
-                Timer.after(1, function()    self.parent.EnemyBulletshot = false 
+                Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false 
 
                 end)
                 
-                print(self, "  removed cos playerhit")
+             --   print(self, "  removed cos playerhit")
                 mapWorld:remove(self)
                 return
             end
@@ -111,8 +112,8 @@ function EnemyBullet:update(dt)
             self.velx, self.vely = 0,0
             self.visible = false
             self.removed = true
-            Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
-            print(self, "  removed cos hit ")
+            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+         --   print(self, "  removed cos hit ")
             mapWorld:remove(self)
             return
          end
@@ -135,8 +136,8 @@ function EnemyBullet:update(dt)
          
             self.visible = false
             self.removed = true
-            Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
-            print(self, "  removed cos stopped ")
+            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+       --     print(self, "  removed cos stopped ")
             mapWorld:remove(self)
             return
         end
@@ -147,8 +148,8 @@ function EnemyBullet:update(dt)
         if distance <= 1 and self.removed ~= true then
             self.visible = false
             self.removed = true
-            Timer.after(1, function()    self.parent.EnemyBulletshot = false end)
-            print(self, "  removed cos distance ")
+            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+         --   print(self, "  removed cos distance ")
             mapWorld:remove(self)
         end
 

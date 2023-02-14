@@ -49,17 +49,12 @@ function Stairs:draw()
 end
 
 function Stairs:action()
-    --[[ if not self.standingonStairs then
-        player.standingonStairs = true
-        Timer.after(5, function ()
-            player.standingonStairs = false
-        end) ]]
      
         if love.keyboard.isDown("space") and player.changinglevel ~= true then
             player.changinglevel = true
             changeLevel()
         end      
---    end
+
 end
 
 

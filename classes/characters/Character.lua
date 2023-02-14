@@ -1,7 +1,7 @@
 local Character = Class('Character')
 
 
-function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, friction, type)
+function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, friction, type, rof)
 
     self.x = x
     self.y = y
@@ -15,10 +15,12 @@ function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, fri
     self.speed = speed
     self.friction = friction
     self.type =  type
+    self.rof = rof
 
 
     self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
     self.shadowimage = love.graphics.newImage("assets/shadow.png")
+    self.shieldimage = love.graphics.newImage("assets/shield.png")
 
 end
 
@@ -26,14 +28,26 @@ local bloodprints = {}
 
 
 function  Character:draw()
-  for _, splatter in pairs(BLOODSPLATTERS) do
-    love.graphics.draw(
-        self.bloodSplatterImage,
-        splatter.x,
-        splatter.y,
-        splatter.alpha,
-        splatter.scale
-    )
+
+if self.name ~= "Turret" then
+    for _, splatter in pairs(BLOODSPLATTERS) do
+      love.graphics.draw(
+          self.bloodSplatterImage,
+          splatter.x,
+          splatter.y,
+          splatter.alpha,
+          splatter.scale
+      )
+  end
+
+  for k, v in ipairs(bloodprints) do
+
+      love.graphics.setColor(1,1,1, v.alpha)
+      love.graphics.draw(self.bloodSplatterImage, v.x + 4, v.y + 4, 0.75, 0.75)
+      love.graphics.setColor(1,1,1, 1)
+    
+  end
+
 end
 if self.name == "gemenc" then
   
@@ -50,26 +64,31 @@ end
     love.graphics.draw(self.image, self.x + 4, self.y + 4, self.angle, nil, nil, 4, 4)
   end
 
+  if self.shielded then
+    love.graphics.draw(self.shieldimage, self.x -4, self.y-4)
+  end
+
   if self.isDead or self.isHit then
+
+    if self.name ~= "Turret" then
+    love.graphics.draw(self.particleSystem, self.x + 4  , self.y + 4)
+   
+    else
     love.graphics.draw(self.particleSystem, self.x + 4, self.y + 4)
+    love.graphics.draw(self.particleSystem, self.x + 8, self.y + 12)
+    love.graphics.draw(self.particleSystem, self.x + 12, self.y + 8)
+    love.graphics.draw(self.particleSystem, self.x + 16, self.y + 4)
+ --   love.graphics.draw(self.particleSystem, self.x + 16, self.y + 8)
+    end
  
     
   end
 
 
-    for k, v in ipairs(bloodprints) do
 
-      love.graphics.setColor(1,1,1, v.alpha)
- --[[      love.graphics.rectangle("fill", v.x, v.y, 1,1)
-      love.graphics.setColor(145/255,0,0, v.alpha)
-      love.graphics.rectangle("fill", v.x + 2, v.y + 2, 2,2)
-      love.graphics.setColor(1,1,1) ]]
-   love.graphics.draw(self.bloodSplatterImage, v.x + 4, v.y + 4, 0.75, 0.75)
-   love.graphics.setColor(1,1,1, 1)
-    end
 
   
-    if player.trail[1] then
+ --[[    if player.trail[1] then
       love.graphics.circle ('fill', player.trail[1], player.trail[2], #player.trail/2)
     end
     for i = 3, #player.trail-1, 2 do
@@ -79,7 +98,7 @@ end
       love.graphics.circle ('fill', player.trail[i], player.trail[i+1], w/2)
     end
 
- 
+  ]]
 
 
  -- love.graphics.setBlendMode('darken', "premultiplied")
@@ -124,9 +143,10 @@ function  Character:addBloodPrints(x,y)
 
  -- print(x % 2)
 --  if #bloodprints < 250 then
-
-    if x % 2 >= 1 or y % 2 >= 1 then
-      table.insert(bloodprints, bp)
+    if #bloodprints < 200 then
+      if x % 2 >= 1.85 or y % 2 >= 1.85 then
+        table.insert(bloodprints, bp)
+      end
     end
  -- end
   end
@@ -152,8 +172,10 @@ function Character:kill(pl)
   else
 
     Timer.after(0.4, function() 
-      self.particleSystem:stop() 
-      self:addBloodSplatters(self.x +4, self.y+4, 8)
+      self.particleSystem:stop()
+      if self.name ~= "Turret" then
+        self:addBloodSplatters(self.x +4, self.y+4, 8)
+      end
     end)
    
     self.isDead = true
@@ -180,7 +202,7 @@ end
 
 
 function  Character:update(dt)
-  
+  print(#bloodprints)
   for _, splatter in pairs(BLOODSPLATTERS) do
     
     self.distance = math.sqrt((splatter.x - (player.prevx))^2 + (splatter.y - (player.prevy))^2)
