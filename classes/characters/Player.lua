@@ -32,6 +32,7 @@ self.ty = math.floor(self.y / 16)
   self.visible = true
 
   self.maxhp = self.hp
+  --
   
   self.angle = 0
 
