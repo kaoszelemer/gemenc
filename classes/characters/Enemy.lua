@@ -18,7 +18,7 @@ function Enemy:init(x, y)
         h = 8
     },
     "soldier",
-    love.graphaics.newImage("assets/enemy.png"),
+    love.graphics.newImage("assets/enemy.png"),
     0,
     0,
     20,
