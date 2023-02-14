@@ -13,24 +13,6 @@ GLOBALS = {
 
 local shadowCanvas
 
-local blur_shader = love.graphics.newShader[[
-  vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) {
-    vec2 center = vec2(0.5, 0.5);
-    float distance = length(texture_coords - center);
-    float brightness = distance * 2.0;
-    
-    vec4 sum = vec4(0);
-    int samples = 10;
-    float s = 0.05;
-    for (int i = -samples; i <= samples; i++) {
-      for (int j = -samples; j <= samples; j++) {
-        vec2 offset = vec2(float(i) * s, float(j) * s);
-        sum += Texel(texture, texture_coords + offset) * 0.11;
-      }
-    }
-    return sum * brightness;
-  }
-]]
 
 MOUSEX, MOUSEY = 0, 0
 maxX, maxY = 16, 16
@@ -160,7 +142,7 @@ local function initPlayer(p)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
         player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
 
-        player.munition = 5
+        player.munition = 20
     else
         player.camera = Camera(player.x, player.y, 6)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
@@ -254,19 +236,18 @@ local function chooseRandomMap()
         print("ellermaze")
         MAP.type = "ellermaze"
     elseif case == 3 then
-        maxX, maxY = 48,48
+        maxX, maxY = 20,20
        mapmaker = ROT.Map.Cellular:new(maxX, maxY)
        MAP.type = "Cellular"
        print("cellular")
 
     elseif case == 2 then
-        maxX, maxY = 64,64
-        local rng = {4}
-        mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {3,2,4,4})
+        maxX, maxY = 28,28
+        mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {1,1,1,1})
         MAP.type = "Uniform"
         print("Uniform")
     elseif case == 4 then
-        maxX, maxY = 32,32
+        maxX, maxY = 18,18
         MAP.type = "IceyMaze"
        mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
     end
@@ -279,19 +260,19 @@ end
 local function setDifficultyForMapAndLevel()
     if MAP.type == "Cellular" then
         MAP.maxitem = {10, 24}
-        MAP.maxenemy = 50 + LEVEL
+        MAP.maxenemy = 30 + (LEVEL * 4)
       end
       if MAP.type == "ellermaze" then
         MAP.maxitem = {5, 8}
-        MAP.maxenemy = 10 + LEVEL
+        MAP.maxenemy = 10 + (LEVEL * 4)
       end
       if MAP.type == "Uniform" then
         MAP.maxitem = {20, 40}
-        MAP.maxenemy = 80 + LEVEL
+        MAP.maxenemy = 40 + (LEVEL * 4)
       end
       if MAP.type == "IceyMaze" then
         MAP.maxitem = {8, 12}
-        MAP.maxenemy = 30 + LEVEL
+        MAP.maxenemy = 20 + (LEVEL * 4)
       end
 end
 
@@ -316,6 +297,7 @@ end
 
 function changeLevel()
     LEVEL = LEVEL + 1
+    MAP = nil
    MAP = {}
    ENEMIES = {}
    ITEMS = {}

@@ -67,10 +67,12 @@ function Enemy:update(dt)
     self.tx = math.floor(self.x / 16)
     self.ty = math.floor(self.y / 16)
 
-    if MAP[self.tx][self.ty].visible and not self.isDead then
-        self.visible = true
-    else
-        self.visible = false
+    if (self.tx > 0 and self.tx <= maxX) and (self.ty > 0 and self.ty <= maxY) then
+        if MAP[self.tx][self.ty].visible and not self.isDead then
+            self.visible = true
+        else
+            self.visible = false
+        end
     end
 
 
