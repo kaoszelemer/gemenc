@@ -42,17 +42,19 @@ end
 function Medpack:action()
 
     if not self.pickedup then
+        if player.hp <= player.maxhp then
         self.visible = false
         self.pickedup = true
         player.hp = player.hp + 1
       --  print(self.tilex, self.tiley)
         MAP[self.tilex][self.tiley].type = 0
-       -- print("itt")
- 
-
-    for i = 1, #ITEMS do
-        if ITEMS[i] == self then
-            table.remove(ITEMS, i)
+        -- print("itt")
+        
+        
+        for i = 1, #ITEMS do
+            if ITEMS[i] == self then
+                table.remove(ITEMS, i)
+            end
         end
     end
 end

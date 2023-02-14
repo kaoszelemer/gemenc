@@ -31,7 +31,8 @@ self.ty = math.floor(self.y / 16)
   self.visible = true
 
   self.hp = 10
-
+  self.maxhp = 10
+  
   self.angle = 0
 
   self.trail = {}
@@ -42,13 +43,13 @@ self.ty = math.floor(self.y / 16)
   self.smokeparticleimage = love.graphics.newImage('assets/smokeparticle.png') 
 
   
-  self.particleImage = love.graphics.newImage("assets/blood.png")
+  self.particleImage = love.graphics.newImage("assets/exploparticle.png")
   self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
-  self.particleSystem:setParticleLifetime(1, 1)
-  self.particleSystem:setEmissionRate(32)
-  self.particleSystem:setSizeVariation(1)
-  self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
-  self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
+  self.particleSystem:setParticleLifetime(0.8, 1.8)
+  self.particleSystem:setEmissionRate(64)
+  self.particleSystem:setLinearAcceleration(-15, -15, 15, 15)
+  self.particleSystem:setColors(255, 255, 255, 255, 255, 255, 255, 0)
+  self.particleSystem:setSizes(2, 0)
   self.particleSystem:start()
 
   self.smokeparticle = love.graphics.newParticleSystem(self.smokeparticleimage, 8)

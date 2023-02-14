@@ -202,7 +202,7 @@ end
 
 
 function  Character:update(dt)
-  print(#bloodprints)
+ 
   for _, splatter in pairs(BLOODSPLATTERS) do
     
     self.distance = math.sqrt((splatter.x - (player.prevx))^2 + (splatter.y - (player.prevy))^2)

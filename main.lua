@@ -392,22 +392,57 @@ end
     
 end
 
+local function drawGUI()
+    love.graphics.setColor(0,0,0)
+    love.graphics.rectangle("fill", 0, 0, 800,50)
+    love.graphics.setColor(1,1,1)
+
+
+    local rectangle = {x = 5, y = 5, w = player.hp * 25, h = 40}
+    
+    local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
+    local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
+    local b = (rectangle.w * COLORS.green[3] + (200 - rectangle.w) * COLORS.red[3]) / 200
+
+
+    love.graphics.setColor(r,g,b,1)
+    love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
+    love.graphics.setColor(COLORS.white)
+
+    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * 25) +2,rectangle.h+2)
+
+    love.graphics.setFont(FONT.f16)
+    love.graphics.print("HP", 6,6)
+
+    love.graphics.setFont(FONT.f16)
+    love.graphics.print("AMMO", (rectangle.x + (player.maxhp*25)) + 50, rectangle.y)
+    love.graphics.setFont(FONT.f24)
+    love.graphics.print(player.munition, (rectangle.x + (player.maxhp*25)) + 150, rectangle.y)
+
+    
+end
 
 
 
 function love.load()
-  love.graphics.setDefaultFilter("nearest", "nearest") 
-  shadowCanvas = love.graphics.newCanvas()
-  love.mouse.setVisible(false)
-  mouseReticleImage = love.graphics.newImage("assets/reticle.png")
+    love.graphics.setDefaultFilter("nearest", "nearest") 
+    shadowCanvas = love.graphics.newCanvas()
+    love.mouse.setVisible(false)
+    mouseReticleImage = love.graphics.newImage("assets/reticle.png")
 
-
-    
-    
-    mapWorld = bump.newWorld(64)
-    
-    MAP = {}
+    COLORS = {
+       green = {42/255, 88/255, 79/255},
+        red = {198/255, 80/255, 90/255},
+        white = {252/255, 1, 192/255}
+    }
+    FONT = {
+        f8 = love.graphics.newFont('assets/font.otf', 8), 
+        f16 = love.graphics.newFont('assets/font.otf', 16),
+        f24 =  love.graphics.newFont('assets/font.otf', 24),
+    }
+    mapWorld = bump.newWorld(64)  
     LEVEL = 1
+    MAP = {}
     MAP.emptytiles = {}
     MAP.walltiles = {}
     MAP.itemtiles = {}
@@ -416,8 +451,6 @@ function love.load()
     ITEMS = {}
     ENEMIES = {}
     BLOODSPLATTERS = {}
-
-
     TILES = {
         wall = {},
         floor = {},
@@ -430,14 +463,11 @@ function love.load()
         uniformfloor = {img = love.graphics.newImage("assets/uniformtile.png")},
         uniformwall = {img = love.graphics.newImage("assets/uniformwall.png")}
     }
-
     IMAGES = {
         titlescreen = love.graphics.newImage("assets/titlescreen.png"),
         godeeper = love.graphics.newImage("assets/godeeper.png"),
         gameover = love.graphics.newImage("assets/gameover.png")
     }
-    
-    
     local mapmaker = chooseRandomMap()
     setTileImagesForMap(MAP.type)
     for x = 1, maxX do
@@ -447,40 +477,17 @@ function love.load()
         end
     end
     setDifficultyForMapAndLevel()
-    
-    if MAP.type == "Cellular" then
-        
+    if MAP.type == "Cellular" then 
         mapmaker:randomize(0.5)
-
     end
-
---[[     if MAP.type == "Uniform" then
-        for x = 1, maxX do
-            MAP[x] = {}
-            for y = 1, maxY do
-                MAP[x][y] = {}
-            end
-        end
-    end ]]
     mapmaker:create(mapcreator) 
-
-
     initPlayer()
-    --print(MAP.maxitem)
     spawnStairs()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(MAP.maxenemy)
-
-
-
-  INVENTORY = {}
-
-  BULLETS = {}
-
-  --debug purposes
-  INVENTORY[1] = Pistol()
-
-   -- print(gameState.state)
+    INVENTORY = {}
+    BULLETS = {}
+    INVENTORY[1] = Pistol()
     
 end
 
@@ -574,28 +581,6 @@ function love.draw()
                 end
             end
         end
-
-
-     --[[    for x = 1, maxX do
-            for y = 1, maxY do
-                if MAP[x][y] ~= nil then
-                    local cell = MAP[x][y] 
-
-                    if cell.type == 1 and cell.visible then          
-                   
-                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
-                    end
-                    if cell.type == 0 and cell.visible then
-                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
-                    end
-                end
-            end
-        end ]]
-
- 
-        
-   
-        
         love.graphics.setColor(1,1,1,1)
         
         for i = 1, #ITEMS do
@@ -620,17 +605,7 @@ function love.draw()
         
         player:draw()
 
-
-  -- Draw the shadows to the shadow canvas
-    
-
-        -- Blend the shadow canvas with the main canvas
-   
-   
-
-
         love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
-
         player.camera:detach()
 
 
@@ -641,7 +616,8 @@ function love.draw()
            
             love.graphics.draw(IMAGES.godeeper, player.x + 200, player.y + 80)
         end
-      
+
+        drawGUI()
     end
 
     if gameState.state == gameState.states.map then
