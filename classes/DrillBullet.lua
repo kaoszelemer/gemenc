@@ -78,7 +78,7 @@ function DrillBullet:update(dt)
               
                 self.visible = false
                 self.removed = true
-                player.drillbulletshot = false
+                player.bulletshot = false
                 self.isHit = true
 
                 self.dustparticles:start()
@@ -103,7 +103,7 @@ function DrillBullet:update(dt)
          
             self.visible = false
             self.removed = true
-            Timer.after(0.3, function()    player.drillbulletshot = false end)
+            Timer.after(0.3, function()    player.bulletshot = false end)
             print(self, "  removed cos stopped ")
             mapWorld:remove(self)
             return
@@ -118,7 +118,7 @@ function DrillBullet:update(dt)
              self.removed = true
             
            
-             Timer.after(0.3, function()    player.drillbulletshot = false end)
+             Timer.after(0.3, function()    player.bulletshot = false end)
              print(self, "  removed cos distance ")
              mapWorld:remove(self)
          end

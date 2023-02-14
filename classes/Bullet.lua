@@ -71,10 +71,15 @@ function Bullet:update(dt)
                 cols[i].other:kill()
                 self.visible = false
                 self.removed = true
-                INVENTORY[1].bulletshot = false
+                player.bulletshot = false
                 print(self, "  removed cos kill")
                 mapWorld:remove(self)
                 else
+                    self.visible = false
+                    self.removed = true
+                    player.bulletshot = false
+                    print(self, "  removed cos hit")
+                    mapWorld:remove(self)
                     cols[i].other.hitinvi = true
                     cols[i].other.particleSystem:start()
                     Timer.after(0.4, function() 
@@ -92,7 +97,7 @@ function Bullet:update(dt)
                 
                 self.visible = false
                 self.removed = true
-                INVENTORY[1].bulletshot = false
+                player.bulletshot = false
                 print(self, "  removed cos hit")
                 mapWorld:remove(self)
                 return

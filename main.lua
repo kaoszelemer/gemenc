@@ -25,6 +25,7 @@ Player = require('classes.characters.Player')
 Enemy = require('classes.characters.Enemy')
 Turret = require('classes.characters.Turret')
 Tank = require('classes.characters.Tank')
+BossRobot = require('classes.characters.BossRobot')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -229,6 +230,17 @@ local function spawnItems(mpnum, bunum)
 end
 
 local function spawnEnemies(num)
+
+    if num == 1 then
+        local ix = MAP[maxX/2][maxY/2].x * 16
+        local iy = MAP[maxX/2][maxY/2].x * 16
+
+        table.insert(ENEMIES, BossRobot(ix,iy + 6))
+        return
+    end
+
+    
+
     for i = 1, num /2 do
         local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
         local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
@@ -261,6 +273,8 @@ local function spawnEnemies(num)
 
         end
     end
+
+
 end
 
 
@@ -349,9 +363,42 @@ local function setTileImagesForMap(type)
 
 end
 
+local function createBossMap()
+
+    for x = 1, maxX do
+        MAP[x] = {}
+        for y = 1, maxY do
+            MAP[x][y] = {}
+            MAP[x][y].visible = true
+            MAP[x][y].x = x
+            MAP[x][y].y = y
+            MAP[x][y].w = 16
+            MAP[x][y].h = 16
+            if x == 1 or x == maxX or y == 1 or y == maxY then
+                MAP[x][y].type = 1
+                mapWorld:add(MAP[x][y], MAP[x][y].x * MAP[x][y].w, MAP[x][y].y * MAP[x][y].h, MAP[x][y].w, MAP[x][y].h)
+                table.insert(MAP.walltiles, MAP[x][y])
+            else
+                MAP[x][y].type = 0
+                table.insert(MAP.emptytiles, MAP[x][y])
+            end
+        
+        end
+    end
+
+    MAP.maxitem = {10,10}
+
+
+
+
+
+
+end
+
 
 function changeLevel()
-    LEVEL = LEVEL + 1
+    LEVEL = LEVEL + 2
+
     MAP = nil
    MAP = {}
    ENEMIES = {}
@@ -372,37 +419,47 @@ function changeLevel()
    BULLETS = {}
    print("changing level to level"..LEVEL)
 
+   if LEVEL % 3 == 0 then
+    mapWorld = bump.newWorld(64)
+    createBossMap()
+    initPlayer(player)
+    spawnItems(MAP.maxitem[1],MAP.maxitem[2])
+    spawnEnemies(1)
+    player.fov=ROT.FOV.Precise:new(lightCalbak)
+   else
 
-   local mapmaker = chooseRandomMap()
-   setTileImagesForMap(MAP.type)
-   for x = 1, maxX do
-    MAP[x] = {}
-    for y = 1, maxY do
-        MAP[x][y] = {}
-        MAP[x][y].visible = false
-    end
-   end
+        local mapmaker = chooseRandomMap()
+        setTileImagesForMap(MAP.type)
+        for x = 1, maxX do
+            MAP[x] = {}
+            for y = 1, maxY do
+                MAP[x][y] = {}
+                MAP[x][y].visible = false
+            end
+        end
+
    
   -- 
- 
-if MAP.type == "Cellular" then
-    mapmaker:randomize(0.5)
+    
+        if MAP.type == "Cellular" then
+            mapmaker:randomize(0.5)
 
-end
+        end
 
 
 
-  
-    mapWorld = bump.newWorld(64)
-    mapmaker:create(mapcreator) 
-    setDifficultyForMapAndLevel()
-    initPlayer(player)
-    spawnStairs()
+    
+        mapWorld = bump.newWorld(64)
+        mapmaker:create(mapcreator) 
+        setDifficultyForMapAndLevel()
+        initPlayer(player)
+        spawnStairs()
 
-    spawnItems(MAP.maxitem[1],MAP.maxitem[2])
-    spawnEnemies(MAP.maxenemy)
+        spawnItems(MAP.maxitem[1],MAP.maxitem[2])
+        spawnEnemies(MAP.maxenemy)
 
-    player.fov=ROT.FOV.Precise:new(lightCalbak)
+        player.fov=ROT.FOV.Precise:new(lightCalbak)
+    end
   
 
 

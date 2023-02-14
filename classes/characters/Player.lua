@@ -209,17 +209,19 @@ end
 
 function Player:action(x,y)
 
-    if self.munition > 0 then
+ 
+    if self.munition > 0 and not self.bulletshot then
         self.munition = self.munition - 1
         self.bulletshot = true
         INVENTORY[1]:shoot(x,y)
     end
 
-
-        if INVENTORY[1]:instanceOf(Drill) then
-            self.bulletshot = true
+--[[ 
+        if self.munition > 0 and not self.drillbulletshot then
+            self.munition = self.munition - 1
+            self.drillbulletshot = true
             INVENTORY[1]:shoot(x,y)
-        end
+        end ]]
 
     
 
