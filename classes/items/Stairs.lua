@@ -6,8 +6,8 @@ function Stairs:init(x, y)
     self,
     x,
     y,
-    16,
-    16,
+    32,
+    32,
     love.graphics.newImage("assets/stairs.png"),
     4
   
@@ -15,10 +15,8 @@ function Stairs:init(x, y)
 
     mapWorld:add(self, self.x, self.y, self.w, self.h)
     self.visible = false
-
-    self.tilex = math.floor(self.x / self.w)
-    self.tiley = math.floor(self.y / self.h)
-
+    self.tilex = math.floor(self.x / tileW)
+    self.tiley = math.floor(self.y / tileH)
 end
 
 

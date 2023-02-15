@@ -145,9 +145,10 @@ end
 
 function Character:kill(pl)
   if pl == "pl" then
-    Timer.after(0.2, function() 
+   
       gameState:changeState(gameState.states.gameover)
-    end)
+  
+   
   elseif pl == "boss" then
     print("spwaning stairs")
     spawnStairs()
@@ -164,6 +165,7 @@ function Character:kill(pl)
     end
   end)
  
+
   self.isDead = true
   self.visible = false
   mapWorld:remove(self)
@@ -220,6 +222,11 @@ function  Character:update(dt)
   if player.velX == 0 and player.velY == 0 then
     player.smokeparticle:stop()
   end
+
+
+
+
+ 
     
 end
 

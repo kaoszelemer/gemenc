@@ -30,8 +30,8 @@ function Turret:init(x, y)
 
     mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
     self.visible = false
-    self.tx = math.floor(self.x / 16)
-    self.ty = math.floor(self.y / 16)
+    self.tx = math.floor(self.x / tileW)
+    self.ty = math.floor(self.y / tileH)
   
 
 
@@ -51,8 +51,8 @@ end
 function Turret:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
-    self.tx = math.floor(self.x / 16)
-    self.ty = math.floor(self.y / 16)
+    self.tx = math.floor(self.x / tileW)
+    self.ty = math.floor(self.y / tileH)
 
     if (self.tx > 0 and self.tx <= maxX) and (self.ty > 0 and self.ty <= maxY) then
         if MAP[self.tx][self.ty].visible and not self.isDead then
@@ -70,23 +70,22 @@ function Turret:update(dt)
     if self.isDead then
         self.particleSystem:update(dt)
     end
-
     if self.x < 18 then
-  
+   
         self.x = 18
-    end
-    if self.y < 18 then
-   
+      end
+      if self.y < 18 then
+  
         self.y = 18
-    end
-    if self.x > ((maxX) * 16) +4 then
-   
-        self.x = ((maxX) * 16)+4
-    end
-    if self.y > ((maxY) * 16)+4 then
-     
-        self.y = ((maxY) * 16)+4
-    end
+      end
+      if self.x > ((maxX) * tileW) +4 then
+      
+        self.x = ((maxX) * tileW)+4
+      end
+      if self.y > ((maxY) * tileH)+4 then
+    
+        self.y = ((maxY) * tileH)+4
+      end 
 end
 
 function Turret:move(dt)

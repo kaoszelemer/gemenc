@@ -21,11 +21,11 @@ function BossRobot:init(x, y)
     love.graphics.newImage("assets/bossrobot.png"),
     0,
     0,
-    3,
+    30, --speed
     1,
     "enemy" ,-- type
     0.05, --rof
-    30 --hp
+    70 --hp
 )
 
 
@@ -33,11 +33,11 @@ function BossRobot:init(x, y)
     mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
     self.visible = false
     self.hitinvi = false
-    self.tx = math.floor(self.x / 16)
-    self.ty = math.floor(self.y / 16)
+    self.tx = math.floor(self.x / tileW)
+    self.ty = math.floor(self.y / tileH)
     self.ox = self.x
     self.direction = 1
-    self.walkdistance = 20
+    self.walkdistance = 200
     self.angle = 0
     self.munition = 8
 
@@ -68,8 +68,8 @@ end
 function BossRobot:update(dt)
     local distance = math.sqrt((player.x - (self.x + self.colliders.w / 2))^2 + (player.y - (self.y + self.colliders.h /2))^2)
     --print(distance)
-    self.tx = math.floor(self.x / 16)
-    self.ty = math.floor(self.y / 16)
+    self.tx = math.floor(self.x / tileW)
+    self.ty = math.floor(self.y / tileH)
 
     if (self.tx > 0 and self.tx <= maxX) and (self.ty > 0 and self.ty <= maxY) then
         if MAP[self.tx][self.ty].visible and not self.isDead then
@@ -105,19 +105,19 @@ function BossRobot:update(dt)
     if self.x < 18 then
         self.direction = -self.direction
         self.x = 18
-    end
-    if self.y < 18 then
+      end
+      if self.y < 18 then
         self.direction = -self.direction
         self.y = 18
-    end
-    if self.x > ((maxX) * 16) +4 then
+      end
+      if self.x > ((maxX) * tileW) +4 then
         self.direction = -self.direction
-        self.x = ((maxX) * 16)+4
-    end
-    if self.y > ((maxY) * 16)+4 then
+        self.x = ((maxX) * tileW)+4
+      end
+      if self.y > ((maxY) * tileH)+4 then
         self.direction = -self.direction
-        self.y = ((maxY) * 16)+4
-    end
+        self.y = ((maxY) * tileH)+4
+      end 
 end
 
 function BossRobot:move(dt)

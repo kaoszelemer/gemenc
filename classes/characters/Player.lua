@@ -19,14 +19,14 @@ function Player:init(x, y)
     love.graphics.newImage("assets/player.png"),
     0,
     0,
-    500,
+    750,
     10,
     2, -- type
     0, -- rof aint used
     25  --hp
 )
-self.tx = math.floor(self.x / 16)
-self.ty = math.floor(self.y / 16)
+self.tx = math.floor(self.x / tileW)
+self.ty = math.floor(self.y / tileH)
 
   mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
   self.visible = true
@@ -79,19 +79,19 @@ end
 
 
 function Player:update(dt)
-    self.tx = math.floor(self.x / 16)
-    self.ty = math.floor(self.y / 16)
+    self.tx = math.floor(self.x / tileW)
+    self.ty = math.floor(self.y / tileH)
     if self.x < 18 then
         self.x = 18
     end
     if self.y < 18 then
         self.y = 18
     end
-    if self.x > ((maxX) * 16) +4 then
-        self.x = ((maxX) * 16)+4
+    if self.x > ((maxX) * tileW) +4 then
+        self.x = ((maxX) * tileH)+4
     end
-    if self.y > ((maxY) * 16)+4 then
-        self.y = ((maxY) * 16)+4
+    if self.y > ((maxY) * tileW)+4 then
+        self.y = ((maxY) * tileH)+4
     end
 
     if self.hitinvi and not self.showhitinvi then
@@ -197,7 +197,7 @@ function Player:move(dt)
    
 
     
-   player.fov:compute(math.floor((self.x - 4) / 16), math.floor((self.y -4) / 16), 4, computeCalbak)
+   player.fov:compute(math.floor((self.x - 4) / tileW), math.floor((self.y -4) / tileH), 4, computeCalbak)
 
 
  --[[   player.prevx = self.x

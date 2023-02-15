@@ -16,8 +16,8 @@ function Ammo:init(x, y)
     mapWorld:add(self, self.x, self.y, self.w, self.h)
     self.visible = false
 
-    self.tilex = math.floor(self.x / self.w)
-    self.tiley = math.floor(self.y / self.h)
+    self.tilex = math.floor(self.x / tileW)
+    self.tiley = math.floor(self.y / tileH)
 
 end
 

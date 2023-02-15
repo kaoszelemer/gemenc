@@ -9,6 +9,7 @@ Luastar = require('lib.luastar')
 --GLOBALS
 
 GLOBALS = {
+    bossonwhichlevel = 2
 }
 
 
@@ -17,6 +18,7 @@ local shadowCanvas
 
 MOUSEX, MOUSEY = 0, 0
 maxX, maxY = 16, 16
+tileW, tileH = 32,32
 
 
 --requires
@@ -100,8 +102,8 @@ local function mapcreator(x,y,val)
    
     MAP[x][y] = {
         type = val,
-        w = 16,
-        h = 16,
+        w = tileW,
+        h = tileH,
         x = x,
         y = y}
 
@@ -157,10 +159,10 @@ end
 end
 
 local function initPlayer(p)
-   -- print(MAP.emptytiles[1].x * 16, "KAJAJAJSKJDSLJDSLKJDKLJ")
-    local playerx = (MAP.emptytiles[1].x * 16) + 4
-    local playery = (MAP.emptytiles[1].y * 16) + 4
-    
+
+    local playerx = (MAP.emptytiles[1].x * tileW) + 4
+    local playery = (MAP.emptytiles[1].y * tileH) + 4
+  
     table.remove(MAP.emptytiles, 1)
     
     
@@ -168,21 +170,21 @@ local function initPlayer(p)
     MAP[player.tx][player.ty].occupied = true
     if p == nil then
        
-        player.camera = Camera(player.x, player.y, 6)
+        player.camera = Camera(player.x, player.y, 4)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
-        player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+        player.fov:compute(math.floor((player.x - 4) / tileW), math.floor((player.y -4) / tileH), 2, computeCalbak)
 
         player.munition = 30
     else
-        player.camera = Camera(player.x, player.y, 6)
+        player.camera = Camera(player.x, player.y, 4)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
-        player.fov:compute(math.floor((player.x - 4) / 16), math.floor((player.y -4) / 16), 2, computeCalbak)
+        player.fov:compute(math.floor((player.x - 4) / tileW), math.floor((player.y -4) / tileH), 2, computeCalbak)
         player.hp = p.hp
         player.munition = p.munition
         player.x = playerx
         player.y = playery
-        player.tx = math.floor(playerx / 16)
-        player.ty = math.floor(playery / 16)
+        player.tx = math.floor(playerx / tileW)
+        player.ty = math.floor(playery / tileH)
     end
 end
 
@@ -191,25 +193,25 @@ local function spawnItems(mpnum, bunum)
   
 
     for i = 1, mpnum do
-        local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
-        local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
-        local tx = ix /16
-        local ty = iy /16
+        local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
         if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
-            table.insert(ITEMS, Medpack(ix,iy))
+            table.insert(ITEMS, Medpack(ix + tileW / 2,iy + tileW/ 2))
           --  MAP[tx][ty].type = 2
             MAP[tx][ty].occupied = true
         end
     end
 
     for i = 1, bunum  do
-        local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
-        local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
-        local tx = ix /16
-        local ty = iy /16
+        local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
 
         if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
-            table.insert(ITEMS, Ammo(ix,iy))
+            table.insert(ITEMS, Ammo(ix + tileW / 2,iy + tileW/ 2))
            -- MAP[tx][ty].type = 2
             MAP[tx][ty].occupied = true
         end
@@ -217,17 +219,17 @@ local function spawnItems(mpnum, bunum)
 
     if LEVEL == 2 then
      
-        table.insert(ITEMS, DrillItem(player.x + 8,player.y))
+        table.insert(ITEMS, DrillItem(player.x + 8,player.y + 8))
     
     end
 
-    local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * 16
-    local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * 16
-    local tx = ix /16
-    local ty = iy /16
+    local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
+    local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
+    local tx = ix / tileW
+    local ty = iy / tileH
 
     if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
-        table.insert(ITEMS, Shield(ix,iy))
+        table.insert(ITEMS, Shield(ix + tileW / 2,iy + tileW/ 2))
        -- MAP[tx][ty].type = 2
         MAP[tx][ty].occupied = true
     end
@@ -239,8 +241,8 @@ end
 local function spawnEnemies(num)
 
     if num == 1 then
-        local ix = MAP[maxX/2][maxY/2].x * 16
-        local iy = MAP[maxX/2][maxY/2].x * 16
+        local ix = MAP[maxX/2][maxY/2].x * tileW
+        local iy = MAP[maxX/2][maxY/2].x * tileH
 
         table.insert(ENEMIES, BossRobot(ix - 32,iy - 32))
         return
@@ -249,33 +251,33 @@ local function spawnEnemies(num)
     
 
     for i = 1, num /2 do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
-        local tx = ix /16
-        local ty = iy /16
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
         
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Enemy(ix,iy + 6))
+            table.insert(ENEMIES, Enemy(ix + tileW / 2,iy + tileW/ 2))
         end
     end
 
     for i = num/4, num do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
-        local tx = ix /16
-        local ty = iy /16
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Turret(ix,iy))
+            table.insert(ENEMIES, Turret(ix + tileW / 2,iy + tileW/ 2))
 
         end
     end
     for i = num/4, num do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * 16
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * 16
-        local tx = ix /16
-        local ty = iy /16
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Tank(ix,iy + 6))
+            table.insert(ENEMIES, Tank(ix + tileW / 2, (iy + tileW/ 2) - 6))
 
         end
     end
@@ -292,7 +294,7 @@ function spawnStairs()
             if MAP[x][y].occupied ~= true and not MAP.stairsinserted then
                 MAP[x][y].occupied = true
                 MAP[x][y].type = 0
-                table.insert(ITEMS, Stairs(x * 16, y * 16))
+                table.insert(ITEMS, Stairs(x * tileW, y * tileH))
                 MAP.stairsinserted = true
                 print("stairs inserted")
             end
@@ -380,8 +382,8 @@ local function createBossMap()
             MAP[x][y].visible = true
             MAP[x][y].x = x
             MAP[x][y].y = y
-            MAP[x][y].w = 16
-            MAP[x][y].h = 16
+            MAP[x][y].w = tileW
+            MAP[x][y].h = tileH
             if x == 1 or x == maxX or y == 1 or y == maxY then
                 MAP[x][y].type = 1
                 mapWorld:add(MAP[x][y], MAP[x][y].x * MAP[x][y].w, MAP[x][y].y * MAP[x][y].h, MAP[x][y].w, MAP[x][y].h)
@@ -404,17 +406,17 @@ local function createBossMap()
 end
 
 local function createMapTransitionVariables()
-    local explosion_center_x, explosion_center_y = maxX * 16 / 2, maxY * 16 / 2 -- center of the map
+    local explosion_center_x, explosion_center_y = maxX * tileW / 2, maxY * tileH / 2 -- center of the map
     local explosionforce = 10
     
     for x = 1, maxX do
         for y = 1, maxY do
 
-            local tile_center_x, tile_center_y = (x - 0.5) * 16, (y - 0.5) * 16 -- center of the tile
+            local tile_center_x, tile_center_y = (x - 0.5) * tileW, (y - 0.5) * tileH -- center of the tile
             local dx, dy = tile_center_x - explosion_center_x, tile_center_y - explosion_center_y -- vector from the center of the map to the center of the tile
             local magnitude = math.sqrt(dx * dx + dy * dy) -- distance from the center of the map to the center of the tile
             local direction = math.atan2(dy, dx) -- direction from the center of the map to the center of the tile
-            local velocity_magnitude = (1 - magnitude / math.sqrt(maxX * 16 * maxY * 16)) * explosionforce -- scale the magnitude based on the distance from the center of the map
+            local velocity_magnitude = (1 - magnitude / math.sqrt(maxX * tileW * maxY * tileH)) * explosionforce -- scale the magnitude based on the distance from the center of the map
             local velocity_x = velocity_magnitude * math.cos(direction)
             local velocity_y = velocity_magnitude * math.sin(direction)
 
@@ -453,7 +455,7 @@ function changeLevel()
 
  
 
-   if LEVEL % 3 == 0 then
+   if LEVEL % GLOBALS.bossonwhichlevel == 0 then
     mapWorld = bump.newWorld(64)
     createBossMap()
     createMapTransitionVariables()
@@ -461,9 +463,9 @@ function changeLevel()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(1)
     player.fov=ROT.FOV.Precise:new(lightCalbak)
-    player.camera.scale = 4
+    player.camera.scale = 2
    else
-        player.camera.scale = 6
+        player.camera.scale = 4
         local mapmaker = chooseRandomMap()
         setTileImagesForMap(MAP.type)
         for x = 1, maxX do
@@ -694,29 +696,32 @@ function love.draw()
         local px, py = player.camera:worldCoords(player.x, player.y)
         love.graphics.clear()
         love.graphics.setColor(1, 1, 1, 0.1)
-        love.graphics.circle("fill", px, py, 80)
+        love.graphics.circle("fill", px, py, 720 / player.camera.scale)
         love.graphics.setCanvas()
        
         for x = 1, maxX do
             for y = 1, maxY do
                 if MAP[x][y] ~= nil then
                     local cell = MAP[x][y] 
-                    local distance =  math.sqrt((player.x - (cell.x * 16 + 8)) ^ 2 + (player.y - (cell.y * 16 + 8)) ^ 2) 
+                    local distance =  math.sqrt((player.x - (cell.x * tileW + 8)) ^ 2 + (player.y - (cell.y * tileH + 8)) ^ 2) 
                   
-                    local alpha = math.max(0, math.min(1, 1 - distance / 90))
+                    local alpha = math.max(0, math.min(1, 1 - distance / 100))
 
         
                     if cell.type == 1 and cell.visible then          
                         love.graphics.setColor(1,1,1, alpha)
-                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+                        love.graphics.draw(TILES.wall.img, cell.x * tileW, cell.y * tileH)
                     end
                     if cell.type == 0 and cell.visible then
                         love.graphics.setColor(1,1,1, alpha)
-                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
+                        love.graphics.draw(TILES.floor.img, cell.x * tileW, cell.y* tileH)
                     end
                 end
             end
         end
+
+
+   
         love.graphics.setColor(1,1,1,1)
         
         for i = 1, #ITEMS do
@@ -729,9 +734,14 @@ function love.draw()
         end
 
         for i = 1, #ENEMIES do
-         
+            local distance =  math.sqrt((player.x - ENEMIES[i].x) ^ 2 + (player.y - ENEMIES[i].y) ^ 2)
+           
+             local alpha = math.max(0, math.min(1, 1.7 - distance / 100))
+             print(alpha)
+            love.graphics.setColor(1,1,1,alpha)
             ENEMIES[i]:draw()
         end
+
 
         
         love.graphics.draw(shadowCanvas, 0, 0)
@@ -746,11 +756,10 @@ function love.draw()
 
 
 
-        love.graphics.print("AMMO: "..player.munition, 0,0)
-        love.graphics.print("HP: "..player.hp, 0,16)
+  
         if player.standingonStairs then
            
-            love.graphics.draw(IMAGES.godeeper, player.x + 200, player.y + 80)
+            love.graphics.draw(IMAGES.godeeper, player.x + 80, player.y - 20)
         end
 
         drawGUI()
@@ -764,12 +773,11 @@ function love.draw()
                     local cell = MAP[x][y] 
 
                     if cell.type == 1 and cell.visible then          
-                        --[[ love.graphics.setColor(1,1,1)
-                        love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16) ]]
-                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+                    
+                        love.graphics.draw(TILES.wall.img, cell.x * tileW, cell.y * tileH)
                     end
                     if cell.type == 0 and cell.visible then
-                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
+                        love.graphics.draw(TILES.floor.img, cell.x * tileW, cell.y * tileH)
                     end
                     for i = 1, #ITEMS do
                         --   print(ITEMS[i].x)
@@ -793,16 +801,11 @@ function love.draw()
                     local cell = MAP[x][y] 
 
                     if cell.type == 1 and cell.visible then          
-                        --[[ love.graphics.setColor(1,1,1)
-                        love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16) ]]
-                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+             
+                        love.graphics.draw(TILES.wall.img, cell.x * tileW, cell.y * tileH)
                     end
                     if cell.type == 0 and cell.visible then
-                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
-                    end
-                    for i = 1, #ITEMS do
-                        --   print(ITEMS[i].x)
-                   --     ITEMS[i]:draw()
+                        love.graphics.draw(TILES.floor.img, cell.x * tileW, cell.y * tileH)
                     end
                     player:draw()
                 end
@@ -838,7 +841,7 @@ function love.mousepressed(x, y, button, istouch)
                  player.onMap = false
             end)
 
-            player.camera.scale = 6
+            player.camera.scale = 4
 
             gameState:changeState(gameState.states.game)
         end

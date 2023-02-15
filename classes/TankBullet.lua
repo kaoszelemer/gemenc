@@ -63,8 +63,8 @@ function TankBullet:update(dt)
         self.angle = self.angle + rspeed * dt
    
       
-        self.velx = 200
-        self.vely = 200
+        self.velx = 400
+        self.vely = 400
 
 --  if self.velx > 0 or self.vely > 0 then
 
