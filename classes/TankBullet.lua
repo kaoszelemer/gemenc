@@ -1,12 +1,12 @@
 local TankBullet = Class('TankBullet')
 
-function TankBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, speed, visible, type)
+function TankBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
     self.x = x
     self.y = y
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
-
+    self.num = num
     self.w = 4
     self.h = 4
     self.velx = 0
@@ -22,6 +22,13 @@ function TankBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, speed
  --   self.maxbulletdistance = 25
     self.ox = x
     self.oy = y
+    self.rotationspeed = math.rad(360)
+
+    if self.parent.name == "bossrobot" then
+        self.angle = (math.pi / 4 * self.num) 
+    else
+        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
+    end
 end
 
 local function EnemyBulletFilter(item, other)
@@ -48,28 +55,42 @@ end
 
 function TankBullet:update(dt)
 
-   
+ 
+
  --   self.removed = false
     if self.parent.name == "bossrobot" then
-      
-        for i = 0,7 do
-            self.angle = i *math.pi /4
-        end
-       
-    else
-        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
-    end
+        local rspeed = math.pi / 1.2
+        self.angle = self.angle + rspeed * dt
    
-    self.velx = 50
-    self.vely = 50
+      
+        self.velx = 200
+        self.vely = 200
 
 --  if self.velx > 0 or self.vely > 0 then
+
         self.velx = self.velx * math.cos(self.angle)
         self.vely = self.vely * math.sin(self.angle) 
   
 
         self.x = self.x + (self.velx) * dt
         self.y = self.y + (self.vely) * dt
+       
+    else
+   
+        self.velx = 50
+        self.vely = 50
+
+--  if self.velx > 0 or self.vely > 0 then
+
+        self.velx = self.velx * math.cos(self.angle)
+        self.vely = self.vely * math.sin(self.angle) 
+  
+
+        self.x = self.x + (self.velx) * dt
+        self.y = self.y + (self.vely) * dt
+    end
+   
+    
   --  end
 
     
@@ -105,7 +126,11 @@ function TankBullet:update(dt)
             
                 self.visible = false
                 self.removed = true
-                Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false 
+                Timer.after(self.parent.rof, function()    
+                    if self.parent.name == "bossrobot" then 
+                        self.parent.munition = self.parent.munition + 1
+                    end
+                    self.parent.EnemyBulletshot = false 
 
                 end)
                 
@@ -120,7 +145,12 @@ function TankBullet:update(dt)
             self.velx, self.vely = 0,0
             self.visible = false
             self.removed = true
-            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+            Timer.after(self.parent.rof, function()  
+                if self.parent.name == "bossrobot" then 
+                    self.parent.munition = self.parent.munition + 1
+                end
+                self.parent.EnemyBulletshot = false
+             end)
              print(self, "  removed cos hit ")
             mapWorld:remove(self)
             return
@@ -144,7 +174,11 @@ function TankBullet:update(dt)
          
             self.visible = false
             self.removed = true
-            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+            Timer.after(self.parent.rof, function()    
+                if self.parent.name == "bossrobot" then 
+                    self.parent.munition = self.parent.munition + 1
+                end
+                self.parent.EnemyBulletshot = false end)
             print(self, "  removed cos stopped ")
             mapWorld:remove(self)
             return
@@ -158,11 +192,19 @@ function TankBullet:update(dt)
             if distance <= 1 and self.removed ~= true then
                 self.visible = false
                 self.removed = true
-                Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+                Timer.after(self.parent.rof, function()   
+                    if self.parent.name == "bossrobot" then 
+                        self.parent.munition = self.parent.munition + 1
+                    end
+                    self.parent.EnemyBulletshot = false end)
           print(self, "  removed cos distance ")
                 mapWorld:remove(self)
             end
 
+        end
+
+        if self.parent.name == "bossrobot" then
+            
         end
 
        

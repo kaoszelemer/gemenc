@@ -61,23 +61,28 @@ SCREENSHAKE = {
 gameState = StateMachine({
     game = {
         name = "game",
-        transitions = {"game", "starting", "gameover", "map"} 
+        transitions = {"game", "starting", "gameover", "map", "trans"} 
     },
 
     map = {
         name = "map",
-        transitions = {"game", "map"}
+        transitions = {"game", "map", "trans"}
     },
 
     starting = {
         name =  "starting",
-        transitions = {"starting", "game"}
+        transitions = {"starting", "game", "trans"}
     },
 
     gameover = {
         name = "gameover", 
-        transitions = {"starting","gameover"}
+        transitions = {"starting","gameover", "trans"}
     },
+
+    trans = {
+        name = "trans",
+        transitions = {"starting", "gameover", "game", "map", "trans"}
+    }
 
     },
     "starting"
@@ -114,6 +119,8 @@ local function mapcreator(x,y,val)
     if val == 0 then
         table.insert(MAP.emptytiles, MAP[x][y])
     end
+
+   
 
  --   print(MAP[x][y].type)
   
@@ -235,7 +242,7 @@ local function spawnEnemies(num)
         local ix = MAP[maxX/2][maxY/2].x * 16
         local iy = MAP[maxX/2][maxY/2].x * 16
 
-        table.insert(ENEMIES, BossRobot(ix,iy + 6))
+        table.insert(ENEMIES, BossRobot(ix - 32,iy - 32))
         return
     end
 
@@ -249,7 +256,6 @@ local function spawnEnemies(num)
         
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Enemy(ix,iy + 6))
-
         end
     end
 
@@ -278,7 +284,7 @@ local function spawnEnemies(num)
 end
 
 
-local function spawnStairs()
+function spawnStairs()
 
     for x = maxX /2, maxX do
         for y = maxY /2, maxY do
@@ -364,6 +370,8 @@ local function setTileImagesForMap(type)
 end
 
 local function createBossMap()
+    maxX = 16
+    maxY = 16
 
     for x = 1, maxX do
         MAP[x] = {}
@@ -388,16 +396,36 @@ local function createBossMap()
 
     MAP.maxitem = {10,10}
 
-
+   
 
 
 
 
 end
 
+local function createMapTransitionVariables()
+    local explosion_center_x, explosion_center_y = maxX * 16 / 2, maxY * 16 / 2 -- center of the map
+    local explosionforce = 10
+    
+    for x = 1, maxX do
+        for y = 1, maxY do
+
+            local tile_center_x, tile_center_y = (x - 0.5) * 16, (y - 0.5) * 16 -- center of the tile
+            local dx, dy = tile_center_x - explosion_center_x, tile_center_y - explosion_center_y -- vector from the center of the map to the center of the tile
+            local magnitude = math.sqrt(dx * dx + dy * dy) -- distance from the center of the map to the center of the tile
+            local direction = math.atan2(dy, dx) -- direction from the center of the map to the center of the tile
+            local velocity_magnitude = (1 - magnitude / math.sqrt(maxX * 16 * maxY * 16)) * explosionforce -- scale the magnitude based on the distance from the center of the map
+            local velocity_x = velocity_magnitude * math.cos(direction)
+            local velocity_y = velocity_magnitude * math.sin(direction)
+
+            MAP[x][y].velocities = {x = velocity_x, y = velocity_y}
+        end
+    end
+end
+
 
 function changeLevel()
-    LEVEL = LEVEL + 2
+    LEVEL = LEVEL + 1
 
     MAP = nil
    MAP = {}
@@ -408,6 +436,9 @@ function changeLevel()
    MAP.walltiles = {}
    MAP.emptytiles = {}
    MAP.itemtiles = {}
+
+   
+
    for i = 1, #BULLETS do
  
     if BULLETS[i] ~= nil then
@@ -416,18 +447,23 @@ function changeLevel()
       
     end
   end
+
    BULLETS = {}
    print("changing level to level"..LEVEL)
+
+ 
 
    if LEVEL % 3 == 0 then
     mapWorld = bump.newWorld(64)
     createBossMap()
+    createMapTransitionVariables()
     initPlayer(player)
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(1)
     player.fov=ROT.FOV.Precise:new(lightCalbak)
+    player.camera.scale = 4
    else
-
+        player.camera.scale = 6
         local mapmaker = chooseRandomMap()
         setTileImagesForMap(MAP.type)
         for x = 1, maxX do
@@ -437,20 +473,20 @@ function changeLevel()
                 MAP[x][y].visible = false
             end
         end
-
-   
-  -- 
-    
+        
+        -- 
+        
         if MAP.type == "Cellular" then
             mapmaker:randomize(0.5)
-
+            
         end
-
-
-
-    
+        
+        
+        
+        
         mapWorld = bump.newWorld(64)
         mapmaker:create(mapcreator) 
+        createMapTransitionVariables()
         setDifficultyForMapAndLevel()
         initPlayer(player)
         spawnStairs()
@@ -522,6 +558,9 @@ function love.load()
     MAP.itemtiles = {}
     MAP.maxitem = {5, 12}
     MAP.maxenemy = 10
+
+  
+
     ITEMS = {}
     ENEMIES = {}
     BLOODSPLATTERS = {}
@@ -555,6 +594,9 @@ function love.load()
         mapmaker:randomize(0.5)
     end
     mapmaker:create(mapcreator) 
+    createMapTransitionVariables()
+
+
     initPlayer()
     spawnStairs()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
@@ -602,6 +644,26 @@ function love.update(dt)
         end
     end
 
+    if gameState.state == gameState.states.trans then
+        for x = 1, maxX do
+            for y = 1, maxY do
+                local cell = MAP[x][y]
+                cell.x = cell.x + cell.velocities.x * dt
+                cell.y = cell.y + cell.velocities.y * dt
+            end
+        end
+
+        Timer.after(0.2, function ()
+            local gravity = 10 -- pixels per second squared
+            for x = 1, maxX do
+                for y = 1, maxY do
+                    local tile = MAP[x][y]
+                    tile.velocities.y = tile.velocities.y + gravity * dt
+                end
+            end
+        end)
+
+    end
 
     Timer.update(dt)
    -- print(ENEMIES[1].x)
@@ -695,6 +757,7 @@ function love.draw()
     end
 
     if gameState.state == gameState.states.map then
+      
         for x = 1, maxX do
             for y = 1, maxY do
                 if MAP[x][y] ~= nil then
@@ -720,6 +783,32 @@ function love.draw()
 
     if gameState.state == gameState.states.gameover then
         love.graphics.draw(IMAGES.gameover, 0,0)
+    end
+
+    if gameState.state == gameState.states.trans then
+        player.camera:attach()
+        for x = 1, maxX do
+            for y = 1, maxY do
+                if MAP[x][y] ~= nil then
+                    local cell = MAP[x][y] 
+
+                    if cell.type == 1 and cell.visible then          
+                        --[[ love.graphics.setColor(1,1,1)
+                        love.graphics.rectangle('fill', (cell.x) * 16, (cell.y) * 16, 16,16) ]]
+                        love.graphics.draw(TILES.wall.img, cell.x * 16, cell.y * 16)
+                    end
+                    if cell.type == 0 and cell.visible then
+                        love.graphics.draw(TILES.floor.img, cell.x * 16, cell.y* 16)
+                    end
+                    for i = 1, #ITEMS do
+                        --   print(ITEMS[i].x)
+                   --     ITEMS[i]:draw()
+                    end
+                    player:draw()
+                end
+            end
+        end
+        player.camera:detach()
     end
 
    

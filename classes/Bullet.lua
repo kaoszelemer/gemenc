@@ -64,11 +64,16 @@ function Bullet:update(dt)
         for i = 1, #cols do
        --    print("type: "..cols[i].other.type)
             if cols[i].other.type == "enemy" and not cols[i].other.hitinvi then
-                cols[i].other.hp = cols[i].other.hp - 1
+                cols[i].other.hp = cols[i].other.hp
             --    screenShake(0.1, 3)
                 print(cols[i].other.hp)
-                if cols[i].other.hp == 0 then
-                cols[i].other:kill()
+                if cols[i].other.hp <= 0 then
+                    print(cols[i].other.name)
+                    if cols[i].other.name == "bossrobot" then
+                        cols[i].other:kill("boss")
+                    else
+                        cols[i].other:kill()
+                    end 
                 self.visible = false
                 self.removed = true
                 player.bulletshot = false

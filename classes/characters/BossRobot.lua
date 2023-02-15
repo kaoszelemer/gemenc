@@ -24,7 +24,7 @@ function BossRobot:init(x, y)
     3,
     1,
     "enemy" ,-- type
-    0.5, --rof
+    0.05, --rof
     30 --hp
 )
 
@@ -37,8 +37,9 @@ function BossRobot:init(x, y)
     self.ty = math.floor(self.y / 16)
     self.ox = self.x
     self.direction = 1
-    self.walkdistance = love.math.random(1,15)
+    self.walkdistance = 20
     self.angle = 0
+    self.munition = 8
 
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
@@ -65,8 +66,8 @@ end
 
 
 function BossRobot:update(dt)
-    local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
-
+    local distance = math.sqrt((player.x - (self.x + self.colliders.w / 2))^2 + (player.y - (self.y + self.colliders.h /2))^2)
+    --print(distance)
     self.tx = math.floor(self.x / 16)
     self.ty = math.floor(self.y / 16)
 
@@ -90,8 +91,11 @@ function BossRobot:update(dt)
     end 
 
 
-    if distance < 90 and not self.isDead then
-        self:action(x, y)
+    if distance < 125 and not self.isDead then
+        for i = 1, 8 do
+   
+            self:action(x, y)
+        end
     end
 
     if self.isDead then
@@ -117,7 +121,6 @@ function BossRobot:update(dt)
 end
 
 function BossRobot:move(dt)
-
 
 
   if not self.isDead then
@@ -153,11 +156,15 @@ end
 
 function BossRobot:action(x,y)
 
-    
-        if self.EnemyBulletshot ~= true then
+
+      
+        if self.EnemyBulletshot ~= true and self.munition > 0 then
+            for i = 1, 8 do
+                self.munition = self.munition - 1
+                table.insert(BULLETS, TankBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
+            end
             self.EnemyBulletshot = true
        
-                table.insert(BULLETS, TankBullet(self.x,self.y, player.x, player.y, self))
 
         end
         

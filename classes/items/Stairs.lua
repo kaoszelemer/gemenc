@@ -51,8 +51,12 @@ end
 function Stairs:action()
      
         if love.keyboard.isDown("space") and player.changinglevel ~= true then
+            gameState:changeState(gameState.states.trans)
             player.changinglevel = true
-            changeLevel()
+            Timer.after(0.8, function ()
+              gameState:changeState(gameState.states.game)
+              changeLevel()
+            end)
         end      
 
 end

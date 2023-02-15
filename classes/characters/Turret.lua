@@ -99,7 +99,7 @@ function Turret:action(x,y)
    
         if self.EnemyBulletshot ~= true then
         
-            table.insert(BULLETS, EnemyBullet(self.x,self.y, player.x, player.y, self))
+            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
             self.EnemyBulletshot = true
         end
         

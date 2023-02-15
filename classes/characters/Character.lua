@@ -148,33 +148,36 @@ function Character:kill(pl)
     Timer.after(0.2, function() 
       gameState:changeState(gameState.states.gameover)
     end)
-  else
+  elseif pl == "boss" then
+    print("spwaning stairs")
+    spawnStairs()
 
-    Timer.after(0.4, function() 
-      self.particleSystem:stop()
-      if self.name ~= "Turret" and self.name ~="Tank" then
-        self:addBloodSplatters(self.x +4, self.y+4, 8)
-      end
-    end)
-   
-    self.isDead = true
-    self.visible = false
-    mapWorld:remove(self)
-  
-  
-  
-      for i = 1, #BULLETS do
-   
-        if BULLETS[i] ~= nil then
-          if BULLETS[i].parent == self then  
-            table.remove(BULLETS, i)
-          end
-        end
-      end
+
+
 
   end
 
+  Timer.after(0.4, function() 
+    self.particleSystem:stop()
+    if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" then
+      self:addBloodSplatters(self.x +4, self.y+4, 8)
+    end
+  end)
+ 
+  self.isDead = true
+  self.visible = false
+  mapWorld:remove(self)
 
+
+
+    for i = 1, #BULLETS do
+ 
+      if BULLETS[i] ~= nil then
+        if BULLETS[i].parent == self then  
+          table.remove(BULLETS, i)
+        end
+      end
+    end
   
 
 end
