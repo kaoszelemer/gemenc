@@ -6,6 +6,7 @@ function TankBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, speed
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
+
     self.w = 4
     self.h = 4
     self.velx = 0
@@ -47,16 +48,24 @@ end
 
 function TankBullet:update(dt)
 
-
-    
+   
  --   self.removed = false
-    local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
+    if self.parent.name == "bossrobot" then
+      
+        for i = 0,7 do
+            self.angle = i *math.pi /4
+        end
+       
+    else
+        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
+    end
+   
     self.velx = 50
     self.vely = 50
 
 --  if self.velx > 0 or self.vely > 0 then
-        self.velx = self.velx * math.cos(angle)
-        self.vely = self.vely * math.sin(angle) 
+        self.velx = self.velx * math.cos(self.angle)
+        self.vely = self.vely * math.sin(self.angle) 
   
 
         self.x = self.x + (self.velx) * dt
@@ -136,20 +145,24 @@ function TankBullet:update(dt)
             self.visible = false
             self.removed = true
             Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
- --           print(self, "  removed cos stopped ")
+            print(self, "  removed cos stopped ")
             mapWorld:remove(self)
             return
         end
+
+        if self.parent.name == "Tank" then
         
-        local distance = math.sqrt((self.targetx - (self.x))^2 + (self.targety - (self.y))^2)
-    --   print(distance, self.maxbulletdistance)
-     
-        if distance <= 1 and self.removed ~= true then
-            self.visible = false
-            self.removed = true
-            Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
-   --      print(self, "  removed cos distance ")
-            mapWorld:remove(self)
+            local distance = math.sqrt((self.targetx - (self.x))^2 + (self.targety - (self.y))^2)
+      --   print(distance, self.maxbulletdistance)
+        
+            if distance <= 1 and self.removed ~= true then
+                self.visible = false
+                self.removed = true
+                Timer.after(self.parent.rof, function()    self.parent.EnemyBulletshot = false end)
+          print(self, "  removed cos distance ")
+                mapWorld:remove(self)
+            end
+
         end
 
        

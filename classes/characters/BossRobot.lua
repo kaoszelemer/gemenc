@@ -17,7 +17,7 @@ function BossRobot:init(x, y)
         w = 64,
         h = 64
     },
-    "",
+    "bossrobot",
     love.graphics.newImage("assets/bossrobot.png"),
     0,
     0,
@@ -90,7 +90,7 @@ function BossRobot:update(dt)
     end 
 
 
-    if distance < 60 and not self.isDead then
+    if distance < 90 and not self.isDead then
         self:action(x, y)
     end
 
@@ -153,11 +153,12 @@ end
 
 function BossRobot:action(x,y)
 
-   
+    
         if self.EnemyBulletshot ~= true then
-        
-            table.insert(BULLETS, TankBullet(self.x,self.y, player.x, player.y, self))
             self.EnemyBulletshot = true
+       
+                table.insert(BULLETS, TankBullet(self.x,self.y, player.x, player.y, self))
+
         end
         
       
