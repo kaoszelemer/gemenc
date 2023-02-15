@@ -9,7 +9,7 @@ Luastar = require('lib.luastar')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 2
+    bossonwhichlevel = 3
 }
 
 
