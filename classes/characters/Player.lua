@@ -32,7 +32,7 @@ self.ty = math.floor(self.y / tileH)
   self.visible = true
 
   self.maxhp = self.hp
-  --
+  -- Ati a legnagynobb kiraly
   
   self.angle = 0
 
