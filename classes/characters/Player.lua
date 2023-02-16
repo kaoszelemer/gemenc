@@ -61,6 +61,10 @@ self.ty = math.floor(self.y / tileH)
   self.smokeparticle:setColors(255, 255, 255, 255, 255, 255, 255, 0) 
 
   self.hitinvi = false
+
+  self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
+
+  self.currentItem = 1
   
 end
 
@@ -81,11 +85,11 @@ end
 function Player:update(dt)
     self.tx = math.floor(self.x / tileW)
     self.ty = math.floor(self.y / tileH)
-    if self.x < 18 then
-        self.x = 18
+    if self.x < tileW + 2 then
+        self.x = tileW + 2
     end
-    if self.y < 18 then
-        self.y = 18
+    if self.y < tileH + 2 then
+        self.y = tileH
     end
     if self.x > ((maxX) * tileW) +4 then
         self.x = ((maxX) * tileH)+4
@@ -109,10 +113,13 @@ function Player:update(dt)
     if #INVENTORY > 1 then
         if love.keyboard.isDown("q") and not self.changingweapon then
             self.changingweapon = true
+            self.currentItem = self.currentItem + 1
+            if self.currentItem > #INVENTORY then
+                self.currentItem = 1
+            end
             local oldi = INVENTORY[1]
-            INVENTORY[1] = INVENTORY[2]
-            INVENTORY[2] = oldi
-            print(INVENTORY[1], INVENTORY[2])
+            INVENTORY[1] = INVENTORY[self.currentItem]
+            INVENTORY[self.currentItem] = oldi
             Timer.after(0.3, function() self.changingweapon = nil end)
         end
     end
@@ -209,12 +216,19 @@ end
 
 function Player:action(x,y)
 
- 
-    if self.munition > 0 and not self.bulletshot then
-        self.munition = self.munition - 1
-        self.bulletshot = true
+    if INVENTORY[1]:instanceOf(MachineGun) and self.munition > 0 then
         INVENTORY[1]:shoot(x,y)
     end
+
+    
+        if self.munition > 0 and not self.bulletshot then
+            self.munition = self.munition - 1
+            self.bulletshot = true
+            INVENTORY[1]:shoot(x,y)
+        end
+    
+ 
+  
 
 --[[ 
         if self.munition > 0 and not self.drillbulletshot then

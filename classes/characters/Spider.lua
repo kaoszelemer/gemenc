@@ -1,8 +1,8 @@
-local Enemy = Character:extend('Enemy')
+local Spider = Character:extend('Spider')
 
 
 
-function Enemy:init(x, y)
+function Spider:init(x, y)
 
     Character.init(
     self,
@@ -11,16 +11,16 @@ function Enemy:init(x, y)
     8,
     8,
     {
-        name = "abi",
+        name = "spider",
         x = x,
         y = y,
         w = 8,
         h = 8
     },
-    "soldier",
-    love.graphics.newImage("assets/enemy.png"),
-    0,
-    0,
+    "spider",
+    love.graphics.newImage("assets/spider.png"),
+    50,
+    50,
     20,
     1,
     "enemy" ,-- type
@@ -38,7 +38,7 @@ function Enemy:init(x, y)
     self.angle = 0
 
 
-    self.particleImage = love.graphics.newImage("assets/blood.png")
+    self.particleImage = love.graphics.newImage("assets/bioblood.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
     self.particleSystem:setParticleLifetime(1, 1)
     self.particleSystem:setEmissionRate(32)
@@ -47,7 +47,7 @@ function Enemy:init(x, y)
     self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
     self.particleSystem:start()
 
-    self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
+    self.bloodSplatterImage = love.graphics.newImage("assets/biobloodsplatter.png")
 
 end
 
@@ -64,7 +64,7 @@ end
 
 
 
-function Enemy:update(dt)
+function Spider:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
     self.tx = math.floor(self.x / tileW)
@@ -79,8 +79,10 @@ function Enemy:update(dt)
     end
 
 
-    if distance < 35 and not self.isDead then
-        self:action(x, y)
+    if distance < 45 and not self.isDead then
+        self.canMove = true
+    else
+        self.canMove = false
     end
 
     if self.isDead then
@@ -105,21 +107,24 @@ function Enemy:update(dt)
 
 end
 
-function Enemy:move(dt)
+function Spider:move(dt)
 
 
 
-  if not self.isDead then
+  if not self.isDead and self.canMove then
 
+        local fX, fY = self.x, self.y
 
-        if (self.direction == 1 and self.x >= (self.ox + self.walkdistance)) or (self.direction == -1 and self.x <= (self.ox - self.walkdistance)) then
-            self.direction = -self.direction
-        end
+        local dx = player.x - self.x
+        local dy = player.y - self.y
+
+        local angle = math.atan2(dy, dx)
+
+        local fx = self.x + (self.velx * dt) * math.cos(angle)
+        local fy = self.y + (self.vely * dt) * math.sin(angle)
         
-        self.x = self.x + (self.speed * self.direction * dt)
-
             
-        local ax, ay, cols, len = mapWorld:move(self, self.x , self.y, enemyFilter)
+        local ax, ay, cols, len = mapWorld:move(self, fx , fy, enemyFilter)
         
         self.x = ax
         self.y = ay
@@ -130,28 +135,43 @@ function Enemy:move(dt)
         --  mapWorld:update(self, self.cx, self.cy)
         for i = 1, #cols do
 
+          
+                if cols[i].other.name == player.name and not player.hitinvi and not player.shielded then
+                    cols[i].other.hp = cols[i].other.hp - 1
+                    --    screenShake(0.1, 3)
+                        
+                        if cols[i].other.hp <= 0 then
+                      
+                                cols[i].other:kill("pl")
+                                
+                        else
+                    
+                            cols[i].other.hitinvi = true
+                            cols[i].other.particleSystem:start()
+                            Timer.after(0.4, function() 
+                                cols[i].other.particleSystem:stop()
+                                cols[i].other.hitinvi = false
+                                cols[i].other.showhitinvi = false
+                            end)
+                        end
+                end
+        end
             
         
-            if len >= 1 and cols[i].other.type ~= "EnemyBullet" and cols[i].other.type ~= "enemy" and cols[i].other.type ~= "enemy" then
-            
-                self.direction = -self.direction
-            end
-            
-
-        end
+ 
 
 
     end
 end
 
-function Enemy:action(x,y)
+function Spider:action(x,y)
 
    
-        if self.EnemyBulletshot ~= true then
+      --[[   if self.EnemyBulletshot ~= true then
         
             table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
             self.EnemyBulletshot = true
-        end
+        end ]]
         
       
         
@@ -159,4 +179,4 @@ function Enemy:action(x,y)
 end
 
 
-return Enemy
+return Spider

@@ -70,13 +70,13 @@ function Turret:update(dt)
     if self.isDead then
         self.particleSystem:update(dt)
     end
-    if self.x < 18 then
-   
-        self.x = 18
+    if self.x < tileW +2 then
+      
+        self.x = tileW+2
       end
-      if self.y < 18 then
-  
-        self.y = 18
+      if self.y < tileH+2 then
+   
+        self.y = tileH+2
       end
       if self.x > ((maxX) * tileW) +4 then
       

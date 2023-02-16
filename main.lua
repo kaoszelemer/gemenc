@@ -9,7 +9,9 @@ Luastar = require('lib.luastar')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 3
+    bossonwhichlevel = 4,
+    mgonwhichlevel = 3,
+    drillonwhichlevel = 2
 }
 
 
@@ -27,17 +29,20 @@ Player = require('classes.characters.Player')
 Enemy = require('classes.characters.Enemy')
 Turret = require('classes.characters.Turret')
 Tank = require('classes.characters.Tank')
+Spider = require('classes.characters.Spider')
 BossRobot = require('classes.characters.BossRobot')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
 Drill = require('classes.weapons.Drill')
+MachineGun = require('classes.weapons.MachineGun')
 
 FieldItem = require('classes.items.FieldItem')
 Medpack = require('classes.items.Medpack')
 Ammo = require('classes.items.Ammo')
 DrillItem = require('classes.items.DrillItem')
 Shield = require('classes.items.Shield')
+MGitem = require('classes.items.MGitem')
 
 Stairs = require('classes.items.Stairs')
 
@@ -217,9 +222,14 @@ local function spawnItems(mpnum, bunum)
         end
     end
 
-    if LEVEL == 2 then
+    if LEVEL == GLOBALS.drillonwhichlevel then
      
         table.insert(ITEMS, DrillItem(player.x + 8,player.y + 8))
+    
+    end
+    if LEVEL == GLOBALS.mgonwhichlevel then
+     
+        table.insert(ITEMS, MGitem(player.x + 8,player.y + 8))
     
     end
 
@@ -278,6 +288,17 @@ local function spawnEnemies(num)
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Tank(ix + tileW / 2, (iy + tileW/ 2) - 6))
+
+        end
+    end
+
+    for i = 1, num do
+        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
+        if MAP[tx][ty].type == 0 then
+            table.insert(ENEMIES, Spider(ix + tileW / 2, (iy + tileW/ 2) - 6))
 
         end
     end
@@ -354,7 +375,7 @@ local function setDifficultyForMapAndLevel()
 end
 
 local function setTileImagesForMap(type)
-    print(type)
+
     if type == "ellermaze" then
         TILES.floor = TILES.ellerfloor
         TILES.wall = TILES.ellerwall
@@ -668,6 +689,14 @@ function love.update(dt)
     end
 
     Timer.update(dt)
+
+    if INVENTORY[1]:instanceOf(MachineGun) and love.mouse.isDown(1) and not player.mgbulletshot then
+        player.mgbulletshot = true
+        player:action(MOUSEX,MOUSEY)
+        Timer.after(0.1, function ()
+            player.mgbulletshot = false
+        end)
+    end
    -- print(ENEMIES[1].x)
 
 end
@@ -737,7 +766,7 @@ function love.draw()
             local distance =  math.sqrt((player.x - ENEMIES[i].x) ^ 2 + (player.y - ENEMIES[i].y) ^ 2)
            
              local alpha = math.max(0, math.min(1, 1.7 - distance / 100))
-             print(alpha)
+          
             love.graphics.setColor(1,1,1,alpha)
             ENEMIES[i]:draw()
         end
@@ -745,6 +774,7 @@ function love.draw()
 
         
         love.graphics.draw(shadowCanvas, 0, 0)
+        love.graphics.setColor(1,1,1,1)
         if INVENTORY ~= nil then
             INVENTORY[1]:draw()
         end
@@ -826,12 +856,14 @@ function love.mousepressed(x, y, button, istouch)
     end
 
 
-    if gameState.state == gameState.states.game then
+    if gameState.state == gameState.states.game and INVENTORY[1]:instanceOf(MachineGun) ~= true then
         if button == 1 then 
             player:action(MOUSEX,MOUSEY)
         end
     end
  end
+
+
 
  function love.keypressed(key)
     if gameState.state == gameState.states.map and player.onMap == true then

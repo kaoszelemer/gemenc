@@ -97,13 +97,13 @@ function Tank:update(dt)
     if self.isDead then
         self.particleSystem:update(dt)
     end
-    if self.x < 18 then
+    if self.x < tileW +2 then
         self.direction = -self.direction
-        self.x = 18
+        self.x = tileW+2
       end
-      if self.y < 18 then
+      if self.y < tileH+2 then
         self.direction = -self.direction
-        self.y = 18
+        self.y = tileH+2
       end
       if self.x > ((maxX) * tileW) +4 then
         self.direction = -self.direction

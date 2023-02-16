@@ -13,7 +13,7 @@ end
 function  Weapon:draw()
    
     love.graphics.draw(self.image, self.x + 5, self.y + 4, self.r)
-    
+  
 end
 
 function Weapon:update(dt)

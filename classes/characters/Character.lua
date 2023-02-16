@@ -19,7 +19,11 @@ function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, fri
     self.hp = hp
 
 
-    self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
+
+      self.biobloodSplatterImage = love.graphics.newImage("assets/biobloodsplatter.png")
+
+      self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
+
     self.shadowimage = love.graphics.newImage("assets/shadow.png")
     self.shieldimage = love.graphics.newImage("assets/shield.png")
 
@@ -30,7 +34,7 @@ local bloodprints = {}
 
 function  Character:draw()
 
-if self.name ~= "Turret" or self.name ~= "Tank" then
+if self.name ~= "Turret" or self.name ~= "Tank" or self.name ~= "spider" then
     for _, splatter in pairs(BLOODSPLATTERS) do
       love.graphics.draw(
           self.bloodSplatterImage,
@@ -49,6 +53,18 @@ if self.name ~= "Turret" or self.name ~= "Tank" then
     
   end
 
+end
+
+if self.name == "spider" then
+  for _, splatter in pairs(BLOODSPLATTERS) do
+    love.graphics.draw(
+        self.biobloodSplatterImage,
+        splatter.x,
+        splatter.y,
+        splatter.alpha,
+        splatter.scale
+    )
+end
 end
 
 if self.name == "gemenc" then
@@ -161,7 +177,7 @@ function Character:kill(pl)
   Timer.after(0.4, function() 
     self.particleSystem:stop()
     if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" then
-      self:addBloodSplatters(self.x +4, self.y+4, 8)
+      self:addBloodSplatters(self.x +4, self.y+4, 16)
     end
   end)
  

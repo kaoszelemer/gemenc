@@ -18,8 +18,7 @@ end
 
 function Pistol:shoot(x, y)
 
-        table.insert(BULLETS, Bullet(self.x,self.y, x, y, player))
-
+        table.insert(BULLETS, Bullet(self.x +4,self.y+4, x, y, player))
 
 end
 
