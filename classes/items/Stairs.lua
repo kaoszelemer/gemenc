@@ -52,7 +52,7 @@ function Stairs:action()
             gameState:changeState(gameState.states.trans)
             player.changinglevel = true
             Timer.after(0.8, function ()
-              gameState:changeState(gameState.states.game)
+              gameState:changeState(gameState.states.countback)
               changeLevel()
             end)
         end      

@@ -24,7 +24,7 @@ function BossRobot:init(x, y)
     50, --speed
     1,
     "enemy" ,-- type
-    0.05, --rof
+    0.5, --rof
     40 --hp
 )
 
@@ -91,7 +91,7 @@ function BossRobot:update(dt)
     end 
 
 
-    if distance < 125 and not self.isDead then
+    if distance < 150 and not self.isDead then
         for i = 1, 8 do
    
             self:action(x, y)

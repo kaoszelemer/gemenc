@@ -90,7 +90,7 @@ gameState = StateMachine({
 
     trans = {
         name = "trans",
-        transitions = {"starting", "gameover", "game", "map", "trans"}
+        transitions = {"starting", "gameover", "game", "map", "trans", "countback"}
     },
 
     countback = {
@@ -215,7 +215,7 @@ local function spawnItems(mpnum, bunum)
         local tx = ix / tileW
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
-            table.insert(ITEMS, Medpack(ix + tileW / 2,iy + tileW/ 2))
+            table.insert(ITEMS, Medpack(ix + tileW / 2 - 4,iy + tileW/ 2- 4))
           --  MAP[tx][ty].type = 2
             MAP[tx][ty].occupied = true
         end
@@ -228,7 +228,7 @@ local function spawnItems(mpnum, bunum)
         local ty = iy / tileH
 
         if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
-            table.insert(ITEMS, Ammo(ix + tileW / 2,iy + tileW/ 2))
+            table.insert(ITEMS, Ammo(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
            -- MAP[tx][ty].type = 2
             MAP[tx][ty].occupied = true
         end
@@ -410,8 +410,8 @@ local function setTileImagesForMap(type)
 end
 
 local function createBossMap()
-    maxX = 16
-    maxY = 16
+    maxX = 12
+    maxY = 12
 
     for x = 1, maxX do
         MAP[x] = {}
@@ -574,6 +574,7 @@ end
 
 
 
+
 function love.load()
     love.graphics.setDefaultFilter("nearest", "nearest") 
     shadowCanvas = love.graphics.newCanvas()
@@ -712,6 +713,19 @@ function love.update(dt)
         player:action(MOUSEX,MOUSEY)
         Timer.after(0.1, function ()
             player.mgbulletshot = false
+        end)
+    end
+
+
+    if not player.countback and gameState.state == gameState.states.countback then
+        player.countback = true
+        Timer.every(1, function ()
+            GLOBALS.howlongbeforestart = GLOBALS.howlongbeforestart - 1 
+        end, 3)
+        Timer.after(3, function ()
+            GLOBALS.howlongbeforestart = 3
+            player.countback = false
+            gameState:changeState(gameState.states.game)
         end)
     end
    -- print(ENEMIES[1].x)
@@ -861,6 +875,82 @@ function love.draw()
         player.camera:detach()
     end
 
+    if gameState.state == gameState.states.countback then
+     
+
+
+        player.camera:attach()
+     
+  
+        love.graphics.setCanvas(shadowCanvas)
+        local px, py = player.camera:worldCoords(player.x, player.y)
+        love.graphics.clear()
+        love.graphics.setColor(1, 1, 1, 0.1)
+        love.graphics.circle("fill", px, py, 720 / player.camera.scale)
+        love.graphics.setCanvas()
+       
+        for x = 1, maxX do
+            for y = 1, maxY do
+                if MAP[x][y] ~= nil then
+                    local cell = MAP[x][y] 
+                    local distance =  math.sqrt((player.x - (cell.x * tileW + 8)) ^ 2 + (player.y - (cell.y * tileH + 8)) ^ 2) 
+                  
+                    local alpha = math.max(0, math.min(1, 1 - distance / 100))
+
+        
+                    if cell.type == 1 and cell.visible then          
+                        love.graphics.setColor(1,1,1, alpha)
+                        love.graphics.draw(TILES.wall.img, cell.x * tileW, cell.y * tileH)
+                    end
+                    if cell.type == 0 and cell.visible then
+                        love.graphics.setColor(1,1,1, alpha)
+                        love.graphics.draw(TILES.floor.img, cell.x * tileW, cell.y* tileH)
+                    end
+                end
+            end
+        end
+
+
+   
+        love.graphics.setColor(1,1,1,1)
+        
+        for i = 1, #ITEMS do
+     
+            ITEMS[i]:draw()
+        end
+           
+        for i = 1, #BULLETS do
+            BULLETS[i]:draw()
+        end
+
+        for i = 1, #ENEMIES do
+            local distance =  math.sqrt((player.x - ENEMIES[i].x) ^ 2 + (player.y - ENEMIES[i].y) ^ 2)
+           
+             local alpha = math.max(0, math.min(1, 1.7 - distance / 100))
+          
+            love.graphics.setColor(1,1,1,alpha)
+            ENEMIES[i]:draw()
+        end
+
+
+        
+        love.graphics.draw(shadowCanvas, 0, 0)
+        love.graphics.setColor(1,1,1,1)
+        if INVENTORY ~= nil then
+            INVENTORY[1]:draw()
+        end
+        
+        player:draw()
+
+        love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
+        player.camera:detach()
+ 
+        love.graphics.setFont(FONT.f24)
+        love.graphics.setColor(COLORS.red)
+        love.graphics.print("Time to start: "..GLOBALS.howlongbeforestart, 350, 200)
+        love.graphics.setColor(1,1,1)
+    end
+
    
 
 end
@@ -882,15 +972,18 @@ function love.mousepressed(x, y, button, istouch)
 
 
 
+
  function love.keypressed(key)
+ 
+
     if gameState.state == gameState.states.map and player.onMap == true then
         if key == "tab" then
-        
+      
             Timer.after(0.5, function ()
                  player.onMap = false
             end)
 
-            player.camera.scale = 4
+            player.camera.scale = player.originalcamscale
 
             gameState:changeState(gameState.states.game)
         end
@@ -899,6 +992,7 @@ function love.mousepressed(x, y, button, istouch)
     
     if gameState.state == gameState.states.game and player.onMap ~= true then
             if key == "tab" then
+           player.originalcamscale = player.camera.scale
                 player.camera.scale = 1
             gameState:changeState(gameState.states.map)
             
