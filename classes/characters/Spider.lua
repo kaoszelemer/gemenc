@@ -40,7 +40,7 @@ function Spider:init(x, y)
 
     self.particleImage = love.graphics.newImage("assets/bioblood.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
-    self.particleSystem:setParticleLifetime(1, 1)
+    self.particleSystem:setParticleLifetime(1.5, 1.5)
     self.particleSystem:setEmissionRate(32)
     self.particleSystem:setSizeVariation(1)
     self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
@@ -48,6 +48,11 @@ function Spider:init(x, y)
     self.particleSystem:start()
 
     self.bloodSplatterImage = love.graphics.newImage("assets/biobloodsplatter.png")
+
+    if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+       self.velx = 80
+       self.vely = 80
+    end
 
 end
 
@@ -78,10 +83,14 @@ function Spider:update(dt)
         end
     end
 
+    if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+        distance = 0
+    end
 
     if distance < 45 and not self.isDead then
         self.canMove = true
     else
+        
         self.canMove = false
     end
 
@@ -120,8 +129,8 @@ function Spider:move(dt)
 
         local angle = math.atan2(dy, dx)
 
-        local fx = self.x + (self.velx * dt) * math.cos(angle)
-        local fy = self.y + (self.vely * dt) * math.sin(angle)
+        local fx = self.x + (self.velx * dt) * math.cos(angle) * self.direction
+        local fy = self.y + (self.vely * dt) * math.sin(angle) * self.direction
         
             
         local ax, ay, cols, len = mapWorld:move(self, fx , fy, enemyFilter)
@@ -139,7 +148,7 @@ function Spider:move(dt)
                 if cols[i].other.name == player.name and not player.hitinvi and not player.shielded then
                     cols[i].other.hp = cols[i].other.hp - 1
                     --    screenShake(0.1, 3)
-                        
+                        self.direction = -self.direction
                         if cols[i].other.hp <= 0 then
                       
                                 cols[i].other:kill("pl")
@@ -152,6 +161,10 @@ function Spider:move(dt)
                                 cols[i].other.particleSystem:stop()
                                 cols[i].other.hitinvi = false
                                 cols[i].other.showhitinvi = false
+                               
+                            end)
+                            Timer.after(0.15, function()
+                                self.direction = -self.direction
                             end)
                         end
                 end

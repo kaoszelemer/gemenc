@@ -27,6 +27,8 @@ function Character:init(x, y, w,h,colliders, name, image, velx, vely, speed, fri
     self.shadowimage = love.graphics.newImage("assets/shadow.png")
     self.shieldimage = love.graphics.newImage("assets/shield.png")
 
+
+
 end
 
 local bloodprints = {}
@@ -34,7 +36,7 @@ local bloodprints = {}
 
 function  Character:draw()
 
-if self.name ~= "Turret" or self.name ~= "Tank" or self.name ~= "spider" then
+if self.name ~= "Turret" or self.name ~= "Tank" then
     for _, splatter in pairs(BLOODSPLATTERS) do
       love.graphics.draw(
           self.bloodSplatterImage,
@@ -55,17 +57,7 @@ if self.name ~= "Turret" or self.name ~= "Tank" or self.name ~= "spider" then
 
 end
 
-if self.name == "spider" then
-  for _, splatter in pairs(BLOODSPLATTERS) do
-    love.graphics.draw(
-        self.biobloodSplatterImage,
-        splatter.x,
-        splatter.y,
-        splatter.alpha,
-        splatter.scale
-    )
-end
-end
+
 
 if self.name == "gemenc" then
   
@@ -93,10 +85,10 @@ end
    
     else
 
-    love.graphics.draw(self.particleSystem, self.x + 4, self.y + 4)
-    love.graphics.draw(self.particleSystem, self.x + 8, self.y + 12)
-    love.graphics.draw(self.particleSystem, self.x + 12, self.y + 8)
-    love.graphics.draw(self.particleSystem, self.x + 16, self.y + 4)
+      for i = 1, #self.explocoordinates do
+        love.graphics.draw(self.particleSystem, self.x + self.explocoordinates[i].x, self.y + self.explocoordinates[i].y)
+      end
+   
 
     end
  
@@ -115,15 +107,24 @@ end
 
 end
 
-function Character:addBloodSplatters(x, y, times)
+function Character:addBloodSplatters(x, y, times, type)
   if times == nil then times = 1 end
   for i = 1, times do
     local splatter = {
-      x = x + love.math.random(-5,5),
-      y = y + love.math.random(-5,5),
-      scale = love.math.random(),
+      x = x + love.math.random(-8,8),
+      y = y + love.math.random(-8,8),
+
+    
+    
       
     }
+
+    if type == 0 then
+      splatter.scale = love.math.random()
+    elseif type == 1 then
+      splatter.scale = love.math.random(1,3)
+    end
+  
     table.insert(BLOODSPLATTERS, splatter)
   end
 
@@ -175,8 +176,9 @@ function Character:kill(pl)
       gameState:changeState(gameState.states.gameover)
   
    
-  elseif pl == "boss" then
+  elseif pl == "bossspider" or pl == "bossrobot" then
     print("spwaning stairs")
+    player.sp = player.maxsp
     spawnStairs()
 
 
@@ -187,13 +189,22 @@ function Character:kill(pl)
   Timer.after(0.4, function() 
     self.particleSystem:stop()
     if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" then
-      self:addBloodSplatters(self.x +4, self.y+4, 16)
+      self:addBloodSplatters(self.x +4, self.y+4, 16, 0)
+    end
+    if self.name == "bossspider" then 
+      for i = 1, #self.explocoordinates do
+   
+        self:addBloodSplatters(self.x + self.explocoordinates[i].x, self.y + self.explocoordinates[i].y, 1, 1)
+      end
     end
   end)
  
 
   self.isDead = true
   self.visible = false
+  if player.sp < player.maxsp then
+    player.sp = player.sp + 1
+  end
   mapWorld:remove(self)
 
 
@@ -206,7 +217,14 @@ function Character:kill(pl)
         end
       end
     end
-  
+
+    GLOBALS.numberofenemies = GLOBALS.numberofenemies - 1
+    print(GLOBALS.numberofenemies)
+    if GLOBALS.bossonwhichlevel then
+      if GLOBALS.numberofenemies <= 1 then
+        spawnStairs()
+      end
+    end
 
 end
 

@@ -1,11 +1,12 @@
 local EnemyBullet = Class('EnemyBullet')
 
-function EnemyBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, speed, visible, type)
+function EnemyBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
     self.x = x
     self.y = y
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
+    self.num = num
     self.w = 2
     self.h = 2
     self.velx = 0
@@ -21,6 +22,15 @@ function EnemyBullet:init(x, y, targetx, targety, parent, w, h, velx, vely, spee
     self.maxbulletdistance = 25
     self.ox = x
     self.oy = y
+    if self.parent.name == "commando" then
+        
+        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
+        if self.num ~= 0 then
+            self.angle = self.angle + math.rad(self.num)
+        end
+    else
+        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
+    end
 end
 
 local function EnemyBulletFilter(item, other)
@@ -50,13 +60,13 @@ function EnemyBullet:update(dt)
 
     
  --   self.removed = false
-    local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
+   -- local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
     self.velx = 50
     self.vely = 50
 
 --  if self.velx > 0 or self.vely > 0 then
-        self.velx = self.velx * math.cos(angle)
-        self.vely = self.vely * math.sin(angle) 
+        self.velx = self.velx * math.cos(self.angle)
+        self.vely = self.vely * math.sin(self.angle) 
   
 
         self.x = self.x + (self.velx) * dt
@@ -97,6 +107,9 @@ function EnemyBullet:update(dt)
             
                 self.visible = false
                 self.removed = true
+                if self.parent.name == "commando" then
+                    self.parent.munition = self.parent.munition +1
+                end
                 Timer.after(self.parent.rof, function()   
                      self.parent.EnemyBulletshot = false 
                     if self.parent.name == "bossrobot" then
@@ -115,6 +128,9 @@ function EnemyBullet:update(dt)
             self.velx, self.vely = 0,0
             self.visible = false
             self.removed = true
+            if self.parent.name == "commando" then
+                self.parent.munition = self.parent.munition +1
+            end
             Timer.after(self.parent.rof, function()   
                  self.parent.EnemyBulletshot = false 
                  if self.parent.name == "bossrobot" then
@@ -144,6 +160,9 @@ function EnemyBullet:update(dt)
          
             self.visible = false
             self.removed = true
+            if self.parent.name == "commando" then
+                self.parent.munition = self.parent.munition +1
+            end
             Timer.after(self.parent.rof, function()   
                  self.parent.EnemyBulletshot = false 
                 
@@ -163,6 +182,10 @@ function EnemyBullet:update(dt)
         if distance <= 1 and self.removed ~= true then
             self.visible = false
             self.removed = true
+            if self.parent.name == "commando" then
+
+                self.parent.munition = self.parent.munition +1
+            end
             Timer.after(self.parent.rof, function()    
                 self.parent.EnemyBulletshot = false 
                 if self.parent.name == "bossrobot" then

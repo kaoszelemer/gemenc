@@ -40,6 +40,8 @@ self.ty = math.floor(self.y / tileH)
   self.maxTrailLength = 32
   self.trailDuration = 0.05
   self.trailTimer = 0
+  self.sp = 0
+  self.maxsp = 10
 
   self.smokeparticleimage = love.graphics.newImage('assets/smokeparticle.png') 
 
@@ -238,6 +240,18 @@ function Player:action(x,y)
         end ]]
 
     
+
+end
+
+function Player:special()
+
+    if self.sp > 8 and not player.specialshoot then
+        player.specialshoot = true
+        player.sp = player.sp - 8
+        player.specialweapon[1]:shoot()
+        
+    end
+
 
 end
 

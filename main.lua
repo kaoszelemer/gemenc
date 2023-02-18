@@ -13,7 +13,9 @@ GLOBALS = {
     mgonwhichlevel = 3,
     drillonwhichlevel = 2,
     howlongbeforestart = 3,
-    drawenemycolliders = false
+    drawenemycolliders = false,
+    timebetweenspecialshots = 5,
+    numberofenemies = 0
 }
 
 
@@ -32,12 +34,15 @@ Enemy = require('classes.characters.Enemy')
 Turret = require('classes.characters.Turret')
 Tank = require('classes.characters.Tank')
 Spider = require('classes.characters.Spider')
+Commando = require('classes.characters.Commando')
 BossRobot = require('classes.characters.BossRobot')
+BossSpider = require('classes.characters.BossSpider')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
 Drill = require('classes.weapons.Drill')
 MachineGun = require('classes.weapons.MachineGun')
+Specialweapon = require('classes.weapons.Specialweapon')
 
 FieldItem = require('classes.items.FieldItem')
 Medpack = require('classes.items.Medpack')
@@ -52,6 +57,7 @@ Bullet = require('classes.Bullet')
 EnemyBullet = require('classes.EnemyBullet')
 DrillBullet = require('classes.DrillBullet')
 TankBullet = require('classes.TankBullet')
+SpecialBullet = require('classes.SpecialBullet')
 
 
 
@@ -106,6 +112,23 @@ gameState = StateMachine({
     },
     "starting"
 )
+
+
+function shuffleTable(t)
+    for i = #t, 2, -1 do
+      local j = love.math.random(i)
+      t[i], t[j] = t[j], t[i]
+    end
+end
+
+function shuffleTableXY(t)
+
+    for i = #t, 2, -1 do
+        local j = love.math.random(i)
+        t[i].x, t[i].y, t[j].x, t[j].y = t[j].x, t[j].y, t[i].x, t[i].y
+    end
+
+end
 
 
 function screenShake(dur, mag)
@@ -184,6 +207,9 @@ local function initPlayer(p)
     
     
     player = Player(playerx, playery)
+    player.specialweapon = {}
+    table.insert(player.specialweapon, Specialweapon(playerx, playery))
+    
     MAP[player.tx][player.ty].occupied = true
     if p == nil then
        
@@ -193,15 +219,16 @@ local function initPlayer(p)
 
         player.munition = 30
     else
-        player.camera = Camera(player.x, player.y, 4)
-        player.fov=ROT.FOV.Precise:new(lightCalbak)
-        player.fov:compute(math.floor((player.x - 4) / tileW), math.floor((player.y -4) / tileH), 2, computeCalbak)
         player.hp = p.hp
+        player.sp = p.sp
         player.munition = p.munition
         player.x = playerx
         player.y = playery
         player.tx = math.floor(playerx / tileW)
         player.ty = math.floor(playery / tileH)
+        player.camera = Camera(player.x, player.y, 4)
+        player.fov=ROT.FOV.Precise:new(lightCalbak)
+        player.fov:compute(math.floor((player.x - 4) / tileW), math.floor((player.y -4) / tileH), 2, computeCalbak)
     end
 end
 
@@ -265,14 +292,65 @@ local function spawnEnemies(num)
     if num == 1 then
         local ix = MAP[maxX/2][maxY/2].x * tileW
         local iy = MAP[maxX/2][maxY/2].x * tileH
+        if LEVEL == GLOBALS.bossonwhichlevel * 4 then
 
-        table.insert(ENEMIES, BossRobot(ix - 32,iy - 32))
-        return
+            table.insert(ENEMIES, BossRobot(ix - 32,iy - 32))
+            return
+        end
+        if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+            table.insert(ENEMIES, BossSpider(ix - 32,iy - 32))
+            return
+        end
+        if LEVEL == GLOBALS.bossonwhichlevel then
+            Timer.every(1, function ()
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                   GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end, 30)
+            Timer.after(23, function ()
+                Timer.every(1, function ()
+                    local index = love.math.random(4,#MAP.emptytiles)
+                    local ix = MAP.emptytiles[index].x * tileW
+                    local iy = MAP.emptytiles[index].y * tileH
+                    local tx = ix / tileW
+                    local ty = iy / tileH
+                    
+                    if MAP[tx][ty].type == 0 then
+                        table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                    --    table.remove(MAP.emptytiles, index)
+                        GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                    end
+                end, 40)
+                Timer.every(2, function ()
+                    local index = love.math.random(4,#MAP.emptytiles)
+                    local ix = MAP.emptytiles[index].x * tileW
+                    local iy = MAP.emptytiles[index].y * tileH
+                    local tx = ix / tileW
+                    local ty = iy / tileH
+                    
+                    if MAP[tx][ty].type == 0 then
+                        table.insert(ENEMIES, Tank(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                        GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                      --  table.remove(MAP.emptytiles, index)
+                    end
+                end, 10)
+                
+            end)
+            return
+        end
     end
 
     
 
     for i = 1, num /2 do
+   
         local index = love.math.random(4,#MAP.emptytiles)
         local ix = MAP.emptytiles[index].x * tileW
         local iy = MAP.emptytiles[index].y * tileH
@@ -282,29 +360,36 @@ local function spawnEnemies(num)
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
             table.remove(MAP.emptytiles, index)
+            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
         end
     end
 
     for i = num/4, num do
-        local index = love.math.random(4,#MAP.emptytiles)
-        local ix = MAP.emptytiles[index].x * tileW
-        local iy = MAP.emptytiles[index].y * tileH
-        local tx = ix / tileW
-        local ty = iy / tileH
-        if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Turret(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
-            table.remove(MAP.emptytiles, index)
+        if #MAP.emptytiles > 0 then
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Turret(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
         end
     end
     for i = num/4, num do
-        local index = love.math.random(4,#MAP.emptytiles)
-        local ix = MAP.emptytiles[index].x * tileW
-        local iy = MAP.emptytiles[index].y * tileH
-        local tx = ix / tileW
-        local ty = iy / tileH
-        if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
-            table.remove(MAP.emptytiles, index)
+        if #MAP.emptytiles > 0 then
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
         end
     end
 
@@ -317,6 +402,7 @@ local function spawnEnemies(num)
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Spider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
             table.remove(MAP.emptytiles, index)
+            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
         end
     end
 
@@ -326,10 +412,10 @@ end
 
 function spawnStairs()
 
-    for x = maxX /2, maxX do
-        for y = maxY /2, maxY do
+    for x = 6, maxX do
+        for y = 6, maxY do
          --   print(MAP[x][y].occupied ~= true)
-            if MAP[x][y].occupied ~= true and not MAP.stairsinserted then
+            if MAP[x][y].occupied ~= true and not MAP.stairsinserted and MAP[x][y].type ~= 1 then
                 MAP[x][y].occupied = true
                 MAP[x][y].type = 0
                 table.insert(ITEMS, Stairs(x * tileW, y * tileH))
@@ -342,32 +428,32 @@ function spawnStairs()
 end
 
 local function chooseRandomMap()
-    local case = love.math.random(1,4)
+  
     local mapmaker
-    if LEVEL == 1 then case = 1  end
-    if case == 1 then
-        maxX, maxY = 16,16
+    if LEVEL <= GLOBALS.bossonwhichlevel then
+        maxX, maxY = 13 + LEVEL,13 + LEVEL  
         mapmaker = ROT.Map.EllerMaze:new(maxX, maxY)
         print("ellermaze")
         MAP.type = "ellermaze"
-    elseif case == 3 then
-        maxX, maxY = 20,20
-       mapmaker = ROT.Map.Cellular:new(maxX, maxY)
-       MAP.type = "Cellular"
-       print("cellular")
-
-    elseif case == 2 then
+    end
+    if LEVEL > GLOBALS.bossonwhichlevel and LEVEL <= GLOBALS.bossonwhichlevel * 2 then
+        maxX, maxY = 14 + LEVEL , 14 + LEVEL
+        mapmaker = ROT.Map.Cellular:new(maxX, maxY)
+        MAP.type = "Cellular"
+        print("cellular")
+    end
+    if LEVEL > GLOBALS.bossonwhichlevel * 2 and LEVEL <= GLOBALS.bossonwhichlevel * 3 then
+        maxX, maxY = 18,18
+        MAP.type = "IceyMaze"
+        mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
+        print("IceyMaze")
+    end
+    if LEVEL < GLOBALS.bossonwhichlevel * 3 and LEVEL == GLOBALS.bossonwhichlevel * 4 then
         maxX, maxY = 28,28
         mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {1,1,1,1})
         MAP.type = "Uniform"
         print("Uniform")
-    elseif case == 4 then
-        maxX, maxY = 18,18
-        MAP.type = "IceyMaze"
-       mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
-    end
-
-  
+    end  
     return mapmaker
 
 end
@@ -389,6 +475,7 @@ local function setDifficultyForMapAndLevel()
         MAP.maxitem = {8, 12}
         MAP.maxenemy = 20 + (LEVEL * 4)
       end
+
 end
 
 local function setTileImagesForMap(type)
@@ -410,8 +497,21 @@ local function setTileImagesForMap(type)
 end
 
 local function createBossMap()
-    maxX = 12
-    maxY = 12
+    if LEVEL == GLOBALS.bossonwhichlevel then
+        
+        maxX = 16
+        maxY = 16
+    elseif LEVEL == GLOBALS.bossonwhichlevel * 2 then
+        maxX = 12
+        maxY = 12
+    elseif LEVEL == GLOBALS.bossonwhichlevel * 3 then
+        maxX = 13
+        maxY = 13
+    elseif LEVEL == GLOBALS.bossonwhichlevel * 4 then
+        maxX = 14
+        maxY = 14
+    end
+
 
     for x = 1, maxX do
         MAP[x] = {}
@@ -434,7 +534,21 @@ local function createBossMap()
         end
     end
 
-    MAP.maxitem = {10,10}
+    if LEVEL == GLOBALS.bossonwhichlevel then
+        MAP.maxitem = {15, 20}
+    end
+
+    if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+        MAP.maxitem = {13, 38}
+    end
+
+    if LEVEL == GLOBALS.bossonwhichlevel * 3 then
+        MAP.maxitem = {13, 38}
+    end
+
+    if LEVEL == GLOBALS.bossonwhichlevel * 4 then
+        MAP.maxitem = {15, 50}
+    end
 
    
 
@@ -466,6 +580,7 @@ end
 
 function changeLevel()
     LEVEL = LEVEL + 1
+    GLOBALS.numberofenemies = 0
 
     MAP = nil
    MAP = {}
@@ -543,12 +658,27 @@ function changeLevel()
 end
 
 local function drawGUI()
+
+
+
+
+
+
     love.graphics.setColor(0,0,0)
-    love.graphics.rectangle("fill", 0, 0, 800,50)
+    love.graphics.rectangle("fill", 0, 0, 800,70)
     love.graphics.setColor(1,1,1)
 
-
+    
     local rectangle = {x = 5, y = 5, w = player.hp * 12, h = 40}
+    local sprectangle = {x = 5, y = 47, w = player.sp * 12, h = 25}
+
+
+    love.graphics.setColor(COLORS.blue)
+    love.graphics.rectangle("fill", sprectangle.x, sprectangle.y, sprectangle.w, sprectangle.h)
+    love.graphics.setColor(COLORS.white)
+    love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * 12) +2,sprectangle.h+2)
+    love.graphics.setFont(FONT.f16)
+    love.graphics.print("SP", 6,46)
     
     local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
     local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
@@ -569,6 +699,12 @@ local function drawGUI()
     love.graphics.setFont(FONT.f24)
     love.graphics.print(player.munition, (rectangle.x + (player.maxhp*12)) + 150, rectangle.y)
 
+
+    love.graphics.setFont(FONT.f16)
+    love.graphics.print("LEVEL", (rectangle.x + (player.maxhp*12)) + 300, rectangle.y)
+    love.graphics.setFont(FONT.f24)
+    love.graphics.print(LEVEL, (rectangle.x + (player.maxhp*12)) + 400, rectangle.y)
+
     
 end
 
@@ -584,7 +720,8 @@ function love.load()
     COLORS = {
        green = {42/255, 88/255, 79/255},
         red = {198/255, 80/255, 90/255},
-        white = {252/255, 1, 192/255}
+        white = {252/255, 1, 192/255},
+        blue = {110/255, 184/255, 168/255}
     }
     FONT = {
         f8 = love.graphics.newFont('assets/font.otf', 8), 
@@ -756,7 +893,7 @@ function love.draw()
         local px, py = player.camera:worldCoords(player.x, player.y)
         love.graphics.clear()
         love.graphics.setColor(1, 1, 1, 0.1)
-        love.graphics.circle("fill", px, py, 720 / player.camera.scale)
+        love.graphics.circle("fill", px, py, 900 / player.camera.scale)
         love.graphics.setCanvas()
        
         for x = 1, maxX do
@@ -843,7 +980,8 @@ function love.draw()
             love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 - 125, 800,100 )
             love.graphics.setColor(COLORS.white)
             love.graphics.setFont(FONT.f24)
-            love.graphics.print("TIME TO START:  "..GLOBALS.howlongbeforestart, love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2 - 123)
+            love.graphics.print("TIME TO START:  ", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2 - 123)
+            love.graphics.print(GLOBALS.howlongbeforestart, love.graphics.getWidth() / 2 - 80, love.graphics.getHeight() / 2 - 83)
         end
 
     end
@@ -918,7 +1056,12 @@ function love.mousepressed(x, y, button, istouch)
         if button == 1 then 
             player:action(MOUSEX,MOUSEY)
         end
+      
     end
+    if gameState.state == gameState.states.game and button == 2 then
+        player:special()
+    end
+
  end
 
 

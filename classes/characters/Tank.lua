@@ -49,6 +49,17 @@ function Tank:init(x, y)
     self.particleSystem:setColors(255, 255, 255, 255, 255, 255, 255, 0)
     self.particleSystem:setSizes(2, 0)
     self.particleSystem:start()
+
+    self.explocoordinates = {
+        {x = love.math.random(4,8), y = love.math.random(0,8)},
+        {x = love.math.random(0,12), y = love.math.random(0,12)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 8)},
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)}
+  
+       }
+  
+       shuffleTable(self.explocoordinates)
+       shuffleTableXY(self.explocoordinates)
 end
 
 

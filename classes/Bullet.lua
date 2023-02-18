@@ -65,11 +65,17 @@ function Bullet:update(dt)
        --    print("type: "..cols[i].other.type)
             if cols[i].other.type == "enemy" and not cols[i].other.hitinvi then
                 cols[i].other.hp = cols[i].other.hp - 1
-            --    screenShake(0.1, 3)
+            --   
+            if cols[i].other.name == "bossspider" and cols[i].other.hp % 2 == 0 then
+                cols[i].other:action()
+            end
+
+
                 
                 if cols[i].other.hp <= 0 then
-                    if cols[i].other.name == "bossrobot" then
-                        cols[i].other:kill("boss")
+                    if cols[i].other.name == "bossrobot" or cols[i].other.name == "bossspider" then
+                        screenShake(0.75, 3)
+                        cols[i].other:kill(cols[i].other.name)
                     else
                         cols[i].other:kill()
                     end 
@@ -93,6 +99,8 @@ function Bullet:update(dt)
                 end
              
             end
+
+            
                 
            
 

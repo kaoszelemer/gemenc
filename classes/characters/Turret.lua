@@ -44,6 +44,21 @@ function Turret:init(x, y)
     self.particleSystem:setSizes(2, 0)
     self.particleSystem:start()
 
+    self.explocoordinates = {
+        {x = love.math.random(4,8), y = love.math.random(4,8)},
+        {x = love.math.random(0,12), y = love.math.random(0,12)},
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 12)},
+        {x = love.math.random(4,8), y = love.math.random(4,8)},
+        {x = love.math.random(0,12), y = love.math.random(0,12)},
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 8)}
+  
+       }
+  
+       shuffleTable(self.explocoordinates)
+       shuffleTableXY(self.explocoordinates)
+
 end
 
 

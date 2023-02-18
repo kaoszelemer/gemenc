@@ -50,6 +50,29 @@ function BossRobot:init(x, y)
     self.particleSystem:setColors(255, 255, 255, 255, 255, 255, 255, 0)
     self.particleSystem:setSizes(2, 0)
     self.particleSystem:start()
+
+    self.explocoordinates = {
+        {x = love.math.random(10,40), y = love.math.random(0,120)},
+        {x = love.math.random(80,120), y = love.math.random(80,120)},
+        {x = love.math.random(-43, -54), y = love.math.random(-11, -176)},
+        {x = love.math.random(-98, -173), y = love.math.random(-40, -32)},
+        {x = love.math.random(40,80), y = love.math.random(40,80)},
+        {x = love.math.random(80,102), y = love.math.random(80,120)},
+        {x = love.math.random(-40, -80), y = love.math.random(-40, -80)},
+        {x = love.math.random(-40, -302), y = love.math.random(-16, -28)},
+        {x = love.math.random(45,87), y = love.math.random(43,82)},
+        {x = love.math.random(81,102), y = love.math.random(82,123)},
+        {x = love.math.random(-42, -38), y = love.math.random(-41, -38)},
+        {x = love.math.random(-29, -78), y = love.math.random(-41, -160)},
+        {x = love.math.random(22,43), y = love.math.random(24,78)},
+        {x = love.math.random(89,121), y = love.math.random(89,123)},
+        {x = love.math.random(-23, -28), y = love.math.random(-4, -8)},
+        {x = love.math.random(-84, 82), y = love.math.random(45, 98)}
+  
+       }
+  
+       shuffleTable(self.explocoordinates)
+       shuffleTableXY(self.explocoordinates)
 end
 
 
@@ -169,7 +192,10 @@ function BossRobot:action(x,y)
         end
 
         if self.SimpleEnemyBulletshot ~= true and self.hp < self.maxhp / 2 then
-            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
+            Timer.every(0.3, function ()
+                
+                table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
+            end, 5)
             self.SimpleEnemyBulletshot = true
         end
         

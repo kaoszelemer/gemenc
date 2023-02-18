@@ -40,7 +40,7 @@ function Enemy:init(x, y)
 
     self.particleImage = love.graphics.newImage("assets/blood.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
-    self.particleSystem:setParticleLifetime(1, 1)
+    self.particleSystem:setParticleLifetime(1, 1.5)
     self.particleSystem:setEmissionRate(32)
     self.particleSystem:setSizeVariation(1)
     self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
@@ -149,7 +149,7 @@ function Enemy:action(x,y)
    
         if self.EnemyBulletshot ~= true then
         
-            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
+            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, 1))
             self.EnemyBulletshot = true
         end
         
