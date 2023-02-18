@@ -86,16 +86,16 @@ function Player:update(dt)
     self.tx = math.floor(self.x / tileW)
     self.ty = math.floor(self.y / tileH)
     if self.x < tileW + 2 then
-        self.x = tileW + 2
+        self.x = tileW + 3
     end
     if self.y < tileH + 2 then
-        self.y = tileH
+        self.y = tileH + 3
     end
     if self.x > ((maxX) * tileW) +4 then
-        self.x = ((maxX) * tileH)+4
+        self.x = ((maxX) * tileH)+5
     end
     if self.y > ((maxY) * tileW)+4 then
-        self.y = ((maxY) * tileH)+4
+        self.y = ((maxY) * tileH)+5
     end
 
     if self.hitinvi and not self.showhitinvi then

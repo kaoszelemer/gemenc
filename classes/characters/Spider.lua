@@ -8,14 +8,14 @@ function Spider:init(x, y)
     self,
     x,
     y,
-    8,
-    8,
+    16,
+    16,
     {
         name = "spider",
         x = x,
         y = y,
-        w = 8,
-        h = 8
+        w = 16,
+        h = 16
     },
     "spider",
     love.graphics.newImage("assets/spider.png"),

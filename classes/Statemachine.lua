@@ -26,9 +26,6 @@ function StateMachine:changeState(targetState)
     if not validTransitionFound then
         error("not valid transition from "..self.state.name.." to "..targetState.name)
     end
-
-
-   
 end
 
 return StateMachine

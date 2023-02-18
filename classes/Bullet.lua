@@ -86,7 +86,7 @@ function Bullet:update(dt)
                     mapWorld:remove(self)
                     cols[i].other.hitinvi = true
                     cols[i].other.particleSystem:start()
-                    Timer.after(0.4, function() 
+                    Timer.after(0.1, function() 
                         cols[i].other.hitinvi = false
                         cols[i].other.showhitinvi = false
                     end)

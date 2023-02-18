@@ -21,11 +21,11 @@ function BossRobot:init(x, y)
     love.graphics.newImage("assets/bossrobot.png"),
     0,
     0,
-    30, --speed
+    50, --speed
     1,
     "enemy" ,-- type
     0.05, --rof
-    70 --hp
+    40 --hp
 )
 
 
@@ -40,7 +40,7 @@ function BossRobot:init(x, y)
     self.walkdistance = 200
     self.angle = 0
     self.munition = 8
-
+    self.maxhp = self.hp
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
@@ -166,6 +166,11 @@ function BossRobot:action(x,y)
             self.EnemyBulletshot = true
        
 
+        end
+
+        if self.SimpleEnemyBulletshot ~= true and self.hp < self.maxhp / 2 then
+            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
+            self.SimpleEnemyBulletshot = true
         end
         
       

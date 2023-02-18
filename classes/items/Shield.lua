@@ -17,7 +17,7 @@ function Shield:init(x, y)
     self.visible = false
     self.tilex = math.floor(self.x / tileW)
     self.tiley = math.floor(self.y / tileH)
-
+   
 end
 
 

@@ -103,6 +103,16 @@ end
     
   end
 
+  --debug
+
+  if GLOBALS.drawenemycolliders then
+    for i = 1, #ENEMIES do
+
+    love.graphics.rectangle("line", ENEMIES[i].x, ENEMIES[i].y, ENEMIES[i].colliders.w, ENEMIES[i].colliders.h)
+    end
+  end
+
+
 end
 
 function Character:addBloodSplatters(x, y, times)

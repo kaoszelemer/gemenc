@@ -9,9 +9,11 @@ Luastar = require('lib.luastar')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 4,
+    bossonwhichlevel = 2,
     mgonwhichlevel = 3,
-    drillonwhichlevel = 2
+    drillonwhichlevel = 2,
+    howlongbeforestart = 3,
+    drawenemycolliders = false
 }
 
 
@@ -53,7 +55,7 @@ TankBullet = require('classes.TankBullet')
 
 
 
-StateMachine = require('classes.StateMachine')
+StateMachine = require('classes.Statemachine')
 
 
 SCREENSHAKE = {
@@ -89,6 +91,16 @@ gameState = StateMachine({
     trans = {
         name = "trans",
         transitions = {"starting", "gameover", "game", "map", "trans"}
+    },
+
+    countback = {
+        name = "countback",
+        transitions = {"starting", "trans", "game", "countback"}
+    },
+
+    pause = {
+        name = "pause",
+        transitions = {"game", "pause"}
     }
 
     },
@@ -261,45 +273,50 @@ local function spawnEnemies(num)
     
 
     for i = 1, num /2 do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local index = love.math.random(4,#MAP.emptytiles)
+        local ix = MAP.emptytiles[index].x * tileW
+        local iy = MAP.emptytiles[index].y * tileH
         local tx = ix / tileW
         local ty = iy / tileH
         
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Enemy(ix + tileW / 2,iy + tileW/ 2))
+            table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+            table.remove(MAP.emptytiles, index)
         end
     end
 
     for i = num/4, num do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local index = love.math.random(4,#MAP.emptytiles)
+        local ix = MAP.emptytiles[index].x * tileW
+        local iy = MAP.emptytiles[index].y * tileH
         local tx = ix / tileW
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Turret(ix + tileW / 2,iy + tileW/ 2))
-
+            table.insert(ENEMIES, Turret(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
+            table.remove(MAP.emptytiles, index)
         end
     end
     for i = num/4, num do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local index = love.math.random(4,#MAP.emptytiles)
+        local ix = MAP.emptytiles[index].x * tileW
+        local iy = MAP.emptytiles[index].y * tileH
         local tx = ix / tileW
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Tank(ix + tileW / 2, (iy + tileW/ 2) - 6))
-
+            table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+            table.remove(MAP.emptytiles, index)
         end
     end
 
     for i = 1, num do
-        local ix = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].x * tileW
-        local iy = MAP.emptytiles[love.math.random(4,#MAP.emptytiles)].y * tileH
+        local index = love.math.random(4,#MAP.emptytiles)
+        local ix = MAP.emptytiles[index].x * tileW
+        local iy = MAP.emptytiles[index].y * tileH
         local tx = ix / tileW
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Spider(ix + tileW / 2, (iy + tileW/ 2) - 6))
-
+            table.insert(ENEMIES, Spider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+            table.remove(MAP.emptytiles, index)
         end
     end
 

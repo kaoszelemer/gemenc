@@ -59,12 +59,12 @@ function TankBullet:update(dt)
 
  --   self.removed = false
     if self.parent.name == "bossrobot" then
-        local rspeed = math.pi / 1.2
+        local rspeed = math.pi
         self.angle = self.angle + rspeed * dt
    
       
-        self.velx = 400
-        self.vely = 400
+        self.velx = 800
+        self.vely = 800
 
 --  if self.velx > 0 or self.vely > 0 then
 
