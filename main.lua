@@ -70,7 +70,7 @@ SCREENSHAKE = {
 gameState = StateMachine({
     game = {
         name = "game",
-        transitions = {"game", "starting", "gameover", "map", "trans"} 
+        transitions = {"game", "starting", "gameover", "map", "trans", "pause"} 
     },
 
     map = {
@@ -744,7 +744,7 @@ function love.draw()
         love.graphics.draw(IMAGES.titlescreen, 0,0)
     end
 
-    if gameState.state == gameState.states.game then
+    if gameState.state == gameState.states.game or gameState.state == gameState.states.pause then
         
  
     
@@ -824,6 +824,19 @@ function love.draw()
         end
 
         drawGUI()
+
+        if gameState.state == gameState.states.pause then
+            love.graphics.setColor(COLORS.red)
+            love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 - 125, 800,100 )
+            love.graphics.setColor(COLORS.white)
+            love.graphics.setFont(FONT.f24)
+
+            love.graphics.print("PAUSED", love.graphics.getWidth() / 2 - 80, love.graphics.getHeight() / 2 - 123)
+            love.graphics.print("press ESC or P to go back", love.graphics.getWidth() / 2 - 300, love.graphics.getHeight() / 2 - 83)
+            love.graphics.setColor(0, 0, 0, 0.5)
+            love.graphics.rectangle('fill', 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+        end
+
     end
 
     if gameState.state == gameState.states.map then
@@ -844,6 +857,8 @@ function love.draw()
                         --   print(ITEMS[i].x)
                         ITEMS[i]:draw()
                     end
+                    love.graphics.setColor(COLORS.red)
+                    love.graphics.circle("line", player.x + 4, player.y + 4, 16)
                     player:draw()
                 end
             end
@@ -999,7 +1014,34 @@ function love.mousepressed(x, y, button, istouch)
             player.onMap = true
 
             end
+            
     end
+    if gameState.state == gameState.states.pause and player.onPause == true then
+        if key == "p"  or key == "escape" then
+      
+            Timer.after(0.5, function ()
+                 player.onPause = false
+            end)
+
+          
+
+            gameState:changeState(gameState.states.game)
+        end
+    
+    end
+    
+    if gameState.state == gameState.states.game and player.onPause ~= true then
+            if key == "p" or key == "escape" then
+         
+            gameState:changeState(gameState.states.pause)
+            
+            player.onPause = true
+
+            end
+
+    end
+
+
 
 
  end
