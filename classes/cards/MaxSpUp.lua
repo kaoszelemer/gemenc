@@ -26,6 +26,7 @@ end
 function MaxSpUp:action()
     player.maxsp = player.maxsp + 6
     player.splevel = player.splevel + 1
+ 
     gameState:changeState(gameState.states.countback)
 end
 

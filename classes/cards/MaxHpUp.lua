@@ -27,6 +27,8 @@ end
 function MaxHpUp:action()
     player.maxhp = player.maxhp + 5
     player.hplevel = player.hplevel + 1
+   
+  
     gameState:changeState(gameState.states.countback)
 end
 

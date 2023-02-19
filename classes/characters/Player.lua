@@ -99,6 +99,8 @@ end
 function Player:levelup()
 
     gameState:changeState(gameState.states.levelup)
+    GUIWorld = bump.newWorld(64)
+    self.cards = {}
     self.level = self.level + 1
     self.xp = 0
     self.maxxp = self.xptolevelup[self.level]
