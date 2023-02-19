@@ -15,7 +15,9 @@ GLOBALS = {
     howlongbeforestart = 3,
     drawenemycolliders = false,
     timebetweenspecialshots = 5,
-    numberofenemies = 0
+    numberofenemies = 0,
+    howmanylevelstoskip = 1,
+--    startonwhichlevel = 11
 }
 
 
@@ -37,6 +39,7 @@ Spider = require('classes.characters.Spider')
 Commando = require('classes.characters.Commando')
 BossRobot = require('classes.characters.BossRobot')
 BossSpider = require('classes.characters.BossSpider')
+BossRefrig = require('classes.characters.BossRefrig')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -58,6 +61,7 @@ EnemyBullet = require('classes.EnemyBullet')
 DrillBullet = require('classes.DrillBullet')
 TankBullet = require('classes.TankBullet')
 SpecialBullet = require('classes.SpecialBullet')
+FreezeBullet = require('classes.FreezeBullet')
 
 
 
@@ -302,6 +306,10 @@ local function spawnEnemies(num)
             return
         end
         if LEVEL == GLOBALS.bossonwhichlevel then
+            table.insert(ENEMIES, BossRefrig(ix - 32,iy - 32))
+            return
+        end
+        if LEVEL == GLOBALS.bossonwhichlevel * 3 then
             Timer.every(1, function ()
                 local index = love.math.random(4,#MAP.emptytiles)
                 local ix = MAP.emptytiles[index].x * tileW
@@ -313,7 +321,7 @@ local function spawnEnemies(num)
                     table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
                 end
-            end, 30)
+            end, 40)
             Timer.after(23, function ()
                 Timer.every(1, function ()
                     local index = love.math.random(4,#MAP.emptytiles)
@@ -347,21 +355,52 @@ local function spawnEnemies(num)
         end
     end
 
-    
+    if LEVEL < GLOBALS.bossonwhichlevel then
 
-    for i = 1, num /2 do
-   
-        local index = love.math.random(4,#MAP.emptytiles)
-        local ix = MAP.emptytiles[index].x * tileW
-        local iy = MAP.emptytiles[index].y * tileH
-        local tx = ix / tileW
-        local ty = iy / tileH
-        
-        if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
-            table.remove(MAP.emptytiles, index)
-            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+        for i = 1, num /2 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
         end
+    else
+        for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+    
     end
 
     for i = num/4, num do
@@ -579,7 +618,7 @@ end
 
 
 function changeLevel()
-    LEVEL = LEVEL + 1
+    LEVEL = LEVEL + GLOBALS.howmanylevelstoskip
     GLOBALS.numberofenemies = 0
 
     MAP = nil
@@ -616,7 +655,7 @@ function changeLevel()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(1)
     player.fov=ROT.FOV.Precise:new(lightCalbak)
-    player.camera.scale = 2
+    player.camera.scale = 3
    else
         player.camera.scale = 4
         local mapmaker = chooseRandomMap()

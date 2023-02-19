@@ -1,19 +1,19 @@
-local EnemyBullet = Class('EnemyBullet')
+local FreezeBullet = Class('EnemyBullet')
 
-function EnemyBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
+function FreezeBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
     self.x = x
     self.y = y
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
     self.num = num
-    self.w = 2
-    self.h = 2
+    self.w = 32
+    self.h = 32
     self.velx = 0
     self.vely = 0
     self.speed = 500
     self.visible = true
-    self.type = "EnemyBullet"
+    self.type = "FreezeBullet"
 
 
     self.removed = false
@@ -22,18 +22,13 @@ function EnemyBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely,
     self.maxbulletdistance = 25
     self.ox = x
     self.oy = y
-    if self.parent.name == "commando" then
-        
-        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
-        if self.num ~= 0 then
-            self.angle = self.angle + math.rad(self.num)
-        end
-    else
-        self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
-    end
+    self.image = love.graphics.newImage('assets/freezebullet.png')
+
+    self.angle = (math.pi / 8 * self.num) 
+    
 end
 
-local function EnemyBulletFilter(item, other)
+local function FreezeBulletFilter(item, other)
   --  if item.parent:instanceOf(Enemy) then return nil end
     
     if other.type == 1 or other.type == 2 then
@@ -46,23 +41,24 @@ local function EnemyBulletFilter(item, other)
 end
 
 
-function EnemyBullet:draw()
+function FreezeBullet:draw()
 
     if self.visible and self.parent.visible then
-        love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+       -- print("lofasy")
+        love.graphics.draw(self.image, self.x, self.y)
     end
 
 end
 
 
-function EnemyBullet:update(dt)
+function FreezeBullet:update(dt)
 
 
     
  --   self.removed = false
    -- local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
-    self.velx = 50
-    self.vely = 50
+    self.velx = 70
+    self.vely = 70
 
 --  if self.velx > 0 or self.vely > 0 then
         self.velx = self.velx * math.cos(self.angle)
@@ -77,7 +73,7 @@ function EnemyBullet:update(dt)
     
     
     if self.removed ~= true then
-        local ax, ay, cols, len = mapWorld:move(self, self.x, self.y, EnemyBulletFilter)
+        local ax, ay, cols, len = mapWorld:move(self, self.x, self.y, FreezeBulletFilter)
         
        -- print(len)
       
@@ -90,7 +86,17 @@ function EnemyBullet:update(dt)
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
-                        player.hp = player.hp - 1
+                        player.hp = player.hp - 5
+                        if not player.frozen then
+                            player.frozen = true
+                            player.originalspeed = player.speed
+                            player.speed = player.speed / 2
+
+                            Timer.after(3.5, function() 
+                               player.frozen = false
+                               player.speed = player.originalspeed
+                            end)
+                        end
                     end
                 else
                     player:kill("pl")
@@ -107,15 +113,14 @@ function EnemyBullet:update(dt)
             
                 self.visible = false
                 self.removed = true
-                if self.parent.name == "commando" then
-                    self.parent.munition = self.parent.munition +1
-                end
+             
                 Timer.after(self.parent.rof, function()   
-                     self.parent.EnemyBulletshot = false 
-                    if self.parent.name == "bossrobot" or self.parent.name == "bossrefrig" then
-                        self.parent.simplemun = self.parent.simplemun + 1
-                        self.parent.SimpleEnemyBulletshot = false
-                    end
+                
+                  
+                        self.parent.munition = self.parent.munition + 1
+                        self.parent.EnemyBulletshot = false
+                       
+                
                 end)
                 
              --   print(self, "  removed cos playerhit")
@@ -129,21 +134,18 @@ function EnemyBullet:update(dt)
             self.velx, self.vely = 0,0
             self.visible = false
             self.removed = true
-            if self.parent.name == "commando" then
-                self.parent.munition = self.parent.munition +1
-            end
             Timer.after(self.parent.rof, function()   
-                 self.parent.EnemyBulletshot = false 
-                 if self.parent.name == "bossrobot" or self.parent.name == "bossrefrig" then
-                    self.parent.simplemun = self.parent.simplemun + 1
-                    self.parent.SimpleEnemyBulletshot = false
-                end
-                end)
+             
+             
+                   self.parent.munition = self.parent.munition + 1
+                   self.parent.EnemyBulletshot = false
+                 
+           end)
          --   print(self, "  removed cos hit ")
             mapWorld:remove(self)
             return
          end
-       
+         
             
         --[[     if len >= 1 then
                 self.visible = false
@@ -162,18 +164,13 @@ function EnemyBullet:update(dt)
          
             self.visible = false
             self.removed = true
-            if self.parent.name == "commando" then
-                self.parent.munition = self.parent.munition +1
-            end
             Timer.after(self.parent.rof, function()   
-                 self.parent.EnemyBulletshot = false 
-                
-                 if self.parent.name == "bossrobot" or self.parent.name == "bossrefrig" then
-                    self.parent.simplemun = self.parent.simplemun + 1
-                    self.parent.SimpleEnemyBulletshot = false
-                end
-                
-                end)
+       
+             
+                   self.parent.munition = self.parent.munition + 1
+                   self.parent.EnemyBulletshot = false
+           
+           end)
        --     print(self, "  removed cos stopped ")
             mapWorld:remove(self)
             return
@@ -185,17 +182,13 @@ function EnemyBullet:update(dt)
         if distance <= 1 and self.removed ~= true then
             self.visible = false
             self.removed = true
-            if self.parent.name == "commando" then
-
-                self.parent.munition = self.parent.munition +1
-            end
-            Timer.after(self.parent.rof, function()    
-                self.parent.EnemyBulletshot = false 
-                  if self.parent.name == "bossrobot" or self.parent.name == "bossrefrig" then
-                        self.parent.simplemun = self.parent.simplemun + 1
-                        self.parent.SimpleEnemyBulletshot = false
-                    end
-            end)
+            Timer.after(self.parent.rof, function()   
+            
+             
+                   self.parent.munition = self.parent.munition + 1
+                   self.parent.EnemyBulletshot = false
+           
+           end)
          --   print(self, "  removed cos distance ")
             mapWorld:remove(self)
         end
@@ -217,4 +210,4 @@ end
 
 
 
-return EnemyBullet
+return FreezeBullet

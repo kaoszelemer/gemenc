@@ -70,8 +70,11 @@ if self.name == "gemenc" then
 
 end
   if self.visible then
-
-    love.graphics.draw(self.image, self.x + 4, self.y + 4, self.angle, nil, nil, 4, 4)
+    if not self.frozen then
+      love.graphics.draw(self.image, self.x + 4, self.y + 4, self.angle, nil, nil, 4, 4)
+    else
+      love.graphics.draw(self.frozenimage, self.x + 4, self.y + 4, self.angle, nil, nil, 4, 4)
+    end
   end
 
   if self.shielded then
@@ -176,7 +179,7 @@ function Character:kill(pl)
       gameState:changeState(gameState.states.gameover)
   
    
-  elseif pl == "bossspider" or pl == "bossrobot" then
+  elseif pl == "bossspider" or pl == "bossrobot" or pl == "bossrefrig" then
     print("spwaning stairs")
     player.sp = player.maxsp
     spawnStairs()
@@ -188,7 +191,7 @@ function Character:kill(pl)
 
   Timer.after(0.4, function() 
     self.particleSystem:stop()
-    if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" then
+    if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" and self.name ~= "bossrefrig" then
       self:addBloodSplatters(self.x +4, self.y+4, 16, 0)
     end
     if self.name == "bossspider" then 

@@ -43,6 +43,9 @@ self.ty = math.floor(self.y / tileH)
   self.sp = 0
   self.maxsp = 10
 
+  self.velmodifier = 0
+  self.frozenimage = love.graphics.newImage('assets/playerfrozen.png')
+
   self.smokeparticleimage = love.graphics.newImage('assets/smokeparticle.png') 
 
   
@@ -154,27 +157,27 @@ function Player:move(dt)
     self.prevx = self.x
     self.prevy = self.y
     if love.keyboard.isDown("d") and
-	self.velx < self.speed then
-		self.velx = self.velx + self.speed * dt
+	self.velx < self.speed  then
+		self.velx = (self.velx) + self.speed * dt
         self.anglechange = -math.pi / 2
         self.smokeparticle:start()
 	end
     
 	if love.keyboard.isDown("a") and
-	self.velx > -self.speed then
-		self.velx = self.velx - self.speed * dt
+	self.velx > -self.speed  then
+		self.velx = (self.velx) - self.speed * dt
         self.anglechange = math.pi / 2
 	end
     
 	if love.keyboard.isDown("s") and
-	self.vely < self.speed then
-		self.vely = self.vely + self.speed * dt
+	self.vely < self.speed  then
+		self.vely = (self.vely) + self.speed * dt
         self.anglechange = 0
 	end
     
 	if love.keyboard.isDown("w") and
-	self.vely > -self.speed then
-		self.vely = self.vely - self.speed * dt
+	self.vely > -self.speed  then
+		self.vely = (self.vely) - self.speed * dt
         self.anglechange = math.pi
 	end
 
