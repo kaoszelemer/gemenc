@@ -17,6 +17,7 @@ function DrillItem:init(x, y)
     self.visible = false
     self.tilex = math.floor(self.x / tileW)
     self.tiley = math.floor(self.y / tileH)
+    self.name = "Drill"
 
 end
 
@@ -50,18 +51,22 @@ function DrillItem:action()
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
-        
+        self.drawValueOnMap = true
+        Timer.after(1, function ()
+            self.drawValueOnMap = false
+            for i = 1, #ITEMS do
+                if ITEMS[i] == self then
+                    table.remove(ITEMS, i)
+                end
+            end
+        end)
       --  print(self.tilex, self.tiley)
      
        -- print("itt")
         table.insert(INVENTORY, Drill())
         print(#INVENTORY)
 
-    for i = 1, #ITEMS do
-        if ITEMS[i] == self then
-            table.remove(ITEMS, i)
-        end
-    end
+   
 end
 
 end

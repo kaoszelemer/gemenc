@@ -42,7 +42,7 @@ function BossRobot:init(x, y)
     self.munition = 8
     self.simplemun = 5
     self.maxhp = self.hp
-
+    self.xp = 20
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
     self.particleSystem:setParticleLifetime(0.8, 1.8)

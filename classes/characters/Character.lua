@@ -182,6 +182,7 @@ function Character:kill(pl)
   elseif pl == "bossspider" or pl == "bossrobot" or pl == "bossrefrig" then
     print("spwaning stairs")
     player.sp = player.maxsp
+    player.xp = player.xp + self.xp
     spawnStairs()
 
 
@@ -207,6 +208,13 @@ function Character:kill(pl)
   self.visible = false
   if player.sp < player.maxsp then
     player.sp = player.sp + 1
+  end
+
+  if player.xp == player.maxxp then
+    player:levelup()
+  
+  elseif player.xp < player.maxxp then
+      player.xp = player.xp + self.xp
   end
   mapWorld:remove(self)
 

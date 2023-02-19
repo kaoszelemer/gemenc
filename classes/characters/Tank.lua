@@ -39,7 +39,7 @@ function Tank:init(x, y)
     self.direction = 1
     self.walkdistance = love.math.random(1,15)
     self.angle = 0
-
+    self.xp = 1
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)

@@ -42,7 +42,8 @@ self.ty = math.floor(self.y / tileH)
   self.trailTimer = 0
   self.sp = 0
   self.maxsp = 10
-
+  self.splevel = 0
+  self.hplevel = 0
   self.velmodifier = 0
   self.frozenimage = love.graphics.newImage('assets/playerfrozen.png')
 
@@ -70,6 +71,15 @@ self.ty = math.floor(self.y / tileH)
   self.bloodSplatterImage = love.graphics.newImage("assets/bloodsplatter.png")
 
   self.currentItem = 1
+
+  self.xptolevelup = {20, 50, 100, 120, 150, 200}
+
+
+  self.cards = {}
+  self.level = 1
+
+  self.maxxp = self.xptolevelup[self.level]
+  self.xp = 0
   
 end
 
@@ -84,6 +94,31 @@ local function playerFilter(item, other)
     else
         return nil   
     end
+end
+
+function Player:levelup()
+
+    gameState:changeState(gameState.states.levelup)
+    self.level = self.level + 1
+    self.xp = 0
+    self.maxxp = self.xptolevelup[self.level]
+    local a = love.math.random(1, #CARDS)
+    table.insert(self.cards, CARDS[a])
+    table.remove(CARDS, a)
+    local b = love.math.random(1, #CARDS)
+    table.insert(self.cards, CARDS[b])
+
+    CARDS = {}
+    table.insert(CARDS, MaxHpUp(0,0))
+    table.insert(CARDS, MaxSpUp(0,0))
+    table.insert(CARDS, MaxSpeedUp(0,0))
+    self.cards[1].x = 162
+    self.cards[1].y = 240
+    self.cards[2].x = 462
+    self.cards[2].y = 240
+    GUIWorld:add(self.cards[1], self.cards[1].x, self.cards[1].y, self.cards[1].w, self.cards[1].h)
+    GUIWorld:add(self.cards[2], self.cards[2].x, self.cards[2].y, self.cards[2].w, self.cards[2].h)
+
 end
 
 

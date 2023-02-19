@@ -18,6 +18,8 @@ function Ammo:init(x, y)
 
     self.tilex = math.floor(self.x / tileW)
     self.tiley = math.floor(self.y / tileH)
+    self.ammoup = love.math.random(10,19)
+    self.name = "Ammo"
 
 end
 
@@ -39,9 +41,16 @@ end
 
 function Ammo:draw()
 
+    
+
     if self.visible then
         love.graphics.draw(self.image, self.x, self.y)
     end
+
+
+
+    
+
 
 
 end
@@ -51,17 +60,22 @@ function Ammo:action()
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
-        player.munition = player.munition + 19
+        self.drawValueOnMap = true
+        Timer.after(1, function ()
+            self.drawValueOnMap = false
+            for i = 1, #ITEMS do
+                if ITEMS[i] == self then
+                    table.remove(ITEMS, i)
+                end
+            end
+        end)
+        player.munition = player.munition + self.ammoup
       --  print(self.tilex, self.tiley)
         MAP[self.tilex][self.tiley].type = 0
        -- print("itt")
  
 
-    for i = 1, #ITEMS do
-        if ITEMS[i] == self then
-            table.remove(ITEMS, i)
-        end
-    end
+   
 end
 
 end

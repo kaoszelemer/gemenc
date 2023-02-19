@@ -17,7 +17,7 @@ function Shield:init(x, y)
     self.visible = false
     self.tilex = math.floor(self.x / tileW)
     self.tiley = math.floor(self.y / tileH)
-   
+   self.name = "Shield"
 end
 
 
@@ -43,17 +43,22 @@ function Shield:action()
     if not self.pickedup then
         self.visible = false
         self.pickedup = true
+        self.drawValueOnMap = true
+        Timer.after(1, function ()
+            self.drawValueOnMap = false
+            for i = 1, #ITEMS do
+                if ITEMS[i] == self then
+                    table.remove(ITEMS, i)
+                end
+            end
+        end)
       player.shielded = true
       Timer.after(10, function ()
         player.shielded = false
      end)
  
 
-    for i = 1, #ITEMS do
-        if ITEMS[i] == self then
-            table.remove(ITEMS, i)
-        end
-    end
+  
 end
 
 end

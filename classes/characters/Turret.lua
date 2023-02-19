@@ -33,7 +33,7 @@ function Turret:init(x, y)
     self.tx = math.floor(self.x / tileW)
     self.ty = math.floor(self.y / tileH)
   
-
+    self.xp = 1
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)

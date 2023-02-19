@@ -42,6 +42,7 @@ function BossRefrig:init(x, y)
     self.munition = 16
     self.simplemun = 8
     self.maxhp = self.hp
+    self.xp = 20
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)

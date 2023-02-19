@@ -37,7 +37,7 @@ function Commando:init(x, y)
     self.walkdistance = love.math.random(1,15)
     self.angle = 0
     self.munition = 3
-
+    self.xp = 2
 
     self.particleImage = love.graphics.newImage("assets/blood.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)

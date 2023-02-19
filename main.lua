@@ -63,6 +63,10 @@ TankBullet = require('classes.TankBullet')
 SpecialBullet = require('classes.SpecialBullet')
 FreezeBullet = require('classes.FreezeBullet')
 
+Card = require('classes.cards.Card')
+MaxHpUp = require('classes.cards.MaxHpUp')
+MaxSpUp = require('classes.cards.MaxSpUp')
+MaxSpeedUp = require('classes.cards.MaxSpeedUp')
 
 
 StateMachine = require('classes.Statemachine')
@@ -80,7 +84,7 @@ SCREENSHAKE = {
 gameState = StateMachine({
     game = {
         name = "game",
-        transitions = {"game", "starting", "gameover", "map", "trans", "pause"} 
+        transitions = {"game", "starting", "gameover", "map", "trans", "pause", "levelup"} 
     },
 
     map = {
@@ -90,7 +94,7 @@ gameState = StateMachine({
 
     starting = {
         name =  "starting",
-        transitions = {"starting", "game", "trans"}
+        transitions = {"starting", "game", "trans", "countback"}
     },
 
     gameover = {
@@ -105,12 +109,18 @@ gameState = StateMachine({
 
     countback = {
         name = "countback",
-        transitions = {"starting", "trans", "game", "countback"}
+        transitions = {"starting", "trans", "game", "countback", "starting", "levelup"}
+    
     },
 
     pause = {
         name = "pause",
         transitions = {"game", "pause"}
+    },
+
+    levelup = {
+        name = "levelup",
+        transitions = {"game", "levelup", "countback"}
     }
 
     },
@@ -708,16 +718,26 @@ local function drawGUI()
     love.graphics.setColor(1,1,1)
 
     
-    local rectangle = {x = 5, y = 5, w = player.hp * 12, h = 40}
-    local sprectangle = {x = 5, y = 47, w = player.sp * 12, h = 25}
+    local rectangle = {x = 5, y = 5, w = player.hp * (12 - player.hplevel*3), h = 40}
+    local sprectangle = {x = 5, y = 47, w = player.sp * (12 - player.splevel*3), h = 25}
+    local xprectangle = {x = 5, y = 73, w = player.xp * 1.5, h = 8}
 
 
     love.graphics.setColor(COLORS.blue)
     love.graphics.rectangle("fill", sprectangle.x, sprectangle.y, sprectangle.w, sprectangle.h)
     love.graphics.setColor(COLORS.white)
-    love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * 12) +2,sprectangle.h+2)
+    love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * (12 - player.splevel*3)) +2,sprectangle.h+2)
     love.graphics.setFont(FONT.f16)
     love.graphics.print("SP", 6,46)
+
+    love.graphics.setColor(COLORS.yellow)
+    love.graphics.rectangle("fill", xprectangle.x, xprectangle.y, xprectangle.w, xprectangle.h)
+    love.graphics.setColor(COLORS.white)
+    love.graphics.rectangle("line", xprectangle.x-1,xprectangle.y-1, (player.maxxp * 1.5) +2,xprectangle.h+2)
+    love.graphics.setFont(FONT.f8)
+    love.graphics.print("XP", 6,72)
+
+
     
     local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
     local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
@@ -728,7 +748,7 @@ local function drawGUI()
     love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
     love.graphics.setColor(COLORS.white)
 
-    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * 12) +2,rectangle.h+2)
+    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * (12 - player.hplevel*3)) +2,rectangle.h+2)
 
     love.graphics.setFont(FONT.f16)
     love.graphics.print("HP", 6,6)
@@ -740,9 +760,9 @@ local function drawGUI()
 
 
     love.graphics.setFont(FONT.f16)
-    love.graphics.print("LEVEL", (rectangle.x + (player.maxhp*12)) + 300, rectangle.y)
+    love.graphics.print("FLOOR", (rectangle.x + (player.maxhp*12)) + 300, rectangle.y)
     love.graphics.setFont(FONT.f24)
-    love.graphics.print(LEVEL, (rectangle.x + (player.maxhp*12)) + 400, rectangle.y)
+    love.graphics.print("-"..LEVEL, (rectangle.x + (player.maxhp*12)) + 400, rectangle.y)
 
     
 end
@@ -760,7 +780,8 @@ function love.load()
        green = {42/255, 88/255, 79/255},
         red = {198/255, 80/255, 90/255},
         white = {252/255, 1, 192/255},
-        blue = {110/255, 184/255, 168/255}
+        blue = {110/255, 184/255, 168/255},
+        yellow = {238/255,156/255,93/255}
     }
     FONT = {
         f8 = love.graphics.newFont('assets/font.otf', 8), 
@@ -768,6 +789,7 @@ function love.load()
         f24 =  love.graphics.newFont('assets/font.otf', 24),
     }
     mapWorld = bump.newWorld(64)  
+    GUIWorld = bump.newWorld(64)
     LEVEL = 1
     MAP = {}
     MAP.emptytiles = {}
@@ -798,6 +820,10 @@ function love.load()
         godeeper = love.graphics.newImage("assets/godeeper.png"),
         gameover = love.graphics.newImage("assets/gameover.png")
     }
+    CARDS = {}
+    table.insert(CARDS, MaxHpUp(0,0))
+    table.insert(CARDS, MaxSpUp(0,0))
+    table.insert(CARDS, MaxSpeedUp(0,0))
     local mapmaker = chooseRandomMap()
     setTileImagesForMap(MAP.type)
     for x = 1, maxX do
@@ -820,6 +846,8 @@ function love.load()
     spawnEnemies(MAP.maxenemy)
     INVENTORY = {}
     BULLETS = {}
+
+
     INVENTORY[1] = Pistol()
     
 end
@@ -828,6 +856,10 @@ function love.update(dt)
 
     if SCREENSHAKE.t < SCREENSHAKE.shakeDuration then
         SCREENSHAKE.t = SCREENSHAKE.t + dt
+    end
+
+    if gameState.state == gameState.states.levelup then
+        MOUSEX, MOUSEY = love.mouse.getPosition()
     end
 
     if gameState.state == gameState.states.game then
@@ -920,7 +952,7 @@ function love.draw()
         love.graphics.draw(IMAGES.titlescreen, 0,0)
     end
 
-    if gameState.state == gameState.states.game or gameState.state == gameState.states.pause or gameState.state == gameState.states.countback then
+    if gameState.state == gameState.states.game or gameState.state == gameState.states.pause or gameState.state == gameState.states.countback or gameState.state == gameState.states.levelup then
         
  
     
@@ -1001,6 +1033,51 @@ function love.draw()
 
         drawGUI()
 
+        for i = 1, #ITEMS do
+            if ITEMS[i].name == "Ammo" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("+"..ITEMS[i].ammoup.."Ammo", x - 32,y)
+                end
+                   
+
+            end
+
+            if ITEMS[i].name == "Medpack" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("+"..ITEMS[i].hpup.."HP", x - 32,y)
+                end
+                   
+            end
+            if ITEMS[i].name == "MG" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("MACHINE GUN", x - 32,y)
+                end
+                   
+            end
+            if ITEMS[i].name == "Drill" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("DRILL", x - 32,y)
+                end
+                   
+            end
+            if ITEMS[i].name == "Shield" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("10s SHIELD", x - 32,y)
+                end
+                   
+            end
+        end
+
         if gameState.state == gameState.states.pause then
             love.graphics.setColor(COLORS.red)
             love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 - 125, 800,100 )
@@ -1020,7 +1097,23 @@ function love.draw()
             love.graphics.setColor(COLORS.white)
             love.graphics.setFont(FONT.f24)
             love.graphics.print("TIME TO START:  ", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2 - 123)
-            love.graphics.print(GLOBALS.howlongbeforestart, love.graphics.getWidth() / 2 - 80, love.graphics.getHeight() / 2 - 83)
+            love.graphics.print(GLOBALS.howlongbeforestart, love.graphics.getWidth() / 2 - 10, love.graphics.getHeight() / 2 - 83)
+        end
+
+        if gameState.state == gameState.states.levelup then
+            love.graphics.setColor(COLORS.red)
+            love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 - 125, 800,100 )
+            love.graphics.setColor(COLORS.white)
+            love.graphics.setFont(FONT.f24)
+            love.graphics.print("LEVEL UP ", love.graphics.getWidth() / 2 - 130, love.graphics.getHeight() / 2 - 123)
+            love.graphics.print("CHOOSE ONE: ", love.graphics.getWidth() / 2 - 160, love.graphics.getHeight() / 2 - 93)
+            for i = 1, #player.cards do
+                love.graphics.draw(player.cards[i].image, player.cards[i].x, player.cards[i].y)
+            end
+        end
+
+        if gameState.state == gameState.states.levelup then
+            love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY, nil, player.camera.scale, player.camera.scale)
         end
 
     end
@@ -1087,7 +1180,7 @@ end
 function love.mousepressed(x, y, button, istouch)
 
     if gameState.state == gameState.states.starting then
-        gameState:changeState(gameState.states.game)
+        gameState:changeState(gameState.states.countback)
     end
 
 
@@ -1099,6 +1192,15 @@ function love.mousepressed(x, y, button, istouch)
     end
     if gameState.state == gameState.states.game and button == 2 then
         player:special()
+    end
+
+    if gameState.state == gameState.states.levelup and button == 1 then
+        local items, len = GUIWorld:queryPoint(MOUSEX,MOUSEY)
+        if len == 1 then
+            for i = 1, len do
+                items[i].action()
+            end
+        end
     end
 
  end
