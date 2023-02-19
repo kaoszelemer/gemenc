@@ -28,6 +28,7 @@ function EnemyBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely,
         if self.num ~= 0 then
             self.angle = self.angle + math.rad(self.num)
         end
+  
     else
         self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
     end

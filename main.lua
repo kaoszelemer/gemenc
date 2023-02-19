@@ -9,14 +9,15 @@ Luastar = require('lib.luastar')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 2,
+    bossonwhichlevel = 4,
     mgonwhichlevel = 3,
+    sgonwhichlevel = 6,
     drillonwhichlevel = 2,
     howlongbeforestart = 3,
     drawenemycolliders = false,
     timebetweenspecialshots = 5,
     numberofenemies = 0,
-    howmanylevelstoskip = 1,
+    howmanylevelstoskip = 5,
 --    startonwhichlevel = 11
 }
 
@@ -46,6 +47,7 @@ Pistol = require('classes.weapons.Pistol')
 Drill = require('classes.weapons.Drill')
 MachineGun = require('classes.weapons.MachineGun')
 Specialweapon = require('classes.weapons.Specialweapon')
+ShotGun = require('classes.weapons.ShotGun')
 
 FieldItem = require('classes.items.FieldItem')
 Medpack = require('classes.items.Medpack')
@@ -53,6 +55,8 @@ Ammo = require('classes.items.Ammo')
 DrillItem = require('classes.items.DrillItem')
 Shield = require('classes.items.Shield')
 MGitem = require('classes.items.MGitem')
+SpeedUp = require('classes.items.SpeedUp')
+SGitem = require('classes.items.SGitem')
 
 Stairs = require('classes.items.Stairs')
 
@@ -235,6 +239,15 @@ local function initPlayer(p)
     else
         player.hp = p.hp
         player.sp = p.sp
+        player.xp = p.xp
+        player.level = p.level
+        player.maxhp =  p.maxhp
+        player.maxsp = p.maxsp
+        player.speed = p.speed
+        if p.originalspeed ~= nil then
+            player.originalspeed = p.originalspeed
+        end
+        player.maxxp = p.maxxp
         player.munition = p.munition
         player.x = playerx
         player.y = playery
@@ -285,14 +298,26 @@ local function spawnItems(mpnum, bunum)
         table.insert(ITEMS, MGitem(player.x + 8,player.y + 8))
     
     end
+    if LEVEL == GLOBALS.sgonwhichlevel then
+        table.insert(ITEMS, SGitem(player.x + 8,player.y + 8))
+    end
 
     local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
     local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
     local tx = ix / tileW
     local ty = iy / tileH
 
-    if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
+    if MAP[tx][ty].type == 0  then
         table.insert(ITEMS, Shield(ix + tileW / 2,iy + tileW/ 2))
+       -- MAP[tx][ty].type = 2
+        MAP[tx][ty].occupied = true
+    end
+    local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
+    local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
+    local tx = ix / tileW
+    local ty = iy / tileH
+    if MAP[tx][ty].type == 0 then
+        table.insert(ITEMS, SpeedUp(ix + tileW / 2,iy + tileW/ 2))
        -- MAP[tx][ty].type = 2
         MAP[tx][ty].occupied = true
     end
@@ -497,7 +522,7 @@ local function chooseRandomMap()
         mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
         print("IceyMaze")
     end
-    if LEVEL < GLOBALS.bossonwhichlevel * 3 and LEVEL == GLOBALS.bossonwhichlevel * 4 then
+    if LEVEL > GLOBALS.bossonwhichlevel * 3 and LEVEL == GLOBALS.bossonwhichlevel * 4 then
         maxX, maxY = 28,28
         mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {1,1,1,1})
         MAP.type = "Uniform"
@@ -1020,7 +1045,9 @@ function love.draw()
         
         player:draw()
 
-        love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
+        if gameState.state ~= gameState.states.levelup then
+            love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
+        end
         player.camera:detach()
 
 
@@ -1073,6 +1100,22 @@ function love.draw()
                     local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
                     love.graphics.setFont(FONT.f16)
                     love.graphics.print("10s SHIELD", x - 32,y)
+                end
+                   
+            end
+            if ITEMS[i].name == "SpeedUp" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("10s SPEED", x - 32,y)
+                end
+                   
+            end
+            if ITEMS[i].name == "SG" then
+                if ITEMS[i].drawValueOnMap then
+                    local x,y = player.camera:cameraCoords(ITEMS[i].x, ITEMS[i].y)
+                    love.graphics.setFont(FONT.f16)
+                    love.graphics.print("SHOTGUN", x - 32,y)
                 end
                    
             end

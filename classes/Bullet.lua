@@ -17,6 +17,7 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
     self.removed = false
   --  print(self, " added")
     mapWorld:add(self, self.x, self.y, self.w, self.h)
+    
 
 end
 

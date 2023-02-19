@@ -191,6 +191,12 @@ function Player:move(dt)
    -- local anglechange = 0
     self.prevx = self.x
     self.prevy = self.y
+    
+    if player.speedup and not player.speedupeffect then
+        self.originalspeed = self.speed
+        player.speedupeffect = true
+        self.speed = self.speed + 300
+    end
     if love.keyboard.isDown("d") and
 	self.velx < self.speed  then
 		self.velx = (self.velx) + self.speed * dt
@@ -262,7 +268,6 @@ function Player:action(x,y)
 
     
         if self.munition > 0 and not self.bulletshot then
-            self.munition = self.munition - 1
             self.bulletshot = true
             INVENTORY[1]:shoot(x,y)
         end
