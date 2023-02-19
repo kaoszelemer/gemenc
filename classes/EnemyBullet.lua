@@ -32,6 +32,8 @@ function EnemyBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely,
     else
         self.angle =  math.atan2(self.targety - self.y, self.targetx - self.x)
     end
+
+    
 end
 
 local function EnemyBulletFilter(item, other)
@@ -64,7 +66,10 @@ function EnemyBullet:update(dt)
    -- local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
     self.velx = 50
     self.vely = 50
-
+    if self.parent.name == "sniper" then
+        self.velx = 180
+        self.vely = 180
+    end
 --  if self.velx > 0 or self.vely > 0 then
         self.velx = self.velx * math.cos(self.angle)
         self.vely = self.vely * math.sin(self.angle) 
@@ -91,7 +96,12 @@ function EnemyBullet:update(dt)
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
-                        player.hp = player.hp - 1
+                        if self.parent.name ~= "sniper" then
+                            player.hp = player.hp - 1
+                        else
+                            player.hp = player.hp - 5
+                        end
+
                     end
                 else
                     player:kill("pl")

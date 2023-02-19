@@ -41,6 +41,7 @@ Commando = require('classes.characters.Commando')
 BossRobot = require('classes.characters.BossRobot')
 BossSpider = require('classes.characters.BossSpider')
 BossRefrig = require('classes.characters.BossRefrig')
+Sniper = require('classes.characters.Sniper')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -406,7 +407,7 @@ local function spawnEnemies(num)
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
-    else
+    elseif LEVEL > GLOBALS.bossonwhichlevel and LEVEL < GLOBALS.bossonwhichlevel * 2 then
         for i = 1, num /4 do
     
             local index = love.math.random(4,#MAP.emptytiles)
@@ -435,7 +436,64 @@ local function spawnEnemies(num)
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
+    elseif LEVEL > GLOBALS.bossonwhichlevel * 2 and LEVEL < GLOBALS.bossonwhichlevel * 3 then
+        for i = 1, num /4 do
     
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Sniper(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+    else
+        for i = 1, num /2 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Sniper(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = 1, num /2 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
     end
 
     for i = num/4, num do
@@ -804,6 +862,7 @@ function love.load()
     COLORS = {
        green = {42/255, 88/255, 79/255},
         red = {198/255, 80/255, 90/255},
+        sniperred = {198/255, 80/255, 90/255, 0.3},
         white = {252/255, 1, 192/255},
         blue = {110/255, 184/255, 168/255},
         yellow = {238/255,156/255,93/255}

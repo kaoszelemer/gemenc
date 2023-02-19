@@ -69,6 +69,7 @@ if self.name == "gemenc" then
   love.graphics.draw(self.smokeparticle, self.x, self.y, self.angle, nil, nil)
 
 end
+
   if self.visible then
     if not self.frozen then
       love.graphics.draw(self.image, self.x + 4, self.y + 4, self.angle, nil, nil, 4, 4)
@@ -106,6 +107,14 @@ end
     love.graphics.rectangle("line", ENEMIES[i].x, ENEMIES[i].y, ENEMIES[i].colliders.w, ENEMIES[i].colliders.h)
     end
   end
+
+  if self.drawMarkerline and self.visible and not self.isDead then
+    love.graphics.setColor(COLORS.sniperred)
+    love.graphics.line(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x + player.colliders.w / 2, player.y + player.colliders.h / 2)
+    love.graphics.setColor(1,1,1,1)
+  end
+
+
 
 
 end
