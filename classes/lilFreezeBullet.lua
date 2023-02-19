@@ -1,19 +1,19 @@
-local FreezeBullet = Class('FreezeBullet')
+local lilFreezeBullet = Class('lilFreezeBullet')
 
-function FreezeBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
+function lilFreezeBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely, speed, visible, type)
     self.x = x
     self.y = y
     self.targetx = targetx
     self.targety = targety
     self.parent = parent
     self.num = num
-    self.w = 32
-    self.h = 32
+    self.w = 6
+    self.h = 6
     self.velx = 0
     self.vely = 0
     self.speed = 500
     self.visible = true
-    self.type = "FreezeBullet"
+    self.type = "lilFreezeBullet"
 
 
     self.removed = false
@@ -22,9 +22,8 @@ function FreezeBullet:init(x, y, targetx, targety, parent, num, w, h, velx, vely
     self.maxbulletdistance = 25
     self.ox = x
     self.oy = y
-    self.image = love.graphics.newImage('assets/freezebullet.png')
+    self.image = love.graphics.newImage('assets/lilfreezebullet.png')
 
-    self.angle = (math.pi / 8 * self.num) 
     
 end
 
@@ -41,7 +40,7 @@ local function FreezeBulletFilter(item, other)
 end
 
 
-function FreezeBullet:draw()
+function lilFreezeBullet:draw()
 
     if self.visible and self.parent.visible then
        -- print("lofasy")
@@ -51,22 +50,21 @@ function FreezeBullet:draw()
 end
 
 
-function FreezeBullet:update(dt)
+function lilFreezeBullet:update(dt)
 
 
     
  --   self.removed = false
    -- local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
-    self.velx = 70
-    self.vely = 70
+    self.velx = 40
+    self.vely = 40
 
 --  if self.velx > 0 or self.vely > 0 then
-        self.velx = self.velx * math.cos(self.angle)
-        self.vely = self.vely * math.sin(self.angle) 
-  
-
-        self.x = self.x + (self.velx) * dt
-        self.y = self.y + (self.vely) * dt
+local angle = math.atan2(self.targety - self.y, self.targetx - self.x)
+self.velx = self.velx * math.cos(angle)
+self.vely = self.vely * math.sin(angle) 
+self.x = self.x + self.velx * dt
+self.y = self.y + self.vely * dt
   --  end
 
     
@@ -79,14 +77,14 @@ function FreezeBullet:update(dt)
       
 
         for i = 1, #cols do
-           
+            print(cols[i].other.type)
             --   print(    cols[i].other.EnemyBulletshot)
             if cols[i].other.type == 2 and not player.shielded then
                 self.velx, self.vely = 0,0
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
-                        player.hp = player.hp - 5
+                        player.hp = player.hp - 1
                         if not player.frozen then
                             player.frozen = true
                             player.originalspeed = player.speed
@@ -117,7 +115,7 @@ function FreezeBullet:update(dt)
                 Timer.after(self.parent.rof, function()   
                 
                   
-                        self.parent.munition = self.parent.munition + 1
+                     
                         self.parent.EnemyBulletshot = false
                        
                 
@@ -137,7 +135,7 @@ function FreezeBullet:update(dt)
             Timer.after(self.parent.rof, function()   
              
              
-                   self.parent.munition = self.parent.munition + 1
+                
                    self.parent.EnemyBulletshot = false
                  
            end)
@@ -167,7 +165,7 @@ function FreezeBullet:update(dt)
             Timer.after(self.parent.rof, function()   
        
              
-                   self.parent.munition = self.parent.munition + 1
+               
                    self.parent.EnemyBulletshot = false
            
            end)
@@ -185,7 +183,7 @@ function FreezeBullet:update(dt)
             Timer.after(self.parent.rof, function()   
             
              
-                   self.parent.munition = self.parent.munition + 1
+          
                    self.parent.EnemyBulletshot = false
            
            end)
@@ -210,4 +208,4 @@ end
 
 
 
-return FreezeBullet
+return lilFreezeBullet

@@ -17,7 +17,7 @@ GLOBALS = {
     drawenemycolliders = false,
     timebetweenspecialshots = 5,
     numberofenemies = 0,
-    howmanylevelstoskip = 5,
+    howmanylevelstoskip = 1,
 --    startonwhichlevel = 11
 }
 
@@ -42,6 +42,7 @@ BossRobot = require('classes.characters.BossRobot')
 BossSpider = require('classes.characters.BossSpider')
 BossRefrig = require('classes.characters.BossRefrig')
 Sniper = require('classes.characters.Sniper')
+FreezeTower = require('classes.characters.FreezeTower')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -67,6 +68,7 @@ DrillBullet = require('classes.DrillBullet')
 TankBullet = require('classes.TankBullet')
 SpecialBullet = require('classes.SpecialBullet')
 FreezeBullet = require('classes.FreezeBullet')
+lilFreezeBullet = require('classes.lilFreezeBullet')
 
 Card = require('classes.cards.Card')
 MaxHpUp = require('classes.cards.MaxHpUp')
@@ -236,7 +238,7 @@ local function initPlayer(p)
         player.fov=ROT.FOV.Precise:new(lightCalbak)
         player.fov:compute(math.floor((player.x - 4) / tileW), math.floor((player.y -4) / tileH), 2, computeCalbak)
 
-        player.munition = 30
+        player.munition = 51
     else
         player.hp = p.hp
         player.sp = p.sp
@@ -496,20 +498,41 @@ local function spawnEnemies(num)
         end
     end
 
-    for i = num/4, num do
-        if #MAP.emptytiles > 0 then
-            local index = love.math.random(4,#MAP.emptytiles)
-            local ix = MAP.emptytiles[index].x * tileW
-            local iy = MAP.emptytiles[index].y * tileH
-            local tx = ix / tileW
-            local ty = iy / tileH
-            if MAP[tx][ty].type == 0 then
-                table.insert(ENEMIES, Turret(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
-                table.remove(MAP.emptytiles, index)
-                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+    if LEVEL < GLOBALS.bossonwhichlevel * 2 then 
+
+        for i = num/4, num do
+            if #MAP.emptytiles > 0 then
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, Turret(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
+                    table.remove(MAP.emptytiles, index)
+                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end
+        end
+    else
+        for i = num/4, num do
+            if #MAP.emptytiles > 0 then
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, FreezeTower(ix + tileW / 2  - 8,iy + tileW/ 2 - 8))
+                    table.remove(MAP.emptytiles, index)
+                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
             end
         end
     end
+
+
+
     for i = num/4, num do
         if #MAP.emptytiles > 0 then
             local index = love.math.random(4,#MAP.emptytiles)

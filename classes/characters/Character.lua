@@ -36,7 +36,7 @@ local bloodprints = {}
 
 function  Character:draw()
 
-if self.name ~= "Turret" or self.name ~= "Tank" then
+if self.name ~= "Turret" and self.name ~= "Tank" and self.name ~= "freezetower" then
     for _, splatter in pairs(BLOODSPLATTERS) do
       love.graphics.draw(
           self.bloodSplatterImage,
@@ -84,8 +84,8 @@ end
 
   if self.isDead or self.isHit then
 
-    if self.name ~= "Turret" and self.name ~= "Tank" then
-    love.graphics.draw(self.particleSystem, self.x + 4  , self.y + 4)
+    if self.name ~= "Turret" and self.name ~= "Tank" and self.name ~= "freezetower" then
+      love.graphics.draw(self.particleSystem, self.x + 4  , self.y + 4)
    
     else
 
@@ -201,7 +201,7 @@ function Character:kill(pl)
 
   Timer.after(0.4, function() 
     self.particleSystem:stop()
-    if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" and self.name ~= "bossrefrig" then
+    if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" and self.name ~= "bossrefrig" and self.name ~= "freezetower" then
       self:addBloodSplatters(self.x +4, self.y+4, 16, 0)
     end
     if self.name == "bossspider" then 

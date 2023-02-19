@@ -1,45 +1,39 @@
-local Tank = Character:extend('Tank')
+local FreezeTower = Character:extend('FreezeTower')
 
 
 
-function Tank:init(x, y)
+function FreezeTower:init(x, y)
 
     Character.init(
     self,
     x,
     y,
-    8,
-    8,
+    16,
+    16,
     {
-        name = "abi",
+        name = "freeztower",
         x = x,
         y = y,
-        w = 8,
-        h = 8
+        w = 16,
+        h = 16
     },
-    "Tank",
-    love.graphics.newImage("assets/tank.png"),
+    "freezetower",
+    love.graphics.newImage("assets/freezetower.png"),
     0,
     0,
-    3,
+    20,
     1,
-    "enemy" ,-- type
-    2, --rof
-    3 --hp
+    "enemy", -- type
+    0.1, --rof
+    2
 )
-
-
 
     mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
     self.visible = false
-    self.hitinvi = false
     self.tx = math.floor(self.x / tileW)
     self.ty = math.floor(self.y / tileH)
-    self.ox = self.x
-    self.direction = 1
-    self.walkdistance = love.math.random(1,15)
-    self.angle = 0
-    self.xp = 1
+  
+    self.xp = 2
 
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
@@ -51,31 +45,25 @@ function Tank:init(x, y)
     self.particleSystem:start()
 
     self.explocoordinates = {
-        {x = love.math.random(4,8), y = love.math.random(0,8)},
+        {x = love.math.random(4,8), y = love.math.random(4,8)},
         {x = love.math.random(0,12), y = love.math.random(0,12)},
-        {x = love.math.random(4, 8), y = love.math.random(4, 8)},
-        {x = love.math.random(4, 4), y = love.math.random(4, 4)}
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 12)},
+        {x = love.math.random(4,8), y = love.math.random(4,8)},
+        {x = love.math.random(0,12), y = love.math.random(0,12)},
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 8)}
   
        }
   
        shuffleTable(self.explocoordinates)
        shuffleTableXY(self.explocoordinates)
+
 end
 
 
 
-local function enemyFilter(item, other)
- 
-    if other.type == 1 or other.type == 2 then
-        return "bounce"
-    else
-        return nil   
-    end
-end
-
-
-
-function Tank:update(dt)
+function FreezeTower:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
     self.tx = math.floor(self.x / tileW)
@@ -88,7 +76,6 @@ function Tank:update(dt)
             self.visible = false
         end
     end
-
     
     if self.hitinvi and not self.showhitinvi then
         self.showhitinvi = true
@@ -100,8 +87,7 @@ function Tank:update(dt)
         end, 8)
     end 
 
-
-    if distance < 60 and not self.isDead then
+    if distance < 65 and distance > 20 and not self.isDead then
         self:action(x, y)
     end
 
@@ -109,65 +95,34 @@ function Tank:update(dt)
         self.particleSystem:update(dt)
     end
     if self.x < tileW +2 then
-        self.direction = -self.direction
+      
         self.x = tileW+2
       end
       if self.y < tileH+2 then
-        self.direction = -self.direction
+   
         self.y = tileH+2
       end
       if self.x > ((maxX) * tileW) +4 then
-        self.direction = -self.direction
+      
         self.x = ((maxX) * tileW)+4
       end
       if self.y > ((maxY) * tileH)+4 then
-        self.direction = -self.direction
+    
         self.y = ((maxY) * tileH)+4
       end 
+end
+
+function FreezeTower:move(dt)
+
 
 end
 
-function Tank:move(dt)
-
-
-
-  if not self.isDead then
-
-
-        if (self.direction == 1 and self.x >= (self.ox + self.walkdistance)) or (self.direction == -1 and self.x <= (self.ox - self.walkdistance)) then
-            self.direction = -self.direction
-        end
-        
-        self.x = self.x + (self.speed * self.direction * dt)
-
-            
-        local ax, ay, cols, len = mapWorld:move(self, self.x , self.y, enemyFilter)
-        
-        self.x = ax
-        self.y = ay
-
-        for i = 1, #cols do
-
-            
-        
-            if len >= 1 and cols[i].other.type ~= "TankBullet" and cols[i].other.type ~= "enemy" and cols[i].other.type ~= "enemy" then
-            
-                self.direction = -self.direction
-            end
-            
-
-        end
-
-
-    end
-end
-
-function Tank:action(x,y)
+function FreezeTower:action(x,y)
 
    
         if self.EnemyBulletshot ~= true then
         
-            table.insert(BULLETS, TankBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, 1))
+            table.insert(BULLETS, lilFreezeBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
             self.EnemyBulletshot = true
         end
         
@@ -177,4 +132,4 @@ function Tank:action(x,y)
 end
 
 
-return Tank
+return FreezeTower
