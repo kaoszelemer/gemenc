@@ -75,6 +75,7 @@ function BossRefrig:init(x, y)
   
        shuffleTable(self.explocoordinates)
        shuffleTableXY(self.explocoordinates)
+       self.displayName = "R3FR0Z"
 end
 
 

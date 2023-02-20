@@ -74,6 +74,9 @@ function BossSpider:init(x, y)
   
        shuffleTable(self.explocoordinates)
        shuffleTableXY(self.explocoordinates)
+
+       self.displayName = "L0VD3R"
+
 end
 
 

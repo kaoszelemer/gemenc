@@ -10,7 +10,7 @@ Ripple = require('lib.ripple')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 4,
+    bossonwhichlevel = 2,
     mgonwhichlevel = 3,
     sgonwhichlevel = 6,
     drillonwhichlevel = 2,
@@ -787,9 +787,10 @@ function changeLevel()
     spawnItems(MAP.maxitem[1],MAP.maxitem[2])
     spawnEnemies(1)
     player.fov=ROT.FOV.Precise:new(lightCalbak)
-    player.camera.scale = 3
+    Timer.tween(2, player.camera, {scale = 3}, 'in-out-quad')
+    --player.camera.scale = 3
    else
-        player.camera.scale = 4
+    Timer.tween(2, player.camera, {scale = 4}, 'in-out-quad')
         local mapmaker = chooseRandomMap()
         setTileImagesForMap(MAP.type)
         for x = 1, maxX do
@@ -945,6 +946,7 @@ function love.load()
         f8 = love.graphics.newFont('assets/font.otf', 8), 
         f16 = love.graphics.newFont('assets/font.otf', 16),
         f24 =  love.graphics.newFont('assets/font.otf', 24),
+        f72 = love.graphics.newFont('assets/font.otf', 56)
     }
     mapWorld = bump.newWorld(64)  
     GUIWorld = bump.newWorld(64)
@@ -1013,6 +1015,8 @@ function love.load()
     MUSICS[1]:play()
     player.progress = 0
     player.totalprogress = GLOBALS.numberofenemies + GLOBALS.numberofitems
+    player.camera.scale = 0.5
+    Timer.tween(3, player.camera, {scale = 4}, 'in-out-quad')
     print(player.totalprogress)
 end
 
@@ -1281,6 +1285,23 @@ function love.draw()
             love.graphics.setFont(FONT.f24)
             love.graphics.print("TIME TO START:  ", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2 - 123)
             love.graphics.print(GLOBALS.howlongbeforestart, love.graphics.getWidth() / 2 - 10, love.graphics.getHeight() / 2 - 83)
+            if LEVEL == GLOBALS.bossonwhichlevel then
+                love.graphics.setColor(COLORS.red)
+                love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 + 125, 800,100 )
+                love.graphics.setColor(COLORS.white)
+                love.graphics.setFont(FONT.f72)
+                love.graphics.print("ARMY", 250, love.graphics.getHeight() / 2 + 126)
+            elseif LEVEL == GLOBALS.bossonwhichlevel * 2 then
+                love.graphics.setColor(COLORS.red)
+                love.graphics.rectangle("fill", 0, love.graphics.getHeight() / 2 + 125, 800,100 )
+                love.graphics.setColor(COLORS.white)
+                love.graphics.setFont(FONT.f72)
+                for i = 1, #ENEMIES do
+                    if ENEMIES[i].displayName ~= nil then
+                        love.graphics.print(ENEMIES[i].displayName, 200, love.graphics.getHeight() / 2 + 126)
+                    end
+                end
+            end
         end
 
         if gameState.state == gameState.states.levelup then

@@ -74,6 +74,8 @@ function BossRobot:init(x, y)
   
        shuffleTable(self.explocoordinates)
        shuffleTableXY(self.explocoordinates)
+
+       self.displayName = "SX7"
 end
 
 

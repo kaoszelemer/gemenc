@@ -62,6 +62,7 @@ function Ammo:action()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true
+        Timer.tween(1, self, {y = self.y - 5}, 'in-out-quad')
         Timer.after(1, function ()
             self.drawValueOnMap = false
             for i = 1, #ITEMS do
