@@ -80,7 +80,7 @@ function DrillBullet:update(dt)
                 self.removed = true
                 player.bulletshot = false
                 self.isHit = true
-
+                local s = SOUNDS.explo:play()
                 self.dustparticles:start()
                 Timer.after(0.4, function() 
                     self.dustparticles:stop() 
