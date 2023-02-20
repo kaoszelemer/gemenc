@@ -250,6 +250,8 @@ local function initPlayer(p)
         player.maxhp =  p.maxhp
         player.maxsp = p.maxsp
         player.speed = p.speed
+        player.splevel = p.splevel
+        player.hplevel = p.hplevel
         if p.originalspeed ~= nil then
             player.originalspeed = p.originalspeed
         end
@@ -841,15 +843,15 @@ local function drawGUI()
     love.graphics.setColor(1,1,1)
 
     
-    local rectangle = {x = 5, y = 5, w = player.hp * (12 - player.hplevel*3), h = 40}
-    local sprectangle = {x = 5, y = 47, w = player.sp * (12 - player.splevel*3), h = 25}
+    local rectangle = {x = 5, y = 5, w = player.hp * (12 - player.hplevel*2), h = 40}
+    local sprectangle = {x = 5, y = 47, w = player.sp * (12 - player.splevel*4), h = 25}
     local xprectangle = {x = 5, y = 73, w = player.xp * 1.5, h = 8}
 
 
     love.graphics.setColor(COLORS.blue)
     love.graphics.rectangle("fill", sprectangle.x, sprectangle.y, sprectangle.w, sprectangle.h)
     love.graphics.setColor(COLORS.white)
-    love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * (12 - player.splevel*3)) +2,sprectangle.h+2)
+    love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * (12 - player.splevel*4)) +2,sprectangle.h+2)
     love.graphics.setFont(FONT.f16)
     love.graphics.print("SP", 6,46)
 
@@ -871,7 +873,7 @@ local function drawGUI()
     love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
     love.graphics.setColor(COLORS.white)
 
-    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * (12 - player.hplevel*3)) +2,rectangle.h+2)
+    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * (12 - player.hplevel*2)) +2,rectangle.h+2)
 
     love.graphics.setFont(FONT.f16)
     love.graphics.print("HP", 6,6)

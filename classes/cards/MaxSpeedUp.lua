@@ -24,7 +24,7 @@ function MaxSpeedUp:init(x, y)
 end
 
 function MaxSpeedUp:action()
-    player.speed = player.speed + 100
+    player.speed = player.speed + 30
    
     gameState:changeState(gameState.states.countback)
 end
