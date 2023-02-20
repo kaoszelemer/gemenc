@@ -39,7 +39,7 @@ end
 local function EnemyBulletFilter(item, other)
   --  if item.parent:instanceOf(Enemy) then return nil end
     
-    if other.type == 1 or other.type == 2 then
+    if other.type == 1 or other.type == 2 or other.type == "egg" then
        -- print("tacs")
         return "touch"
     else 
@@ -89,6 +89,26 @@ function EnemyBullet:update(dt)
       
 
         for i = 1, #cols do
+
+            if cols[i].other.type == "egg" then
+                cols[i].other:kill(cols[i].other)
+                self.velx, self.vely = 0,0
+                self.visible = false
+                self.removed = true
+                if self.parent.name == "commando" then
+                    self.parent.munition = self.parent.munition +1
+                end
+                Timer.after(self.parent.rof, function()   
+                     self.parent.EnemyBulletshot = false 
+                     if self.parent.name == "bossrobot" or self.parent.name == "bossrefrig" then
+                        self.parent.simplemun = self.parent.simplemun + 1
+                        self.parent.SimpleEnemyBulletshot = false
+                    end
+                    end)
+             --   print(self, "  removed cos hit ")
+                mapWorld:remove(self)
+                return
+            end
            
             --   print(    cols[i].other.EnemyBulletshot)
             if cols[i].other.type == 2 and not player.shielded then

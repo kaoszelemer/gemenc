@@ -23,7 +23,7 @@ function Player:init(x, y)
     10,
     2, -- type
     0, -- rof aint used
-    25  --hp
+    60  --hp
 )
 self.tx = math.floor(self.x / tileW)
 self.ty = math.floor(self.y / tileH)
@@ -72,7 +72,7 @@ self.ty = math.floor(self.y / tileH)
 
   self.currentItem = 1
 
-  self.xptolevelup = {20, 50, 100, 120, 150, 200}
+  self.xptolevelup = {20, 50, 100, 120, 150, 200, 250, 250, 250, 250, 250}
 
 
   self.cards = {}
@@ -81,6 +81,12 @@ self.ty = math.floor(self.y / tileH)
   self.maxxp = self.xptolevelup[self.level]
   self.xp = 0
   
+
+self.spboxshake = {
+    t = 0,
+    shakeDuration = -1,
+    shakeMagnitude = 0
+}
 
 
   
@@ -97,6 +103,12 @@ local function playerFilter(item, other)
     else
         return nil   
     end
+end
+
+function Player:spShake(dur, mag)
+
+    self.spboxshake.t, self.spboxshake.shakeDuration, self.spboxshake.shakeMagnitude = 0, dur, mag
+
 end
 
 function Player:levelup()
@@ -173,6 +185,11 @@ function Player:update(dt)
 
     if self.isHit then
         self.particleSystem:update(dt)
+    end
+
+    
+    if self.spboxshake.t < self.spboxshake.shakeDuration then
+        self.spboxshake.t = self.spboxshake.t + dt
     end
 
     --self.smokeparticle:update(dt)
@@ -308,10 +325,13 @@ end
 function Player:special()
 
     if self.sp > 8 and not player.specialshoot then
+        local instance = SOUNDS.special:play()
         player.specialshoot = true
         player.sp = player.sp - 8
         player.specialweapon[1]:shoot()
-        
+    else
+        local instance = SOUNDS.cantdo:play()
+        player:spShake(1, 3)
     end
 
 

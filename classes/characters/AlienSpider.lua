@@ -1,81 +1,58 @@
-local BossSpider = Character:extend('BossSpider')
+local AlienSpider = Character:extend('AlienSpider')
 
 
 
-function BossSpider:init(x, y)
+function AlienSpider:init(x, y)
 
     Character.init(
     self,
     x,
     y,
-    64,
-    64,
+    16,
+    16,
     {
-        name = "bossspider",
+        name = "alienspider",
         x = x,
         y = y,
-        w = 64,
-        h = 64
+        w = 16,
+        h = 16
     },
-    "bossspider",
-    love.graphics.newImage("assets/spiderboss.png"),
-    30,
-    30,
-    50, --speed
+    "alienspider",
+    love.graphics.newImage("assets/alienspider.png"),
+    love.math.random(30,70),
+    love.math.random(30,70),
+    20,
     1,
     "enemy" ,-- type
-    0.5, --rof
-    100 --hp
+    1, --rof
+    2 --hp
 )
 
-
-
-    mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
-    self.visible = false
-    self.hitinvi = false
-    self.tx = math.floor(self.x / tileW)
-    self.ty = math.floor(self.y / tileH)
+  mapWorld:add(self, self.x, self.y, self.colliders.w, self.colliders.h)
+  self.visible = false
+  self.tx = math.floor(self.x / tileW)
+  self.ty = math.floor(self.y / tileH)
     self.ox = self.x
     self.direction = 1
-    self.walkdistance = 200
+    self.walkdistance = love.math.random(1,15)
     self.angle = 0
-    self.munition = 8
-    self.maxhp = self.hp
-    self.xp = 20
+    self.xp = 1
 
-    self.particleImage = love.graphics.newImage("assets/exploparticle.png")
+    self.particleImage = love.graphics.newImage("assets/bioblood.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
-    self.particleSystem:setParticleLifetime(0.8, 1.8)
-    self.particleSystem:setEmissionRate(64)
-    self.particleSystem:setLinearAcceleration(-15, -15, 15, 15)
-    self.particleSystem:setColors(255, 255, 255, 255, 255, 255, 255, 0)
-    self.particleSystem:setSizes(2, 0)
+    self.particleSystem:setParticleLifetime(1.5, 1.5)
+    self.particleSystem:setEmissionRate(32)
+    self.particleSystem:setSizeVariation(1)
+    self.particleSystem:setLinearAcceleration(-20, -20, 20, 20)
+    self.particleSystem:setColors(145, 0, 0, 255, 145, 0, 0, 0)
     self.particleSystem:start()
 
-    self.explocoordinates = {
-        {x = love.math.random(10,40), y = love.math.random(0,40)},
-        {x = love.math.random(0,20), y = love.math.random(0,20)},
-        {x = love.math.random(-43, -54), y = love.math.random(-11, -17)},
-        {x = love.math.random(-8, -17), y = love.math.random(-4, -30)},
-        {x = love.math.random(0,60), y = love.math.random(40,80)},
-        {x = love.math.random(0,52), y = love.math.random(0,64)},
-        {x = love.math.random(0, 64), y = love.math.random(-40, -64)},
-        {x = love.math.random(-40, -64), y = love.math.random(-16, -28)},
-        {x = love.math.random(5,7), y = love.math.random(3,62)},
-        {x = love.math.random(23,29), y = love.math.random(28,32)},
-        {x = love.math.random(-64, -0), y = love.math.random(-64, -0)},
-        {x = love.math.random(-48, 12), y = love.math.random(-48, -16)},
-        {x = love.math.random(22,43), y = love.math.random(24,78)},
-        {x = love.math.random(32,64), y = love.math.random(-32,32)},
-        {x = love.math.random(-23, -28), y = love.math.random(-4, -8)},
-        {x = love.math.random(-4, 60), y = love.math.random(45, 60)}
-  
-       }
-  
-       shuffleTable(self.explocoordinates)
-       shuffleTableXY(self.explocoordinates)
+    self.bloodSplatterImage = love.graphics.newImage("assets/biobloodsplatter.png")
 
-       self.displayName = "L0VD3R"
+    if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+       self.velx = love.math.random(60,80)
+       self.vely = love.math.random(60,80)
+    end
 
 end
 
@@ -92,7 +69,7 @@ end
 
 
 
-function BossSpider:update(dt)
+function AlienSpider:update(dt)
     local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
 
     self.tx = math.floor(self.x / tileW)
@@ -106,24 +83,26 @@ function BossSpider:update(dt)
         end
     end
 
-
-
     if self.hitinvi and not self.showhitinvi then
         self.showhitinvi = true
-        Timer.every(0.01, function() 
+        Timer.every(0.03, function() 
             self.visible = true
         end, 14)
-        Timer.every(0.02, function ()
+        Timer.every(0.05, function ()
             self.visible = false
         end, 8)
     end 
 
-    if distance < 150 and not self.isDead then
+    if LEVEL == GLOBALS.bossonwhichlevel * 2 then
+        distance = 0
+    end
+
+    if distance < 75 and not self.isDead then
         self.canMove = true
     else
+        
         self.canMove = false
     end
- 
 
     if self.isDead then
         self.particleSystem:update(dt)
@@ -144,22 +123,24 @@ function BossSpider:update(dt)
         self.direction = -self.direction
         self.y = ((maxY) * tileH)+4
       end 
+
 end
 
-function BossSpider:move(dt)
+function AlienSpider:move(dt)
 
 
-    if not self.isDead and self.canMove then
 
-    
+  if not self.isDead and self.canMove then
+
+        local fX, fY = self.x, self.y
 
         local dx = player.x - self.x
         local dy = player.y - self.y
 
         local angle = math.atan2(dy, dx)
 
-        local fx = self.x + (self.velx * dt) * math.cos(angle)
-        local fy = self.y + (self.vely * dt) * math.sin(angle)
+        local fx = self.x + (self.velx * dt) * math.cos(angle) * self.direction
+        local fy = self.y + (self.vely * dt) * math.sin(angle) * self.direction
         
             
         local ax, ay, cols, len = mapWorld:move(self, fx , fy, enemyFilter)
@@ -177,7 +158,7 @@ function BossSpider:move(dt)
                 if cols[i].other.name == player.name and not player.hitinvi and not player.shielded then
                     cols[i].other.hp = cols[i].other.hp - 1
                     --    screenShake(0.1, 3)
-                        
+                        self.direction = -self.direction
                         if cols[i].other.hp <= 0 then
                       
                                 cols[i].other:kill("pl")
@@ -190,6 +171,10 @@ function BossSpider:move(dt)
                                 cols[i].other.particleSystem:stop()
                                 cols[i].other.hitinvi = false
                                 cols[i].other.showhitinvi = false
+                               
+                            end)
+                            Timer.after(0.15, function()
+                                self.direction = -self.direction
                             end)
                         end
                 end
@@ -202,26 +187,19 @@ function BossSpider:move(dt)
     end
 end
 
-function BossSpider:action(x,y)
+function AlienSpider:action(x,y)
 
-    if self.hp < self.maxhp / 2 then
-        for i = 1, 5 do
-            table.insert(ENEMIES, Spider(self.x,self.y))
-        end
+   
+      --[[   if self.EnemyBulletshot ~= true then
         
-    else
+            table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
+            self.EnemyBulletshot = true
+        end ]]
         
-        for i = 1, 2 do
-            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
-            table.insert(ENEMIES, Spider(self.x + i *9, self.y + i * 9))
-        end
-    end
-
- 
       
         
 
 end
 
 
-return BossSpider
+return AlienSpider

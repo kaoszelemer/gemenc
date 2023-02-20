@@ -25,7 +25,7 @@ function BossRefrig:init(x, y)
     1,
     "enemy" ,-- type
     0.5, --rof
-    40 --hp
+    200 --hp
 )
 
 

@@ -10,7 +10,7 @@ Ripple = require('lib.ripple')
 --GLOBALS
 
 GLOBALS = {
-    bossonwhichlevel = 2,
+    bossonwhichlevel = 4,
     mgonwhichlevel = 3,
     sgonwhichlevel = 6,
     drillonwhichlevel = 2,
@@ -46,6 +46,9 @@ BossSpider = require('classes.characters.BossSpider')
 BossRefrig = require('classes.characters.BossRefrig')
 Sniper = require('classes.characters.Sniper')
 FreezeTower = require('classes.characters.FreezeTower')
+AlienEgg = require('classes.characters.AlienEgg')
+AlienSpider = require('classes.characters.AlienSpider')
+RapidTank = require('classes.characters.RapidTank')
 
 Weapon = require('classes.weapons.Weapon')
 Pistol = require('classes.weapons.Pistol')
@@ -62,6 +65,7 @@ Shield = require('classes.items.Shield')
 MGitem = require('classes.items.MGitem')
 SpeedUp = require('classes.items.SpeedUp')
 SGitem = require('classes.items.SGitem')
+Lamp = require('classes.items.Lamp')
 
 Stairs = require('classes.items.Stairs')
 
@@ -94,7 +98,7 @@ SCREENSHAKE = {
 gameState = StateMachine({
     game = {
         name = "game",
-        transitions = {"game", "starting", "gameover", "map", "trans", "pause", "levelup"} 
+        transitions = {"game", "starting", "gameover", "map", "trans", "pause", "levelup", "win"} 
     },
 
     map = {
@@ -119,7 +123,7 @@ gameState = StateMachine({
 
     countback = {
         name = "countback",
-        transitions = {"starting", "trans", "game", "countback", "starting", "levelup"}
+        transitions = {"starting", "trans", "game", "countback", "starting", "levelup", "win"}
     
     },
 
@@ -131,7 +135,13 @@ gameState = StateMachine({
     levelup = {
         name = "levelup",
         transitions = {"game", "levelup", "countback"}
+    },
+
+    win = {
+        name = "win",
+        transitions = {"game", "win"}
     }
+
 
     },
     "starting"
@@ -233,7 +243,8 @@ local function initPlayer(p)
     player = Player(playerx, playery)
     player.specialweapon = {}
     table.insert(player.specialweapon, Specialweapon(playerx, playery))
-    
+    player.hpbarvisible = true
+    player.hpflashing = false
     MAP[player.tx][player.ty].occupied = true
     if p == nil then
        
@@ -334,6 +345,20 @@ local function spawnItems(mpnum, bunum)
         MAP[tx][ty].occupied = true
     end
 
+    if LEVEL % GLOBALS.bossonwhichlevel ~= 0 then
+
+        local ix = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].x * tileW
+        local iy = MAP.emptytiles[love.math.random(2,#MAP.emptytiles)].y * tileH
+        local tx = ix / tileW
+        local ty = iy / tileH
+        if MAP[tx][ty].type == 0 then
+            GLOBALS.numberofitems = GLOBALS.numberofitems + 1
+            table.insert(ITEMS, Lamp(ix + tileW / 2 + 8,iy + tileW/ 2 - 8))
+        -- MAP[tx][ty].type = 2
+            MAP[tx][ty].occupied = true
+        end
+    end
+
       
 
 end
@@ -341,8 +366,8 @@ end
 local function spawnEnemies(num)
 
     if num == 1 then
-        local ix = MAP[maxX/2][maxY/2].x * tileW
-        local iy = MAP[maxX/2][maxY/2].x * tileH
+        local ix = MAP[math.floor(maxX/2)][math.floor(maxY/2)].x * tileW
+        local iy = MAP[math.floor(maxX/2)][math.floor(maxY/2)].x * tileH
         if LEVEL == GLOBALS.bossonwhichlevel * 4 then
 
             table.insert(ENEMIES, BossRobot(ix - 32,iy - 32))
@@ -378,11 +403,11 @@ local function spawnEnemies(num)
                     local ty = iy / tileH
                     
                     if MAP[tx][ty].type == 0 then
-                        table.insert(ENEMIES, Enemy(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                        table.insert(ENEMIES, AlienEgg(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
                     --    table.remove(MAP.emptytiles, index)
                         GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
                     end
-                end, 40)
+                end, 20)
                 Timer.every(2, function ()
                     local index = love.math.random(4,#MAP.emptytiles)
                     local ix = MAP.emptytiles[index].x * tileW
@@ -420,6 +445,20 @@ local function spawnEnemies(num)
         end
     elseif LEVEL > GLOBALS.bossonwhichlevel and LEVEL < GLOBALS.bossonwhichlevel * 2 then
         for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, AlienEgg(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+     
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = 1, num /8 do
     
             local index = love.math.random(4,#MAP.emptytiles)
             local ix = MAP.emptytiles[index].x * tileW
@@ -476,6 +515,21 @@ local function spawnEnemies(num)
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
+        for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, AlienEgg(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+         
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        
     else
         for i = 1, num /2 do
     
@@ -491,7 +545,7 @@ local function spawnEnemies(num)
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
-        for i = 1, num /2 do
+        for i = 1, num /4 do
     
             local index = love.math.random(4,#MAP.emptytiles)
             local ix = MAP.emptytiles[index].x * tileW
@@ -502,6 +556,20 @@ local function spawnEnemies(num)
             if MAP[tx][ty].type == 0 then
                 table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
                 table.remove(MAP.emptytiles, index)
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = 1, num /4 do
+    
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, AlienEgg(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+              
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
@@ -544,31 +612,90 @@ local function spawnEnemies(num)
 
 
 
-    for i = num/4, num do
-        if #MAP.emptytiles > 0 then
+
+
+    if LEVEL < GLOBALS.bossonwhichlevel then
+
+        for i = 1, num do
             local index = love.math.random(4,#MAP.emptytiles)
             local ix = MAP.emptytiles[index].x * tileW
             local iy = MAP.emptytiles[index].y * tileH
             local tx = ix / tileW
             local ty = iy / tileH
             if MAP[tx][ty].type == 0 then
-                table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
-              
+                table.insert(ENEMIES, Spider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+        
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
-    end
-
-    for i = 1, num do
-        local index = love.math.random(4,#MAP.emptytiles)
-        local ix = MAP.emptytiles[index].x * tileW
-        local iy = MAP.emptytiles[index].y * tileH
-        local tx = ix / tileW
-        local ty = iy / tileH
-        if MAP[tx][ty].type == 0 then
-            table.insert(ENEMIES, Spider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
-       
-            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+        for i = num/4, num do
+            if #MAP.emptytiles > 0 then
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+                  
+                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end
+        end
+    elseif LEVEL > GLOBALS.bossonwhichlevel * 2 then
+        for i = 1, num/2 do
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, AlienSpider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+        
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+            
+        end
+        for i = 1, num/2 do
+            local index = love.math.random(4,#MAP.emptytiles)
+            local ix = MAP.emptytiles[index].x * tileW
+            local iy = MAP.emptytiles[index].y * tileH
+            local tx = ix / tileW
+            local ty = iy / tileH
+            if MAP[tx][ty].type == 0 then
+                table.insert(ENEMIES, AlienEgg(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+        
+                GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+            end
+        end
+        for i = num/4, num do
+            if #MAP.emptytiles > 0 then
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+                  
+                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end
+        end
+    elseif LEVEL > GLOBALS.bossonwhichlevel * 3 then
+        for i = num/4, num do
+            if #MAP.emptytiles > 0 then
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, RapidTank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
+                  
+                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end
         end
     end
 
@@ -614,7 +741,7 @@ local function chooseRandomMap()
         mapmaker = ROT.Map.IceyMaze:new(maxX, maxY)
         print("IceyMaze")
     end
-    if LEVEL > GLOBALS.bossonwhichlevel * 3 and LEVEL == GLOBALS.bossonwhichlevel * 4 then
+    if LEVEL > GLOBALS.bossonwhichlevel * 3 then
         maxX, maxY = 28,28
         mapmaker = ROT.Map.Rogue:new(maxX, maxY,  {1,1,1,1})
         MAP.type = "Uniform"
@@ -627,19 +754,19 @@ end
 local function setDifficultyForMapAndLevel()
     if MAP.type == "Cellular" then
         MAP.maxitem = {10, 24}
-        MAP.maxenemy = 30 + (LEVEL * 4)
+        MAP.maxenemy = 20 + (LEVEL * 3)
       end
       if MAP.type == "ellermaze" then
         MAP.maxitem = {5, 8}
-        MAP.maxenemy = 10 + (LEVEL * 4)
+        MAP.maxenemy = 10 + (LEVEL * 3)
       end
       if MAP.type == "Uniform" then
         MAP.maxitem = {20, 40}
-        MAP.maxenemy = 40 + (LEVEL * 4)
+        MAP.maxenemy = 25 + (LEVEL * 3)
       end
       if MAP.type == "IceyMaze" then
         MAP.maxitem = {8, 12}
-        MAP.maxenemy = 20 + (LEVEL * 4)
+        MAP.maxenemy = 15 + (LEVEL * 3)
       end
 
 end
@@ -748,6 +875,9 @@ function changeLevel()
     MUSICS[3]:stop()
     MUSICS[2]:resume()
     LEVEL = LEVEL + GLOBALS.howmanylevelstoskip
+    if LEVEL == (GLOBALS.bossonwhichlevel * 4) + 1 then
+        gameState:changeState(gameState.states.win)
+    end
     GLOBALS.numberofenemies = 0
     GLOBALS.numberofitems = 0
  
@@ -846,38 +976,54 @@ local function drawGUI()
     
     local rectangle = {x = 5, y = 5, w = player.hp * (12 - player.hplevel*2), h = 40}
     local sprectangle = {x = 5, y = 47, w = player.sp * (12 - player.splevel*4), h = 25}
-    local xprectangle = {x = 5, y = 73, w = player.xp * 1.5, h = 8}
+    local xprectangle = {x = 5, y = 75, w = player.xp * 1.5, h = 8}
 
-
+    love.graphics.push()
+    if player.spboxshake.t < player.spboxshake.shakeDuration then
+        local dx = love.math.random(-player.spboxshake.shakeMagnitude, player.spboxshake.shakeMagnitude)
+        local dy = love.math.random(-player.spboxshake.shakeMagnitude, player.spboxshake.shakeMagnitude)
+        love.graphics.translate(math.floor(dx), math.ceil(dy))
+    end
     love.graphics.setColor(COLORS.blue)
     love.graphics.rectangle("fill", sprectangle.x, sprectangle.y, sprectangle.w, sprectangle.h)
     love.graphics.setColor(COLORS.white)
     love.graphics.rectangle("line", sprectangle.x-1,sprectangle.y-1, (player.maxsp * (12 - player.splevel*4)) +2,sprectangle.h+2)
+
+  
+--[[ local rectWidth = (player.maxsp * (12 - player.splevel * 4))
+local sectionWidth = rectWidth / 8
+love.graphics.rectangle("line", sprectangle.x - 1, sprectangle.y - 1, rectWidth + 2, sprectangle.h + 2)
+
+local lineX = sprectangle.x + 8 * sectionWidth
+love.graphics.line(lineX, sprectangle.y, lineX, sprectangle.y + sprectangle.h) ]]
+
     love.graphics.setFont(FONT.f16)
     love.graphics.print("SP", 6,46)
+    love.graphics.pop()
 
     love.graphics.setColor(COLORS.yellow)
     love.graphics.rectangle("fill", xprectangle.x, xprectangle.y, xprectangle.w, xprectangle.h)
     love.graphics.setColor(COLORS.white)
     love.graphics.rectangle("line", xprectangle.x-1,xprectangle.y-1, (player.maxxp * 1.5) +2,xprectangle.h+2)
     love.graphics.setFont(FONT.f8)
-    love.graphics.print("XP", 6,72)
+    love.graphics.print("XP", 6,73)
 
 
-    
-    local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
-    local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
-    local b = (rectangle.w * COLORS.green[3] + (200 - rectangle.w) * COLORS.red[3]) / 200
+    if player.hpbarvisible then
+        local r = (rectangle.w * COLORS.green[1] + (200 - rectangle.w) * COLORS.red[1]) / 200
+        local g = (rectangle.w * COLORS.green[2] + (200 - rectangle.w) * COLORS.red[2]) / 200
+        local b = (rectangle.w * COLORS.green[3] + (200 - rectangle.w) * COLORS.red[3]) / 200
 
 
-    love.graphics.setColor(r,g,b,1)
-    love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
-    love.graphics.setColor(COLORS.white)
+        love.graphics.setColor(r,g,b,1)
+        love.graphics.rectangle("fill", rectangle.x, rectangle.y, rectangle.w, rectangle.h)
+        love.graphics.setColor(COLORS.white)
 
-    love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * (12 - player.hplevel*2)) +2,rectangle.h+2)
+        love.graphics.rectangle("line", rectangle.x-1,rectangle.y-1, (player.maxhp * (12 - player.hplevel*2)) +2,rectangle.h+2)
 
-    love.graphics.setFont(FONT.f16)
-    love.graphics.print("HP", 6,6)
+        love.graphics.setFont(FONT.f16)
+        love.graphics.print("HP", 6,6)
+    end
 
     love.graphics.setFont(FONT.f16)
     love.graphics.print("AMMO", 410, rectangle.y)
@@ -978,7 +1124,8 @@ function love.load()
     IMAGES = {
         titlescreen = love.graphics.newImage("assets/titlescreen.png"),
         godeeper = love.graphics.newImage("assets/godeeper.png"),
-        gameover = love.graphics.newImage("assets/gameover.png")
+        gameover = love.graphics.newImage("assets/gameover.png"),
+        win = love.graphics.newImage('assets/winscreen.png')
     }
     CARDS = {}
     table.insert(CARDS, MaxHpUp(0,0))
@@ -1059,6 +1206,29 @@ function love.update(dt)
                 ENEMIES[i]:move(dt)
                 ENEMIES[i]:update(dt)
         end
+
+     --   print(player.hpflashing, player.hp, player.hp / 3.5)
+
+     if player.hp >= player.maxhp / 3.5 then
+        player.hpbarvisible = true
+        player.hpflashing = false
+    end
+
+    if player.hp < player.maxhp / 3.5 and player.hpflashing ~= true then 
+        player.hpflashing = true
+        Timer.every(0.3, function()
+            if player.hpbarvisible then
+             player.hpbarvisible = false 
+            else
+                player.hpbarvisible = true
+            end   
+        end)  
+    end
+
+        
+
+    
+
     end
 
     if gameState.state == gameState.states.trans then
@@ -1373,6 +1543,10 @@ function love.draw()
         player.camera:detach()
     end
 
+    if gameState.state == gameState.states.win then
+        love.graphics.draw(IMAGES.win,0,0)
+    end
+
 
 
 
@@ -1397,7 +1571,7 @@ function love.mousepressed(x, y, button, istouch)
       
     end
     if gameState.state == gameState.states.game and button == 2 then
-        local instance = SOUNDS.special:play()
+     
         player:special()
     end
 

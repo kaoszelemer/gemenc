@@ -26,7 +26,7 @@ local function bulletFilter(item, other)
         
         return nil
     
-    elseif other.type == 1 or other.type == "enemy" then
+    elseif other.type == 1 or other.type == "enemy" or other.type == "egg" then
 
         return "touch"
     else return nil
@@ -64,7 +64,7 @@ function Bullet:update(dt)
         local _, _, cols, len = mapWorld:move(self, self.x, self.y, bulletFilter)
         for i = 1, #cols do
        --    print("type: "..cols[i].other.type)
-            if cols[i].other.type == "enemy" and not cols[i].other.hitinvi then
+            if cols[i].other.type == "enemy" or cols[i].other.type == "egg" and not cols[i].other.hitinvi then
                 cols[i].other.hp = cols[i].other.hp - 1
             --   
             if cols[i].other.name == "bossspider" and cols[i].other.hp % 2 == 0 then

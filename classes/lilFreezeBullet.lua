@@ -30,7 +30,7 @@ end
 local function FreezeBulletFilter(item, other)
   --  if item.parent:instanceOf(Enemy) then return nil end
     
-    if other.type == 1 or other.type == 2 then
+    if other.type == 1 or other.type == 2  or other.type == "egg" then
        -- print("tacs")
         return "touch"
     else 
@@ -77,7 +77,21 @@ self.y = self.y + self.vely * dt
       
 
         for i = 1, #cols do
-            print(cols[i].other.type)
+       
+            if cols[i].other.type == "egg" then
+                cols[i].other:kill(cols[i].other)
+                self.velx, self.vely = 0,0
+                self.visible = false
+                self.removed = true
+                Timer.after(self.parent.rof, function()   
+                 
+                       self.parent.EnemyBulletshot = false
+                     
+               end)
+             --   print(self, "  removed cos hit ")
+                mapWorld:remove(self)
+                return
+            end
             --   print(    cols[i].other.EnemyBulletshot)
             if cols[i].other.type == 2 and not player.shielded then
                 self.velx, self.vely = 0,0

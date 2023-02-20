@@ -36,7 +36,7 @@ end
 local function SpecialBulletFilter(item, other)
   --  if item.parent:instanceOf(Enemy) then return nil end
     
-    if other.type == "enemy" then
+    if other.type == "enemy"  or other.type == "egg" then
        -- print("tacs")
         return "touch"
     elseif other.type == 1 then
@@ -118,7 +118,7 @@ function SpecialBullet:update(dt)
             
          --   print(cols[i].other.type)
           --  print(cols[i].other.type, self.removed)
-          if cols[i].other.type == "enemy" and not cols[i].other.hitinvi then
+          if cols[i].other.type == "enemy" or cols[i].other.type == "egg" and not cols[i].other.hitinvi then
             cols[i].other.hp = cols[i].other.hp - 3
         --   
             

@@ -213,12 +213,21 @@ function Character:kill(pl)
     end
   end)
 
-  if self.name == "spider" or self.name == "bossspider" then
+  if self.name == "spider" or self.name == "bossspider" or self.name == "alienegg" or self.name == "alienspider" then
     local instance = SOUNDS.biodeath:play()
-  elseif self.name == "freezetower" or self.name == "commando" or self.name == "soldier" or self.name == "sniper" then
+  elseif self.name == "commando" or self.name == "soldier" or self.name == "sniper" then
     local instance = SOUNDS.deathscream:play()
   else
     local instance = SOUNDS.explo:play()
+  end
+
+  if self.name == "alienegg" then
+    local num = love.math.random(1,3)
+
+    for i = 1, num do
+      GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+      table.insert(ENEMIES, AlienSpider(self.x + 4, self.y + 4))
+    end
   end
  
 
@@ -249,7 +258,8 @@ function Character:kill(pl)
 
     GLOBALS.numberofenemies = GLOBALS.numberofenemies - 1
     print(GLOBALS.numberofenemies)
-    if GLOBALS.bossonwhichlevel then
+
+    if LEVEL == GLOBALS.bossonwhichlevel then
       if GLOBALS.numberofenemies <= 1 then
         spawnStairs()
       end

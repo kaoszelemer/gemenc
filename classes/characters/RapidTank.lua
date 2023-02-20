@@ -1,31 +1,31 @@
-local BossRobot = Character:extend('BossRobot')
+local RapidTank = Character:extend('RapidTank')
 
 
 
-function BossRobot:init(x, y)
+function RapidTank:init(x, y)
 
     Character.init(
     self,
     x,
     y,
-    64,
-    64,
+    8,
+    8,
     {
-        name = "bossrobot",
+        name = "abi",
         x = x,
         y = y,
-        w = 64,
-        h = 64
+        w = 16,
+        h = 16
     },
-    "bossrobot",
-    love.graphics.newImage("assets/bossrobot.png"),
+    "rapidtank",
+    love.graphics.newImage("assets/rapidtank.png"),
     0,
     0,
-    50, --speed
+    love.math.random(8,16),
     1,
     "enemy" ,-- type
-    0.4, --rof
-    300 --hp
+    1, --rof
+    3 --hp
 )
 
 
@@ -37,12 +37,10 @@ function BossRobot:init(x, y)
     self.ty = math.floor(self.y / tileH)
     self.ox = self.x
     self.direction = 1
-    self.walkdistance = 200
+    self.walkdistance = love.math.random(10,15)
     self.angle = 0
-    self.munition = 8
-    self.simplemun = 5
-    self.maxhp = self.hp
-    self.xp = 20
+    self.xp = 1
+
     self.particleImage = love.graphics.newImage("assets/exploparticle.png")
     self.particleSystem = love.graphics.newParticleSystem(self.particleImage, 32)
     self.particleSystem:setParticleLifetime(0.8, 1.8)
@@ -53,29 +51,15 @@ function BossRobot:init(x, y)
     self.particleSystem:start()
 
     self.explocoordinates = {
-        {x = love.math.random(10,40), y = love.math.random(0,40)},
-        {x = love.math.random(0,20), y = love.math.random(0,20)},
-        {x = love.math.random(-43, -54), y = love.math.random(-11, -17)},
-        {x = love.math.random(-8, -17), y = love.math.random(-4, -30)},
-        {x = love.math.random(0,60), y = love.math.random(40,80)},
-        {x = love.math.random(0,52), y = love.math.random(0,64)},
-        {x = love.math.random(0, 64), y = love.math.random(-40, -64)},
-        {x = love.math.random(-40, -64), y = love.math.random(-16, -28)},
-        {x = love.math.random(5,7), y = love.math.random(3,62)},
-        {x = love.math.random(23,29), y = love.math.random(28,32)},
-        {x = love.math.random(-64, -0), y = love.math.random(-64, -0)},
-        {x = love.math.random(-48, 12), y = love.math.random(-48, -16)},
-        {x = love.math.random(22,43), y = love.math.random(24,78)},
-        {x = love.math.random(32,64), y = love.math.random(-32,32)},
-        {x = love.math.random(-23, -28), y = love.math.random(-4, -8)},
-        {x = love.math.random(-4, 60), y = love.math.random(45, 60)}
+        {x = love.math.random(4,8), y = love.math.random(0,8)},
+        {x = love.math.random(0,12), y = love.math.random(0,12)},
+        {x = love.math.random(4, 8), y = love.math.random(4, 8)},
+        {x = love.math.random(4, 4), y = love.math.random(4, 4)}
   
        }
   
        shuffleTable(self.explocoordinates)
        shuffleTableXY(self.explocoordinates)
-
-       self.displayName = "SX7"
 end
 
 
@@ -91,9 +75,9 @@ end
 
 
 
-function BossRobot:update(dt)
-    local distance = math.sqrt((player.x - (self.x + self.colliders.w / 2))^2 + (player.y - (self.y + self.colliders.h /2))^2)
-    --print(distance)
+function RapidTank:update(dt)
+    local distance = math.sqrt((player.x - self.x)^2 + (player.y - self.y)^2)
+
     self.tx = math.floor(self.x / tileW)
     self.ty = math.floor(self.y / tileH)
 
@@ -117,17 +101,13 @@ function BossRobot:update(dt)
     end 
 
 
-    if distance < 150 and not self.isDead then
-        for i = 1, 8 do
-   
-            self:action(x, y)
-        end
+    if distance < 60 and not self.isDead then
+        self:action(x, y)
     end
 
     if self.isDead then
         self.particleSystem:update(dt)
     end
-
     if self.x < tileW +2 then
         self.direction = -self.direction
         self.x = tileW+2
@@ -144,9 +124,11 @@ function BossRobot:update(dt)
         self.direction = -self.direction
         self.y = ((maxY) * tileH)+4
       end 
+
 end
 
-function BossRobot:move(dt)
+function RapidTank:move(dt)
+
 
 
   if not self.isDead then
@@ -180,28 +162,13 @@ function BossRobot:move(dt)
     end
 end
 
-function BossRobot:action(x,y)
+function RapidTank:action(x,y)
 
-
-      
-        if self.EnemyBulletshot ~= true and self.munition > 0 then
+   
+        if self.EnemyBulletshot ~= true then
             local instance = SOUNDS.drilltank:play()
-            for i = 1, 8 do
-                self.munition = self.munition - 1
-                table.insert(BULLETS, TankBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
-            end
+            table.insert(BULLETS, TankBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, 1))
             self.EnemyBulletshot = true
-       
-
-        end
-
-        if self.SimpleEnemyBulletshot ~= true and self.hp < self.maxhp / 2 then
-            local instance = SOUNDS.bullet:play()
-            Timer.every(0.3, function ()
-                self.simplemun = self.simplemun - 1
-                table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
-            end, 5)
-            self.SimpleEnemyBulletshot = true
         end
         
       
@@ -210,4 +177,4 @@ function BossRobot:action(x,y)
 end
 
 
-return BossRobot
+return RapidTank
