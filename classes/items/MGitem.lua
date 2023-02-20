@@ -64,7 +64,8 @@ function MGItem:action()
       --  print(self.tilex, self.tiley)
      
        -- print("itt")
-        
+       GLOBALS.numberofitems = GLOBALS.numberofitems - 1
+       player:updateProgress()
         table.insert(INVENTORY, MachineGun())
         print(#INVENTORY)
 

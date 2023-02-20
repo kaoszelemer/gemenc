@@ -18,6 +18,8 @@ GLOBALS = {
     drawenemycolliders = false,
     timebetweenspecialshots = 5,
     numberofenemies = 0,
+    numberofitems = 0,
+    numberofvisibletiles = 0,
     howmanylevelstoskip = 1,
 --    startonwhichlevel = 11
 }
@@ -288,21 +290,23 @@ local function spawnItems(mpnum, bunum)
         if MAP[tx][ty].type == 0 and not MAP[tx][ty].occupied then
             table.insert(ITEMS, Ammo(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
            -- MAP[tx][ty].type = 2
+           GLOBALS.numberofitems = GLOBALS.numberofitems + 1
             MAP[tx][ty].occupied = true
         end
     end
 
     if LEVEL == GLOBALS.drillonwhichlevel then
-     
+        GLOBALS.numberofitems = GLOBALS.numberofitems + 1
         table.insert(ITEMS, DrillItem(player.x + 8,player.y + 8))
     
     end
     if LEVEL == GLOBALS.mgonwhichlevel then
-     
+        GLOBALS.numberofitems = GLOBALS.numberofitems + 1
         table.insert(ITEMS, MGitem(player.x + 8,player.y + 8))
     
     end
     if LEVEL == GLOBALS.sgonwhichlevel then
+        GLOBALS.numberofitems = GLOBALS.numberofitems + 1
         table.insert(ITEMS, SGitem(player.x + 8,player.y + 8))
     end
 
@@ -312,6 +316,7 @@ local function spawnItems(mpnum, bunum)
     local ty = iy / tileH
 
     if MAP[tx][ty].type == 0  then
+        GLOBALS.numberofitems = GLOBALS.numberofitems + 1
         table.insert(ITEMS, Shield(ix + tileW / 2,iy + tileW/ 2))
        -- MAP[tx][ty].type = 2
         MAP[tx][ty].occupied = true
@@ -321,7 +326,8 @@ local function spawnItems(mpnum, bunum)
     local tx = ix / tileW
     local ty = iy / tileH
     if MAP[tx][ty].type == 0 then
-        table.insert(ITEMS, SpeedUp(ix + tileW / 2,iy + tileW/ 2))
+        GLOBALS.numberofitems = GLOBALS.numberofitems + 1
+        table.insert(ITEMS, SpeedUp(ix + tileW / 2 - 8,iy + tileW/ 2 - 8))
        -- MAP[tx][ty].type = 2
         MAP[tx][ty].occupied = true
     end
@@ -741,13 +747,14 @@ function changeLevel()
     MUSICS[2]:resume()
     LEVEL = LEVEL + GLOBALS.howmanylevelstoskip
     GLOBALS.numberofenemies = 0
+    GLOBALS.numberofitems = 0
+ 
 
     MAP = nil
    MAP = {}
    ENEMIES = {}
    ITEMS = {}
    BLOODSPLATTERS = {}
-  
    MAP.walltiles = {}
    MAP.emptytiles = {}
    MAP.itemtiles = {}
@@ -812,6 +819,9 @@ function changeLevel()
         spawnEnemies(MAP.maxenemy)
 
         player.fov=ROT.FOV.Precise:new(lightCalbak)
+        player.progress = 0
+        player.totalprogress = GLOBALS.numberofenemies + GLOBALS.numberofitems
+  
     end
   
 
@@ -867,15 +877,46 @@ local function drawGUI()
     love.graphics.print("HP", 6,6)
 
     love.graphics.setFont(FONT.f16)
-    love.graphics.print("AMMO", (rectangle.x + (player.maxhp*12)) + 50, rectangle.y)
+    love.graphics.print("AMMO", 410, rectangle.y)
     love.graphics.setFont(FONT.f24)
-    love.graphics.print(player.munition, (rectangle.x + (player.maxhp*12)) + 150, rectangle.y)
+    love.graphics.print(player.munition, 510, rectangle.y)
 
 
     love.graphics.setFont(FONT.f16)
-    love.graphics.print("FLOOR", (rectangle.x + (player.maxhp*12)) + 300, rectangle.y)
+    love.graphics.print("FLOOR", 590, rectangle.y)
     love.graphics.setFont(FONT.f24)
-    love.graphics.print("-"..LEVEL, (rectangle.x + (player.maxhp*12)) + 400, rectangle.y)
+    love.graphics.print("-"..LEVEL, 690, rectangle.y)
+
+    if LEVEL % GLOBALS.bossonwhichlevel ~= 0 then
+
+        local lineWidth = 2
+        local radius = 20
+        local x,y = 770, 30
+        -- Redraw the progress bar
+        love.graphics.setLineWidth(lineWidth)
+
+        -- Draw the empty circle
+        love.graphics.setColor(COLORS.white)
+        love.graphics.circle("line", x, y, radius)
+
+        -- Draw the filled portion of the circle
+        love.graphics.setColor(COLORS.lightgreen)
+        love.graphics.arc("fill", x, y, radius, -math.pi / 2, -math.pi / 2 + player.progress * 2 * math.pi)
+
+        -- Apply a mask to the filled portion of the circle to make it circular
+        love.graphics.stencil(function()
+            love.graphics.circle("fill", x, y, radius)
+        end, "replace", 1)
+        love.graphics.setStencilTest("equal", 1)
+        love.graphics.setColor(0, 0, 0, 0.1)
+        love.graphics.rectangle("fill", x - radius, y - radius, radius * 2, radius * 2)
+        love.graphics.setStencilTest()
+            
+        love.graphics.setColor(COLORS.white)
+        love.graphics.setFont(FONT.f16)
+        love.graphics.print("%", x-10, y-10)
+
+    end
 
     
 end
@@ -891,6 +932,7 @@ function love.load()
 
     COLORS = {
        green = {42/255, 88/255, 79/255},
+       lightgreen = {116/255,163/255,63/255},
         red = {198/255, 80/255, 90/255},
         sniperred = {198/255, 80/255, 90/255, 0.3},
         white = {252/255, 1, 192/255},
@@ -967,6 +1009,9 @@ function love.load()
         SOUNDS.menu, SOUNDS.game, SOUNDS.boss
     } 
     MUSICS[1]:play()
+    player.progress = 0
+    player.totalprogress = GLOBALS.numberofenemies + GLOBALS.numberofitems
+    print(player.totalprogress)
 end
 
 function love.update(dt)

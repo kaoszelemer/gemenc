@@ -183,6 +183,7 @@ function Character:action()
 end
 
 function Character:kill(pl)
+  player:updateProgress()
   if pl == "pl" then
    
       gameState:changeState(gameState.states.gameover)

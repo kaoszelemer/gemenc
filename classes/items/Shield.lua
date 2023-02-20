@@ -44,6 +44,8 @@ function Shield:action()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true
+        GLOBALS.numberofitems = GLOBALS.numberofitems - 1
+        player:updateProgress()
         local instance = SOUNDS.pickup:play()
         Timer.after(1, function ()
             self.drawValueOnMap = false
@@ -54,6 +56,7 @@ function Shield:action()
             end
         end)
       player.shielded = true
+
       Timer.after(10, function ()
         player.shielded = false
      end)

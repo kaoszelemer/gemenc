@@ -44,6 +44,8 @@ function SpeedUp:action()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true
+        GLOBALS.numberofitems = GLOBALS.numberofitems - 1
+        player:updateProgress()
         local instance = SOUNDS.pickup:play()
         Timer.after(1, function ()
             self.drawValueOnMap = false

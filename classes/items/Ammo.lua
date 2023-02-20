@@ -70,6 +70,8 @@ function Ammo:action()
                 end
             end
         end)
+        GLOBALS.numberofitems = GLOBALS.numberofitems - 1
+        player:updateProgress()
         player.munition = player.munition + self.ammoup
       --  print(self.tilex, self.tiley)
         MAP[self.tilex][self.tiley].type = 0

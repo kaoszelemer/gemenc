@@ -81,6 +81,9 @@ self.ty = math.floor(self.y / tileH)
   self.maxxp = self.xptolevelup[self.level]
   self.xp = 0
   
+
+
+  
 end
 
 local function playerFilter(item, other)
@@ -121,6 +124,7 @@ function Player:levelup()
     self.cards[2].y = 240
     GUIWorld:add(self.cards[1], self.cards[1].x, self.cards[1].y, self.cards[1].w, self.cards[1].h)
     GUIWorld:add(self.cards[2], self.cards[2].x, self.cards[2].y, self.cards[2].w, self.cards[2].h)
+ 
 
 end
 
@@ -184,6 +188,18 @@ function Player:physics(dt)
 
 	self.velx = self.velx * (1 - math.min(dt*self.friction, 1))
 	self.vely = self.vely * (1 - math.min(dt*self.friction, 1))
+
+end
+
+function Player:updateProgress()
+
+  
+
+    if player.totalprogress ~= nil and player.totalprogress > 0 then
+        player.progress = 1 - (GLOBALS.numberofenemies + GLOBALS.numberofitems) / player.totalprogress
+    else
+        player.progress = 0
+    end
 
 end
 
