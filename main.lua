@@ -343,11 +343,11 @@ local function spawnEnemies(num)
             table.insert(ENEMIES, BossSpider(ix - 32,iy - 32))
             return
         end
-        if LEVEL == GLOBALS.bossonwhichlevel then
+        if LEVEL == GLOBALS.bossonwhichlevel * 3 then
             table.insert(ENEMIES, BossRefrig(ix - 32,iy - 32))
             return
         end
-        if LEVEL == GLOBALS.bossonwhichlevel * 3 then
+        if LEVEL == GLOBALS.bossonwhichlevel then
             Timer.every(1, function ()
                 local index = love.math.random(4,#MAP.emptytiles)
                 local ix = MAP.emptytiles[index].x * tileW
@@ -498,6 +498,8 @@ local function spawnEnemies(num)
         end
     end
 
+  
+
     if LEVEL < GLOBALS.bossonwhichlevel * 2 then 
 
         for i = num/4, num do
@@ -542,7 +544,7 @@ local function spawnEnemies(num)
             local ty = iy / tileH
             if MAP[tx][ty].type == 0 then
                 table.insert(ENEMIES, Tank(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
-                table.remove(MAP.emptytiles, index)
+              
                 GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
             end
         end
@@ -556,7 +558,7 @@ local function spawnEnemies(num)
         local ty = iy / tileH
         if MAP[tx][ty].type == 0 then
             table.insert(ENEMIES, Spider(ix + tileW / 2 - 4, (iy + tileW/ 2) - 4))
-            table.remove(MAP.emptytiles, index)
+       
             GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
         end
     end

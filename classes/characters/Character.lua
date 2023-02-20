@@ -202,7 +202,7 @@ function Character:kill(pl)
   Timer.after(0.4, function() 
     self.particleSystem:stop()
     if self.name ~= "Turret" and self.name ~="Tank" and self.name ~= "bossrobot" and self.name ~= "bossrefrig" and self.name ~= "freezetower" then
-      self:addBloodSplatters(self.x +4, self.y+4, 16, 0)
+      self:addBloodSplatters(self.x +4, self.y+4, 8, 0)
     end
     if self.name == "bossspider" then 
       for i = 1, #self.explocoordinates do
@@ -219,7 +219,7 @@ function Character:kill(pl)
     player.sp = player.sp + 1
   end
 
-  if player.xp == player.maxxp then
+  if player.xp >= player.maxxp then
     player:levelup()
   
   elseif player.xp < player.maxxp then
@@ -260,7 +260,7 @@ function  Character:update(dt)
     end
     if player.standinblood then
     
-      player:addBloodPrints(player.x, player.y)
+   --   player:addBloodPrints(player.x, player.y)
      
     end
 

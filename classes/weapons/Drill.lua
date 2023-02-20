@@ -19,7 +19,7 @@ end
 
 function Drill:shoot(x, y)
 
-
+        player.munition = player.munition - 1
         table.insert(BULLETS, DrillBullet(self.x,self.y, x, y, player))
    
   

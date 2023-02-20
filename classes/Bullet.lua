@@ -17,7 +17,7 @@ function Bullet:init(x, y, targetx, targety, parent, w, h, speed, velx, vely, vi
     self.removed = false
   --  print(self, " added")
     mapWorld:add(self, self.x, self.y, self.w, self.h)
-    
+
 
 end
 
@@ -93,7 +93,7 @@ function Bullet:update(dt)
                     mapWorld:remove(self)
                     cols[i].other.hitinvi = true
                     cols[i].other.particleSystem:start()
-                    Timer.after(0.1, function() 
+                    Timer.after(0.3, function() 
                         cols[i].other.hitinvi = false
                         cols[i].other.showhitinvi = false
                     end)
