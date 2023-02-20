@@ -19,8 +19,8 @@ function Spider:init(x, y)
     },
     "spider",
     love.graphics.newImage("assets/spider.png"),
-    love.math.random(40,60),
-    love.math.random(40,60),
+    love.math.random(30,70),
+    love.math.random(30,70),
     20,
     1,
     "enemy" ,-- type
@@ -50,8 +50,8 @@ function Spider:init(x, y)
     self.bloodSplatterImage = love.graphics.newImage("assets/biobloodsplatter.png")
 
     if LEVEL == GLOBALS.bossonwhichlevel * 2 then
-       self.velx = 80
-       self.vely = 80
+       self.velx = love.math.random(50,80)
+       self.vely = love.math.random(50,80)
     end
 
 end
@@ -87,7 +87,7 @@ function Spider:update(dt)
         distance = 0
     end
 
-    if distance < 45 and not self.isDead then
+    if distance < 65 and not self.isDead then
         self.canMove = true
     else
         
