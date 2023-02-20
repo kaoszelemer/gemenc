@@ -58,6 +58,7 @@ end
 function Ammo:action()
 
     if not self.pickedup then
+        local instance = SOUNDS.pickup:play()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true

@@ -110,6 +110,7 @@ function TankBullet:update(dt)
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
+                        local instance = SOUNDS.hurt:play()
                         player.hp = player.hp - 2
                     end
                 else

@@ -96,6 +96,7 @@ function EnemyBullet:update(dt)
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
+                        local instance = SOUNDS.hurt:play()
                         if self.parent.name ~= "sniper" then
                             player.hp = player.hp - 1
                         else

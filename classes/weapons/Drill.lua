@@ -18,7 +18,8 @@ end
 
 
 function Drill:shoot(x, y)
-
+    
+        local instance = SOUNDS.drilltank:play()
         player.munition = player.munition - 1
         table.insert(BULLETS, DrillBullet(self.x,self.y, x, y, player))
    

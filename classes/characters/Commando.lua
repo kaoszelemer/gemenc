@@ -192,6 +192,7 @@ function Commando:action(x,y)
 
    
         if self.EnemyBulletshot ~= true and self.munition == 3 then
+            local instance = SOUNDS.bullet:play()
             self.munition = self.munition - 3
          
                 table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, 0))

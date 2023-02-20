@@ -84,6 +84,7 @@ self.y = self.y + self.vely * dt
                 player.isHit = true
                 if player.hp > 0 then
                     if player.hitinvi == false then
+                        local instance = SOUNDS.hurt:play()
                         player.hp = player.hp - 1
                         if not player.frozen then
                             player.frozen = true

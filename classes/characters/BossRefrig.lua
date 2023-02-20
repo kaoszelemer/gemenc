@@ -183,6 +183,7 @@ function BossRefrig:action(x,y)
    
       
         if self.EnemyBulletshot ~= true and self.munition == 16 then
+            local instance = SOUNDS.freezebullet:play()
             for i = 1, 16 do
                 self.munition = self.munition - 1
                 table.insert(BULLETS, FreezeBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
@@ -193,6 +194,7 @@ function BossRefrig:action(x,y)
         end
 
         if self.SimpleEnemyBulletshot ~= true and self.simplemun >= 8 then
+            local instance = SOUNDS.bullet:play()
             Timer.every(0.3, function ()
                 self.simplemun = self.simplemun - 1
                 table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))

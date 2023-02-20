@@ -19,8 +19,8 @@ function Spider:init(x, y)
     },
     "spider",
     love.graphics.newImage("assets/spider.png"),
-    50,
-    50,
+    love.math.random(40,60),
+    love.math.random(40,60),
     20,
     1,
     "enemy" ,-- type

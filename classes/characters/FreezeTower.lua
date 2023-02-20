@@ -121,7 +121,7 @@ function FreezeTower:action(x,y)
 
    
         if self.EnemyBulletshot ~= true then
-        
+            local instance = SOUNDS.freezebullet:play()
             table.insert(BULLETS, lilFreezeBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self))
             self.EnemyBulletshot = true
         end

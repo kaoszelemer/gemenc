@@ -200,6 +200,7 @@ function Sniper:action(x,y)
             self.drawMarkerline = false
         end)
         Timer.after(3.4, function ()
+            local instance = SOUNDS.drilltank:play()
             table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, 0))
         end)
         self.EnemyBulletshot = true

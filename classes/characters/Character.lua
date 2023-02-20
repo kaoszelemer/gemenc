@@ -211,6 +211,14 @@ function Character:kill(pl)
       end
     end
   end)
+
+  if self.name == "spider" or self.name == "bossspider" then
+    local instance = SOUNDS.biodeath:play()
+  elseif self.name == "freezetower" or self.name == "commando" or self.name == "soldier" or self.name == "sniper" then
+    local instance = SOUNDS.deathscream:play()
+  else
+    local instance = SOUNDS.explo:play()
+  end
  
 
   self.isDead = true

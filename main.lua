@@ -6,6 +6,7 @@ Class = require('lib.30log')
 Camera = require('lib.humpcam')
 Timer = require('lib.humptimer')
 Luastar = require('lib.luastar')
+Ripple = require('lib.ripple')
 --GLOBALS
 
 GLOBALS = {
@@ -28,7 +29,7 @@ local shadowCanvas
 MOUSEX, MOUSEY = 0, 0
 maxX, maxY = 16, 16
 tileW, tileH = 32,32
-
+SOUNDS = require('sounds')
 
 --requires
 Character = require('classes.characters.Character')
@@ -736,6 +737,8 @@ end
 
 
 function changeLevel()
+    MUSICS[3]:stop()
+    MUSICS[2]:resume()
     LEVEL = LEVEL + GLOBALS.howmanylevelstoskip
     GLOBALS.numberofenemies = 0
 
@@ -766,6 +769,8 @@ function changeLevel()
  
 
    if LEVEL % GLOBALS.bossonwhichlevel == 0 then
+    MUSICS[2]:pause()
+    MUSICS[3]:play()
     mapWorld = bump.newWorld(64)
     createBossMap()
     createMapTransitionVariables()
@@ -958,7 +963,10 @@ function love.load()
 
 
     INVENTORY[1] = Pistol()
-    
+    MUSICS = {
+        SOUNDS.menu, SOUNDS.game, SOUNDS.boss
+    } 
+    MUSICS[1]:play()
 end
 
 function love.update(dt)
@@ -1037,6 +1045,7 @@ function love.update(dt)
     if not player.countback and gameState.state == gameState.states.countback then
         player.countback = true
         Timer.every(1, function ()
+            local instance = SOUNDS.blip:play()
             GLOBALS.howlongbeforestart = GLOBALS.howlongbeforestart - 1 
         end, 3)
         Timer.after(3, function ()
@@ -1307,23 +1316,27 @@ end
 function love.mousepressed(x, y, button, istouch)
 
     if gameState.state == gameState.states.starting then
+        MUSICS[1]:stop()
+        MUSICS[2]:play()
         gameState:changeState(gameState.states.countback)
     end
 
 
     if gameState.state == gameState.states.game and INVENTORY[1]:instanceOf(MachineGun) ~= true then
-        if button == 1 then 
+        if button == 1 then
             player:action(MOUSEX,MOUSEY)
         end
       
     end
     if gameState.state == gameState.states.game and button == 2 then
+        local instance = SOUNDS.special:play()
         player:special()
     end
 
     if gameState.state == gameState.states.levelup and button == 1 then
         local items, len = GUIWorld:queryPoint(MOUSEX,MOUSEY)
         if len == 1 then
+            local instance = SOUNDS.blip:play()
             for i = 1, len do
                 items[i].action()
             end
@@ -1340,7 +1353,8 @@ function love.mousepressed(x, y, button, istouch)
 
     if gameState.state == gameState.states.map and player.onMap == true then
         if key == "tab" then
-      
+            MUSICS[1]:stop()
+            MUSICS[2]:resume()
             Timer.after(0.5, function ()
                  player.onMap = false
             end)
@@ -1354,6 +1368,8 @@ function love.mousepressed(x, y, button, istouch)
     
     if gameState.state == gameState.states.game and player.onMap ~= true then
             if key == "tab" then
+                MUSICS[2]:pause()
+                MUSICS[1]:play()
            player.originalcamscale = player.camera.scale
                 player.camera.scale = 1
             gameState:changeState(gameState.states.map)
@@ -1365,7 +1381,8 @@ function love.mousepressed(x, y, button, istouch)
     end
     if gameState.state == gameState.states.pause and player.onPause == true then
         if key == "p"  or key == "escape" then
-      
+            MUSICS[1]:stop()
+            MUSICS[2]:resume()
             Timer.after(0.5, function ()
                  player.onPause = false
             end)
@@ -1379,7 +1396,8 @@ function love.mousepressed(x, y, button, istouch)
     
     if gameState.state == gameState.states.game and player.onPause ~= true then
             if key == "p" or key == "escape" then
-         
+                MUSICS[2]:pause()
+                MUSICS[1]:play()
             gameState:changeState(gameState.states.pause)
             
             player.onPause = true

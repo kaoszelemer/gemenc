@@ -45,6 +45,7 @@ function Medpack:action()
 
     if not self.pickedup then
         if player.hp < player.maxhp then
+            local instance = SOUNDS.pickup:play()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true

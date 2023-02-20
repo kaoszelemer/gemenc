@@ -44,6 +44,7 @@ function Shield:action()
         self.visible = false
         self.pickedup = true
         self.drawValueOnMap = true
+        local instance = SOUNDS.pickup:play()
         Timer.after(1, function ()
             self.drawValueOnMap = false
             for i = 1, #ITEMS do

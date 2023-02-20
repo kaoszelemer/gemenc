@@ -17,7 +17,7 @@ end
 
 
 function MachineGun:shoot(x, y)
-
+        local instance = SOUNDS.bullet:play()
         player.munition = player.munition - 1
         table.insert(BULLETS, Bullet(self.x +4,self.y+4, x, y, player))
 

@@ -99,6 +99,7 @@ end
 function Player:levelup()
 
     gameState:changeState(gameState.states.levelup)
+    local instance = SOUNDS.lvlup:play()
     GUIWorld = bump.newWorld(64)
     self.cards = {}
     self.level = self.level + 1

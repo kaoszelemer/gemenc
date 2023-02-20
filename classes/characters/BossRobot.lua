@@ -183,6 +183,7 @@ function BossRobot:action(x,y)
 
       
         if self.EnemyBulletshot ~= true and self.munition > 0 then
+            local instance = SOUNDS.drilltank:play()
             for i = 1, 8 do
                 self.munition = self.munition - 1
                 table.insert(BULLETS, TankBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))
@@ -193,6 +194,7 @@ function BossRobot:action(x,y)
         end
 
         if self.SimpleEnemyBulletshot ~= true and self.hp < self.maxhp / 2 then
+            local instance = SOUNDS.bullet:play()
             Timer.every(0.3, function ()
                 self.simplemun = self.simplemun - 1
                 table.insert(BULLETS, EnemyBullet(self.x + self.colliders.w / 2,self.y + self.colliders.h / 2, player.x, player.y, self, i))

@@ -17,7 +17,7 @@ end
 
 
 function ShotGun:shoot(x, y)
-
+    local instance = SOUNDS.bullet:play()
     local angle = 45 -- in degrees
     local bullet_distance = 16
     if player.munition > 4 then
