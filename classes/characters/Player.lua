@@ -23,7 +23,7 @@ function Player:init(x, y)
     10,
     2, -- type
     0, -- rof aint used
-    60  --hp
+    30  --hp
 )
 self.tx = math.floor(self.x / tileW)
 self.ty = math.floor(self.y / tileH)
@@ -72,7 +72,7 @@ self.ty = math.floor(self.y / tileH)
 
   self.currentItem = 1
 
-  self.xptolevelup = {20, 50, 100, 120, 150, 200, 250, 250, 250, 250, 250}
+  self.xptolevelup = {20, 50, 100, 120, 150, 200, 250, 250, 250, 250, 250, 250,250,300,300,300,300,300,300,350}
 
 
   self.cards = {}

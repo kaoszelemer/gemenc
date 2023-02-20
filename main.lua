@@ -1577,7 +1577,11 @@ function love.mousepressed(x, y, button, istouch)
 
     if gameState.state == gameState.states.levelup and button == 1 then
         local items, len = GUIWorld:queryPoint(MOUSEX,MOUSEY)
-        if len == 1 then
+        Timer.after(0.3, function ()
+            player.selectinglevelup = true
+        end)
+        if len == 1 and player.selectinglevelup then
+            player.selectinglevelup = false
             local instance = SOUNDS.blip:play()
             for i = 1, len do
                 items[i].action()
