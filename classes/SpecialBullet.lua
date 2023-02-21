@@ -123,7 +123,7 @@ function SpecialBullet:update(dt)
         --   
             
             if cols[i].other.hp <= 0 then
-                if cols[i].other.name == "bossrobot" then
+                if cols[i].other.name == "bossrobot" or cols[i].other.name == "bossspider" or cols[i].other.name == "bossrefrig" then
                     screenShake(0.75, 3)
                     cols[i].other:kill("boss")
                 else

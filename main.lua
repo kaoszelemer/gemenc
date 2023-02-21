@@ -1074,6 +1074,7 @@ end
 
 
 function love.load()
+
     love.graphics.setDefaultFilter("nearest", "nearest") 
     shadowCanvas = love.graphics.newCanvas()
     love.mouse.setVisible(false)
