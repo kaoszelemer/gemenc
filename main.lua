@@ -76,6 +76,7 @@ TankBullet = require('classes.TankBullet')
 SpecialBullet = require('classes.SpecialBullet')
 FreezeBullet = require('classes.FreezeBullet')
 lilFreezeBullet = require('classes.lilFreezeBullet')
+SniperBullet = require('classes.SniperBullet')
 
 Card = require('classes.cards.Card')
 MaxHpUp = require('classes.cards.MaxHpUp')
@@ -393,7 +394,31 @@ local function spawnEnemies(num)
                     table.insert(ENEMIES, Commando(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
                    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
                 end
-            end, 40)
+            end, 10)
+            Timer.every(3, function ()
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, RapidTank(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                   GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end, 5)
+            Timer.every(5, function ()
+                local index = love.math.random(4,#MAP.emptytiles)
+                local ix = MAP.emptytiles[index].x * tileW
+                local iy = MAP.emptytiles[index].y * tileH
+                local tx = ix / tileW
+                local ty = iy / tileH
+                
+                if MAP[tx][ty].type == 0 then
+                    table.insert(ENEMIES, Sniper(ix + tileW / 2 - 4,iy + tileW/ 2 - 4))
+                   GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+                end
+            end, 5)
             Timer.after(23, function ()
                 Timer.every(1, function ()
                     local index = love.math.random(4,#MAP.emptytiles)
@@ -407,7 +432,7 @@ local function spawnEnemies(num)
                     --    table.remove(MAP.emptytiles, index)
                         GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
                     end
-                end, 20)
+                end, 10)
                 Timer.every(2, function ()
                     local index = love.math.random(4,#MAP.emptytiles)
                     local ix = MAP.emptytiles[index].x * tileW
@@ -753,19 +778,19 @@ end
 
 local function setDifficultyForMapAndLevel()
     if MAP.type == "Cellular" then
-        MAP.maxitem = {10, 24}
+        MAP.maxitem = {10, 25}
         MAP.maxenemy = 20 + (LEVEL * 3)
       end
       if MAP.type == "ellermaze" then
-        MAP.maxitem = {5, 8}
+        MAP.maxitem = {5, 10}
         MAP.maxenemy = 10 + (LEVEL * 3)
       end
       if MAP.type == "Uniform" then
-        MAP.maxitem = {20, 40}
-        MAP.maxenemy = 25 + (LEVEL * 3)
+        MAP.maxitem = {20, 25}
+        MAP.maxenemy = 25 + (LEVEL * 2)
       end
       if MAP.type == "IceyMaze" then
-        MAP.maxitem = {8, 12}
+        MAP.maxitem = {8, 15}
         MAP.maxenemy = 15 + (LEVEL * 3)
       end
 
@@ -1342,23 +1367,21 @@ function love.draw()
         end
 
         for i = 1, #ENEMIES do
-            local distance =  math.sqrt((player.x - ENEMIES[i].x) ^ 2 + (player.y - ENEMIES[i].y) ^ 2)
-           
-             local alpha = math.max(0, math.min(1, 1.7 - distance / 100))
-          
-            love.graphics.setColor(1,1,1,alpha)
             ENEMIES[i]:draw()
         end
 
-
+        
+        player:draw()
         
         love.graphics.draw(shadowCanvas, 0, 0)
-        love.graphics.setColor(1,1,1,1)
+   
+
         if INVENTORY ~= nil then
             INVENTORY[1]:draw()
         end
         
-        player:draw()
+   
+
 
         if gameState.state ~= gameState.states.levelup then
             love.graphics.draw(mouseReticleImage, MOUSEX, MOUSEY)
@@ -1549,7 +1572,8 @@ function love.draw()
     end
 
 
-
+--[[     sanyi = love.graphics.getStats()
+    print(sanyi.drawcalls) ]]
 
    
 

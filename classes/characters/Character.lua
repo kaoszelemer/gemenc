@@ -47,14 +47,6 @@ if self.name ~= "Turret" and self.name ~= "Tank" and self.name ~= "freezetower" 
       )
   end
 
-  for k, v in ipairs(bloodprints) do
-
-      love.graphics.setColor(1,1,1, v.alpha)
-      love.graphics.draw(self.bloodSplatterImage, v.x + 4, v.y + 4, 0.75, 0.75)
-      love.graphics.setColor(1,1,1, 1)
-    
-  end
-
 end
 
 

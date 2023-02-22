@@ -204,18 +204,10 @@ end
 
 function BossSpider:action(x,y)
 
-    if self.hp < self.maxhp / 2 then
-        for i = 1, 5 do
-            table.insert(ENEMIES, Spider(self.x,self.y))
-        end
-        
-    else
-        
-        for i = 1, 2 do
-            GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
-            table.insert(ENEMIES, Spider(self.x + i *9, self.y + i * 9))
-        end
-    end
+
+            table.insert(ENEMIES, AlienSpider(self.x+8,self.y+8))
+        --    GLOBALS.numberofenemies = GLOBALS.numberofenemies + 1
+   
 
  
       
